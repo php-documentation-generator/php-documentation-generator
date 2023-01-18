@@ -1,0 +1,15 @@
+#!/usr/bin/env php
+<?php
+
+use PDG\Kernel;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+
+require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+
+return function (array $context) {
+    $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+
+    // returning an "Application" makes the Runtime run a Console
+    // application instead of the HTTP Kernel
+    return new Application($kernel);
+};
