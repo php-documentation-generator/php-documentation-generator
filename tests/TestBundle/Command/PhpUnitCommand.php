@@ -1,6 +1,7 @@
 <?php
 
 namespace PDG\Tests\TestBundle\Command;
+
 use PHPUnit\Framework\TestSuite;
 
 class PhpUnitCommand extends \PHPUnit\TextUI\Command {

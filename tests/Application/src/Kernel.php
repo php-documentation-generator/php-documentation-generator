@@ -27,7 +27,7 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    public function __construct(string $environment, bool $debug, private string $guide = 'bla') {
+    public function __construct(string $environment, bool $debug, private string $guide = 'test') {
         parent::__construct($environment ?? 'test', $debug ?? true);
     }
 
@@ -43,6 +43,8 @@ class Kernel extends BaseKernel
                 ->autowire()
                 ->autoconfigure()
         ;
+
+        $services->load('PDG\Tests\TestBundle\\', '../../TestBundle/');
 
         $classes = get_declared_classes();
         $resources = [];
@@ -85,14 +87,14 @@ class Kernel extends BaseKernel
         $this->terminate($request, $response);
     }
 
-    public function getCacheDir(): string
-    {
-        return parent::getCacheDir() . $this->guide;
-    }
+//    public function getCacheDir(): string
+//    {
+//        return parent::getCacheDir() . $this->guide;
+//    }
 
     public function getDBDir(): string
     {
-        return $this->getProjectDir() . '/var/databases/' . $this->guide;
+        return $this->getProjectDir() . '/var/databases/test';
     }
 
     public function executeMigrations(string $direction = Direction::UP): void
@@ -103,7 +105,7 @@ class Kernel extends BaseKernel
             return;
         }
         $this->boot();
-        @mkdir('var/databases/' . $this->guide, recursive: true);
+        @mkdir('var/databases/test', recursive: true);
 
         foreach ($migrationClasses as $migrationClass) {
             if ("Doctrine\Migrations\AbstractMigration" !== (new ReflectionClass($migrationClass))->getParentClass()->getName()) {

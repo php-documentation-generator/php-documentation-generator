@@ -24,80 +24,77 @@
 # ...
 
 // api/src/Serializer/CustomItemNormalizer.php
-namespace App\Serializer {
-
-    use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-    use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-
-    final class CustomItemNormalizer implements NormalizerInterface, DenormalizerInterface
-    {
-        private NormalizerInterface&DenormalizerInterface $normalizer;
-
-        public function __construct(NormalizerInterface $normalizer)
-        {
-            if (!$normalizer instanceof DenormalizerInterface) {
-                throw new \InvalidArgumentException('The normalizer must implement the DenormalizerInterface');
-            }
-
-            $this->normalizer = $normalizer;
-        }
-
-        public function denormalize($data, $class, $format = null, array $context = [])
-        {
-            return $this->normalizer->denormalize($data, $class, $format, $context);
-        }
-
-        public function supportsDenormalization($data, $type, $format = null)
-        {
-            return $this->normalizer->supportsDenormalization($data, $type, $format);
-        }
-
-        public function normalize($object, $format = null, array $context = [])
-        {
-            return $this->normalizer->normalize($object, $format, $context);
-        }
-
-        public function supportsNormalization($data, $format = null)
-        {
-            return $this->normalizer->supportsNormalization($data, $format);
-        }
-    }
-}
+//namespace App\Serializer {
+//
+//    use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+//    use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+//
+//    final class CustomItemNormalizer implements NormalizerInterface, DenormalizerInterface
+//    {
+//        private NormalizerInterface&DenormalizerInterface $normalizer;
+//
+//        public function __construct(NormalizerInterface $normalizer)
+//        {
+//            if (!$normalizer instanceof DenormalizerInterface) {
+//                throw new \InvalidArgumentException('The normalizer must implement the DenormalizerInterface');
+//            }
+//
+//            $this->normalizer = $normalizer;
+//        }
+//
+//        public function denormalize($data, $class, $format = null, array $context = [])
+//        {
+//            return $this->normalizer->denormalize($data, $class, $format, $context);
+//        }
+//
+//        public function supportsDenormalization($data, $type, $format = null)
+//        {
+//            return $this->normalizer->supportsDenormalization($data, $type, $format);
+//        }
+//
+//        public function normalize($object, $format = null, array $context = [])
+//        {
+//            return $this->normalizer->normalize($object, $format, $context);
+//        }
+//
+//        public function supportsNormalization($data, $format = null)
+//        {
+//            return $this->normalizer->supportsNormalization($data, $format);
+//        }
+//    }
+//}
 
 
 //For example if you want to make the csv format work for even complex entities with a lot of hierarchy, you have to flatten or remove overly complex relations:
 
 
 // api/src/Serializer/CustomItemNormalizer.php
-namespace App\Serializer {
-
-    use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-    use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-
-    abstract class CustomCSVItemNormalizer implements NormalizerInterface, DenormalizerInterface
-    {
-        // ...
-
-        public function normalize($object, $format = null, array $context = [])
-        {
-            $result = $this->normalizer->normalize($object, $format, $context);
-
-            if ('csv' !== $format || !is_array($result)) {
-                return $result;
-            }
-
-            foreach ($result as $key => $value) {
-                if (is_array($value) && array_keys(array_keys($value)) === array_keys($value)) {
-                    unset($result[$key]);
-                }
-            }
-
-            return $result;
-        }
-
-        // ...
-    }
-}
+//namespace App\Serializer {
+//
+//    abstract class CustomCSVItemNormalizer implements NormalizerInterface, DenormalizerInterface
+//    {
+//        // ...
+//
+//        public function normalize($object, $format = null, array $context = [])
+//        {
+//            $result = $this->normalizer->normalize($object, $format, $context);
+//
+//            if ('csv' !== $format || !is_array($result)) {
+//                return $result;
+//            }
+//
+//            foreach ($result as $key => $value) {
+//                if (is_array($value) && array_keys(array_keys($value)) === array_keys($value)) {
+//                    unset($result[$key]);
+//                }
+//            }
+//
+//            return $result;
+//        }
+//
+//        // ...
+//    }
+//}
 
 
 //Contributing Support for New Formats

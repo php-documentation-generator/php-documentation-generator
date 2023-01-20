@@ -4,15 +4,22 @@
 use App\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
-if (!is_file(dirname(__DIR__).'/vendor/autoload_runtime.php')) {
+if (!is_file(dirname(__DIR__).'/../../vendor/autoload_runtime.php')) {
     throw new LogicException('Symfony Runtime is missing. Try running "composer require symfony/runtime".');
 }
 
-require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+require_once dirname(__DIR__).'/../../vendor/autoload_runtime.php';
 
-return function (array $context, string $guide = '') {
+return function (array $context) use ($argv) {
 
-    $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG'], $guide);
+    $guideName = '';
+    if (isset($argv[1], $argv[2]) && 'app:test:guide' === $argv[1]) {
+        require $argv[2];
+        $expl = explode('/', $argv[2]);
+        $guideName = str_replace('.php', '', end($expl));
+    }
+
+    $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG'], $guideName);
 
     return new Application($kernel);
 };

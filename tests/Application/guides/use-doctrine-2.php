@@ -23,7 +23,7 @@ namespace App\Entity {
         #[ORM\Column]
         public $name;
         #[ORM\Column(unique: true)]
-        public $isbn;
+        public $description;
 
         public function getId()
         {
@@ -40,7 +40,7 @@ namespace App\Playground {
     {
         $body = [
             'name' => 'bookToto',
-            'isbn' => 'abcd'
+            'description' => 'abcd'
         ];
         return Request::create('/books.jsonld', 'POST',[], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($body));
     }
@@ -63,7 +63,7 @@ namespace App\Tests {
         public function testPostBook(): void
         {
             $response = static::createClient()->request('POST', '/books', ['json' => [
-                'isbn' => '0099740915',
+                'description' => '0099740915',
                 'name' => 'The Handmaid\'s Tale'
             ]]);
 
@@ -72,7 +72,7 @@ namespace App\Tests {
             $this->assertJsonContains([
                 '@context' => '/contexts/Book',
                 '@type' => 'Book',
-                'isbn' => '0099740915',
+                'description' => '0099740915',
                 'name' => 'The Handmaid\'s Tale'
             ]);
             $this->assertMatchesRegularExpression('~^/books/\d+$~', $response->toArray()['@id']);
@@ -90,8 +90,13 @@ namespace DoctrineMigrations {
     {
         public function up(Schema $schema): void
         {
-            $this->addSql('CREATE TABLE book (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(255) NOT NULL, isbn VARCHAR(255) NOT NULL)');
-            $this->addSql('CREATE UNIQUE INDEX UNIQ_CBE5A331CC1CF4E6 ON book (isbn)');
+            $this->addSql('CREATE TABLE book (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL)');
+            $this->addSql('CREATE UNIQUE INDEX UNIQ_CBE5A331CC1CF4E6 ON book (description)');
+        }
+
+        public function down(Schema $schema): void
+        {
+            $this->addSql('DROP TABLE book');
         }
     }
 }
@@ -111,7 +116,7 @@ namespace App\Fixtures {
             $factory->many(20)->create(static function (int $i): array {
                 return [
                     'name' => faker()->name,
-                    'isbn' => faker()->isbn10()
+                    'description' => faker()->isbn10()
                 ];
             });
         }

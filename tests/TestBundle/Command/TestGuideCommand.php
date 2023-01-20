@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PDG\Tests\TestBundle\Command;
 
 use App\Kernel;
+use Doctrine\Migrations\Version\Direction;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\TextUI\Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -34,13 +35,14 @@ class TestGuideCommand extends Command
 
         $suite = new TestSuite();
 
-        require $guide;
+//        require $guide;
 
-        $testClasses = $this->getDeclaredClassesForNamesPace('App\Tests');
-        $migrationClasses = $this->getDeclaredClassesForNamesPace('DoctrineMigrations');
+        $testClasses = $this->getDeclaredClassesForNamespace('App\Tests');
+        $migrationClasses = $this->getDeclaredClassesForNamespace('DoctrineMigrations');
 
+        /** @var Kernel $app */
+        $app = $this->getApplication()->getKernel();
         if ($migrationClasses) {
-            $app = new Kernel('test', true, $this->getGuideName($guide));
             $app->executeMigrations();
         }
 
@@ -49,13 +51,27 @@ class TestGuideCommand extends Command
         }
 
         PhpUnitCommand::setSuite($suite);
-        return PhpUnitCommand::main(false);
+        try {
+            $result = PhpUnitCommand::main(false);
+        } catch (Exception $e) {
+            if ($migrationClasses) {
+                $app->executeMigrations(Direction::DOWN);
+            }
+            $this->deleteDir($app->getCacheDir());
+            throw $e;
+        }
+        if ($migrationClasses) {
+            $app->executeMigrations(Direction::DOWN);
+        }
+//        $this->deleteDir($app->getCacheDir());
+
+        return $result;
     }
 
     /**
      * @return array|string[]
      */
-    private function getDeclaredClassesForNamesPace(string $namespace): array
+    private function getDeclaredClassesForNamespace(string $namespace): array
     {
         return array_filter(get_declared_classes(), static function (string $class) use ($namespace): bool {
             return str_starts_with($class, $namespace);
@@ -66,5 +82,28 @@ class TestGuideCommand extends Command
     {
         $expl = explode('/', $guide);
         return str_replace('.php', '', end($expl));
+    }
+
+    private function deleteDir(string $directory): bool
+    {
+        if (!\file_exists($directory)) {
+            return true;
+        }
+
+        if (!\is_dir($directory)) {
+            return \unlink($directory);
+        }
+
+        foreach (\scandir($directory) as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            if (!$this->deleteDir($directory.\DIRECTORY_SEPARATOR.$item)) {
+                return false;
+            }
+        }
+
+        return \rmdir($directory);
     }
 }
