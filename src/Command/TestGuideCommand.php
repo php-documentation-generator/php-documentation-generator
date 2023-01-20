@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace PDG\Tests\TestBundle\Command;
+namespace PDG\Command;
 
 use App\Kernel;
 use Doctrine\Migrations\Version\Direction;
+use PDG\Tests\TestBundle\Command\PhpUnitCommand;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\TextUI\Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -15,7 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'app:test:guide')]
+#[AsCommand(name: 'pdg:test:guide')]
 class TestGuideCommand extends Command
 {
     protected function configure(): void
@@ -35,37 +36,18 @@ class TestGuideCommand extends Command
 
         $suite = new TestSuite();
 
-//        require $guide;
+        require $guide;
 
         $testClasses = $this->getDeclaredClassesForNamespace('App\Tests');
-        $migrationClasses = $this->getDeclaredClassesForNamespace('DoctrineMigrations');
-
-        /** @var Kernel $app */
-        $app = $this->getApplication()->getKernel();
-        if ($migrationClasses) {
-            $app->executeMigrations();
-        }
 
         foreach ($testClasses as $testClass) {
             $suite->addTestSuite($testClass);
         }
 
         PhpUnitCommand::setSuite($suite);
-        try {
-            $result = PhpUnitCommand::main(false);
-        } catch (Exception $e) {
-            if ($migrationClasses) {
-                $app->executeMigrations(Direction::DOWN);
-            }
-            $this->deleteDir($app->getCacheDir());
-            throw $e;
-        }
-        if ($migrationClasses) {
-            $app->executeMigrations(Direction::DOWN);
-        }
-//        $this->deleteDir($app->getCacheDir());
-
-        return $result;
+            $_ENV['KERNEL_CLASS'] = Kernel::class;
+            $_ENV['GUIDE_NAME'] = $this->getGuideName($guide);
+        return PhpUnitCommand::main(false);
     }
 
     /**
@@ -82,28 +64,5 @@ class TestGuideCommand extends Command
     {
         $expl = explode('/', $guide);
         return str_replace('.php', '', end($expl));
-    }
-
-    private function deleteDir(string $directory): bool
-    {
-        if (!\file_exists($directory)) {
-            return true;
-        }
-
-        if (!\is_dir($directory)) {
-            return \unlink($directory);
-        }
-
-        foreach (\scandir($directory) as $item) {
-            if ($item === '.' || $item === '..') {
-                continue;
-            }
-
-            if (!$this->deleteDir($directory.\DIRECTORY_SEPARATOR.$item)) {
-                return false;
-            }
-        }
-
-        return \rmdir($directory);
     }
 }

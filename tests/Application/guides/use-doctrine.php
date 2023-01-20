@@ -60,6 +60,11 @@ namespace App\Tests {
 
     final class BookTest extends ApiTestCase
     {
+        public function setUp(): void
+        {
+            static::createKernel()->executeMigrations();
+        }
+
         public function testPostBook(): void
         {
             $response = static::createClient()->request('POST', '/books', ['json' => [
