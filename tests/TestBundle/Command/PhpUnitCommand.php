@@ -1,11 +1,14 @@
 <?php
 
-namespace PDG\Tests\TestBundle\Command;
+namespace ApiPlatform\PDGBundle\Tests\TestBundle\Command;
 
 use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\Command;
 
-class PhpUnitCommand extends \PHPUnit\TextUI\Command {
+class PhpUnitCommand extends Command {
+
     static $suite;
+
     static function setSuite(TestSuite $suite) {
         self::$suite = $suite;
     }

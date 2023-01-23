@@ -11,7 +11,7 @@ return function(ContainerConfigurator $configurator) {
 
     // makes classes in src/ available to be used as services
     // this creates a service per class whose id is the fully-qualified class name
-    $services->load('PDG\\', '../src/')
+    $services->load('ApiPlatform\\PDGBundle\\', '../src/')
         ->exclude('../src/{DependencyInjection,Entity,Kernel.php, config.php}');
 
     // order is important in this file because service definitions

@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace PDG\Command;
+namespace ApiPlatform\PDGBundle\Command;
 
-use PDG\Services\Reference\OutputFormatter;
-use PDG\Services\Reference\PhpDocHelper;
-use PDG\Services\Reference\Reflection\ReflectionHelper;
+use ApiPlatform\PDGBundle\Services\Reference\OutputFormatter;
+use ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper;
+use ApiPlatform\PDGBundle\Services\Reference\Reflection\ReflectionHelper;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Console\Attribute\AsCommand;

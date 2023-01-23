@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-namespace PDG\Command;
+namespace ApiPlatform\PDGBundle\Command;
 
+use ApiPlatform\PDGBundle\Tests\TestBundle\Command\PhpUnitCommand;
 use App\Kernel;
-use Doctrine\Migrations\Version\Direction;
-use PDG\Tests\TestBundle\Command\PhpUnitCommand;
 use PHPUnit\Framework\TestSuite;
-use PHPUnit\TextUI\Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

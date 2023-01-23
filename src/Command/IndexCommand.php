@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace PDG\Command;
+namespace ApiPlatform\PDGBundle\Command;
 
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 use Symfony\Component\Console\Attribute\AsCommand;

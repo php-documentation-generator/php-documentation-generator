@@ -3,6 +3,7 @@
 namespace App;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\PDGBundle\Tests\TestBundle\Metadata\Resource\Factory\StaticResourceNameCollectionFactory;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
@@ -11,7 +12,6 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use Doctrine\ORM\EntityManagerInterface;
-use PDG\Tests\TestBundle\Metadata\Resource\Factory\StaticResourceNameCollectionFactory;
 use ReflectionClass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -90,12 +90,12 @@ class Kernel extends BaseKernel
 
     public function getCacheDir(): string
     {
-        return (new \PDG\Kernel('test', true))->getCacheDir() . $this->guide;
+        return (new \ApiPlatform\PDGBundle\Kernel('test', true))->getCacheDir() . $this->guide;
     }
 
     public function getDBDir(): string
     {
-        return (new \PDG\Kernel('test', true))->getProjectDir() . '/var/databases/'.$this->guide;
+        return (new \ApiPlatform\PDGBundle\Kernel('test', true))->getProjectDir() . '/var/databases/'.$this->guide;
     }
 
     public function executeMigrations(string $direction = Direction::UP): void

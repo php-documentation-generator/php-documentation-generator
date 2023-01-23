@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace PDG\Services\Reference\Reflection;
+namespace ApiPlatform\PDGBundle\Services\Reference\Reflection;
 
 /**
  * Contains helper methods applicable to different kinds of Reflection objects.

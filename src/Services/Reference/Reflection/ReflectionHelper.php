@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace PDG\Services\Reference\Reflection;
+namespace ApiPlatform\PDGBundle\Services\Reference\Reflection;
 
-use PDG\Services\Reference\OutputFormatter;
-use PDG\Services\Reference\PhpDocHelper;
+use ApiPlatform\PDGBundle\Services\Reference\OutputFormatter;
+use ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocChildNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 

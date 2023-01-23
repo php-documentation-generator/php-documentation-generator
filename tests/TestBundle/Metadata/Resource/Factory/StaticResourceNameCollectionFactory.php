@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace PDG\Tests\TestBundle\Metadata\Resource\Factory;
+namespace ApiPlatform\PDGBundle\Tests\TestBundle\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;

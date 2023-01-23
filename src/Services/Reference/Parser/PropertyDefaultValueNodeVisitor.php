@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace PDG\Services\Reference\Parser;
+namespace ApiPlatform\PDGBundle\Services\Reference\Parser;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;

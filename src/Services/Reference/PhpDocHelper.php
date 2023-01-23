@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace PDG\Services\Reference;
+namespace ApiPlatform\PDGBundle\Services\Reference;
 
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocChildNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;

@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use PDG\Kernel;
+use ApiPlatform\PDGBundle\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 require_once dirname(__DIR__).'/vendor/autoload_runtime.php';

@@ -11,11 +11,10 @@
 
 declare(strict_types=1);
 
-namespace PDG\Command;
+namespace ApiPlatform\PDGBundle\Command;
 
-use ApiPlatform\Metadata\Get;
-use PDG\Services\Reference\PhpDocHelper;
-use PDG\Services\Reference\Reflection\ReflectionHelper;
+use ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper;
+use ApiPlatform\PDGBundle\Services\Reference\Reflection\ReflectionHelper;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
