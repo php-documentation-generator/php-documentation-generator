@@ -27,32 +27,30 @@ use Symfony\Component\Finder\Finder;
 #[AsCommand(name: 'pdg:references')]
 class ReferencesCommand extends Command
 {
-    private readonly array $config;
     private readonly string $root;
 
     public function __construct(
         private readonly PhpDocHelper $phpDocHelper,
         private readonly ReflectionHelper $reflectionHelper,
-        string $name = 'pdg:references'
+        private readonly array $patterns = [],
+        private readonly string $referencePath = '',
+        string $root = '',
+        string $name = null
     ) {
         parent::__construct($name);
-        $this->config = (require 'src/config.php')();
-        $this->root = Path::makeAbsolute($this->config['reference']['src'], getcwd());
+        $this->root = Path::makeAbsolute($root, getcwd());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
 
-        // TODO: move this to a Sf Configuration
-        $patterns = $this->config['reference']['patterns'];
-        $referencePath = $this->config['sidebar']['directories']['Reference'][0];
-        $tagsToIgnore = $patterns['class-tags-to-ignore'];
-        $filesToExclude = $patterns['exclude'];
+        $tagsToIgnore = $this->patterns['class-tags-to-ignore'];
+        $filesToExclude = $this->patterns['exclude'];
 
         $files = [];
-        $files = $this->findFilesByName($patterns['names'], $files, $filesToExclude);
-        $files = $this->findFilesByDirectories($patterns['directories'], $files, $filesToExclude);
+        $files = $this->findFilesByName($this->patterns['names'], $files, $filesToExclude);
+        $files = $this->findFilesByDirectories($this->patterns['directories'], $files, $filesToExclude);
 
         $namespaces = [];
 
@@ -60,6 +58,7 @@ class ReferencesCommand extends Command
             $relativeToSrc = Path::makeRelative($file->getPath(), $this->root);
             $relativeToDocs = Path::makeRelative($file->getRealPath(), getcwd());
 
+            // Todo make this non ApiPlatform related
             $namespace = 'ApiPlatform\\'.str_replace(['/', '.php'], ['\\', ''], $relativeToSrc);
             $className = sprintf('%s\\%s', $namespace, $file->getBasename('.php'));
             $refl = new \ReflectionClass($className);
@@ -85,7 +84,7 @@ class ReferencesCommand extends Command
                 continue;
             }
 
-            if (!@mkdir($concurrentDirectory = $referencePath.'/'.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
+            if (!@mkdir($concurrentDirectory = $this->referencePath.'/'.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
                 $style->error(sprintf('Directory "%s" was not created', $concurrentDirectory));
                 return Command::FAILURE;
             }
@@ -94,7 +93,7 @@ class ReferencesCommand extends Command
 
             $arguments = [
                 'filename' => $relativeToDocs,
-                'output' => sprintf('%s%s%s%2$s%s.mdx', $referencePath, \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php')),
+                'output' => sprintf('%s%s%s%2$s%s.mdx', $this->referencePath, \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php')),
             ];
 
             $commandInput = new ArrayInput($arguments);

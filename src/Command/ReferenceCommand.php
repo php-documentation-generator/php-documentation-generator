@@ -29,7 +29,6 @@ use Symfony\Component\Filesystem\Path;
 #[AsCommand(name: 'pdg:reference')]
 class ReferenceCommand extends Command
 {
-    private readonly array $config;
     private string $root;
     private \ReflectionClass $reflectionClass;
 
@@ -37,11 +36,11 @@ class ReferenceCommand extends Command
         private readonly PhpDocHelper $phpDocHelper,
         private readonly ReflectionHelper $reflectionHelper,
         private readonly OutputFormatter $outputFormatter,
+        string $root = '',
         string $name = null
     ) {
         parent::__construct($name);
-        $this->config = (require 'src/config.php')();
-        $this->root = Path::makeAbsolute($this->config['reference']['src'], getcwd());
+        $this->root = Path::makeAbsolute($root, getcwd());
     }
 
     protected function configure(): void

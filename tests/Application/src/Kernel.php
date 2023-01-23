@@ -45,7 +45,7 @@ class Kernel extends BaseKernel
                 ->autoconfigure()
         ;
 
-        $services->load('PDG\Tests\TestBundle\\', '../../TestBundle/');
+        $services->load('ApiPlatform\PDGBundle\Tests\TestBundle\\', '../../TestBundle/');
 
         $classes = get_declared_classes();
         $resources = [];
