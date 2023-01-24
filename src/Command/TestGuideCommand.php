@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace ApiPlatform\PDGBundle\Command;
@@ -30,7 +39,7 @@ class TestGuideCommand extends Command
     {
         $style = new SymfonyStyle($input, $output);
         $guide = $input->getArgument('guide');
-        $style->info('Testing guide: ' . $guide);
+        $style->info('Testing guide: '.$guide);
 
         $suite = new TestSuite();
 
@@ -43,8 +52,9 @@ class TestGuideCommand extends Command
         }
 
         PhpUnitCommand::setSuite($suite);
-            $_ENV['KERNEL_CLASS'] = Kernel::class;
-            $_ENV['GUIDE_NAME'] = $this->getGuideName($guide);
+        $_ENV['KERNEL_CLASS'] = Kernel::class;
+        $_ENV['GUIDE_NAME'] = $this->getGuideName($guide);
+
         return PhpUnitCommand::main(false);
     }
 
@@ -61,6 +71,7 @@ class TestGuideCommand extends Command
     private function getGuideName(string $guide): string
     {
         $expl = explode('/', $guide);
+
         return str_replace('.php', '', end($expl));
     }
 }

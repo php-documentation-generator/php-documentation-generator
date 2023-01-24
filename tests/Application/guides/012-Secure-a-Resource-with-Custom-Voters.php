@@ -1,5 +1,16 @@
 <?php
-// --- 
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+// ---
 // slug: secure-a-resource-with-custom-voters
 // name: Secure a Resource with Custom Voters
 // position: 10
@@ -25,28 +36,28 @@ namespace App\Security\Voter {
         protected function supports($attribute, $subject): bool
         {
             // It supports several attributes related to our Resource access control.
-            $supportsAttribute = in_array($attribute, ['BOOK_CREATE', 'BOOK_READ', 'BOOK_EDIT', 'BOOK_DELETE']);
+            $supportsAttribute = \in_array($attribute, ['BOOK_CREATE', 'BOOK_READ', 'BOOK_EDIT', 'BOOK_DELETE'], true);
             $supportsSubject = $subject instanceof Book;
 
             return $supportsAttribute && $supportsSubject;
         }
 
         /**
-        * @param string $attribute
-        * @param Book $subject
-        * @param TokenInterface $token
-        * @return bool
-        */
+         * @param string $attribute
+         * @param Book   $subject
+         */
         protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
         {
-            /** ... check if the user is anonymous ... **/
+            /* ... check if the user is anonymous ... * */
 
             switch ($attribute) {
                 case 'BOOK_CREATE':
-                    if ( $this->security->isGranted(Role::ADMIN) ) { return true; }  // only admins can create books
+                    if ($this->security->isGranted(Role::ADMIN)) {
+                        return true;
+                    }  // only admins can create books
                     break;
                 case 'BOOK_READ':
-                    /** ... other autorization rules ... **/
+                    /* ... other autorization rules ... * */
             }
 
             return false;
@@ -69,7 +80,7 @@ namespace App\ApiResource {
     #[Delete(security: "is_granted('BOOK_DELETE', object)")]
     // On a collection, you need to [implement a Provider](provide-the-resource-state) to filter the collection manually.
     #[GetCollection]
-    // `object` is empty uppon creation, we use `securityPostDenormalize` to get the denormalized object. 
+    // `object` is empty uppon creation, we use `securityPostDenormalize` to get the denormalized object.
     #[Post(securityPostDenormalize: "is_granted('BOOK_CREATE', object)")]
     class Book
     {

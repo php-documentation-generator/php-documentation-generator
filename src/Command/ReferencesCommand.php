@@ -71,9 +71,9 @@ class ReferencesCommand extends Command
                 'className' => $className,
                 'shortName' => $file->getBasename('.php'),
                 'type' => $this->getClassType($refl),
-                'link' => '/reference/' . ($relativeToSrc . $file->getBaseName('.php'))
+                'link' => '/reference/'.($relativeToSrc.$file->getBaseName('.php')),
             ];
-                
+
             foreach ($tagsToIgnore as $tagToIgnore) {
                 if ($this->phpDocHelper->classDocContainsTag($refl, $tagToIgnore)) {
                     continue 2;
@@ -86,6 +86,7 @@ class ReferencesCommand extends Command
 
             if (!@mkdir($concurrentDirectory = $this->referencePath.'/'.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
                 $style->error(sprintf('Directory "%s" was not created', $concurrentDirectory));
+
                 return Command::FAILURE;
             }
 
@@ -100,6 +101,7 @@ class ReferencesCommand extends Command
 
             if (Command::FAILURE === $generateRefCommand->run($commandInput, $output)) {
                 $style->error(sprintf('Failed generating reference for %s', $file->getBaseNme()));
+
                 return Command::FAILURE;
             }
         }
@@ -142,7 +144,8 @@ class ReferencesCommand extends Command
         return $files;
     }
 
-    private function getClassType(\ReflectionClass $refl): string {
+    private function getClassType(\ReflectionClass $refl): string
+    {
         if ($refl->isInterface()) {
             return 'I';
         }

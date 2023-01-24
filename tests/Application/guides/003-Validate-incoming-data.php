@@ -1,8 +1,19 @@
 <?php
-// --- 
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+// ---
 // slug: use-validation-groups
 // name: Use Validation Groups
-// position: 3 
+// position: 3
 // executable: true
 // ---
 
@@ -10,16 +21,16 @@
 // When processing the incoming request, when creating or updating content, API-Platform will validate the
 // incoming content. It will use the [Symfony's validator](https://symfony.com/doc/current/validation.html).
 //
-// API Platform takes care of validating the data sent to the API by the client (usually user data entered through forms). 
+// API Platform takes care of validating the data sent to the API by the client (usually user data entered through forms).
 // By default, the framework relies on the powerful [Symfony Validator Component](http://symfony.com/doc/current/validation.html) for this task, but you can replace it with your preferred validation library such as the [PHP filter extension](https://www.php.net/manual/en/intro.filter.php) if you want to.
 // Validation is called when handling a POST, PATCH, PUT request as follows :
 
-//graph LR
-//Request --> Deserialization
-//Deserialization --> Validation
-//Validation --> Persister
-//Persister --> Serialization
-//Serialization --> Response
+// graph LR
+// Request --> Deserialization
+// Deserialization --> Validation
+// Validation --> Persister
+// Persister --> Serialization
+// Serialization --> Response
 
 // In this guide we're going to use [Symfony's built-in constraints](http://symfony.com/doc/current/reference/constraints.html) and a [custom constraint](http://symfony.com/doc/current/validation/custom_constraint.html). Let's start by shaping our to-be-validated resource:
 
@@ -34,7 +45,7 @@ namespace App\Entity {
     /**
      * A product.
      */
-    #[ORM\Entity] 
+    #[ORM\Entity]
     #[ApiResource]
     class Product
     {
@@ -49,13 +60,14 @@ namespace App\Entity {
          * @var string[] Describe the product
          */
         #[MinimalProperties]
-        #[ORM\Column(type: 'json')] 
+        #[ORM\Column(type: 'json')]
         public $properties;
     }
 }
 
 // The `MinimalProperties` constraint will check that the `properties` data holds at least two values: description and price.
 // We start by creating the constraint:
+
 namespace App\Validator\Constraints {
     use Symfony\Component\Validator\Constraint;
 
@@ -84,22 +96,21 @@ namespace App\Validator\Constraints {
 }
 
 namespace App\Tests {
-
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use PHPUnit\Framework\TestCase;
     use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-    final class FooTest extends ApiTestCase {
-
-        public function testToto()
+    final class FooTest extends ApiTestCase
+    {
+        public function testToto(): void
         {
             $this->assertTrue(true);
         }
     }
 
-    final class BarTest extends KernelTestCase {
-
-        public function testTiti()
+    final class BarTest extends KernelTestCase
+    {
+        public function testTiti(): void
         {
             $this->assertTrue(true);
         }
@@ -107,14 +118,14 @@ namespace App\Tests {
 
     final class BazTest extends TestCase
     {
-        public function testTutu()
+        public function testTutu(): void
         {
             $this->assertTrue(true);
         }
     }
 }
 
-//If the data submitted by the client is invalid, the HTTP status code will be set to 422 Unprocessable Entity and the response's body will contain the list of violations serialized in a format compliant with the requested one. For instance, a validation error will look like the following if the requested format is JSON-LD (the default):
+// If the data submitted by the client is invalid, the HTTP status code will be set to 422 Unprocessable Entity and the response's body will contain the list of violations serialized in a format compliant with the requested one. For instance, a validation error will look like the following if the requested format is JSON-LD (the default):
 // ```json
 // {
 //   "@context": "/contexts/ConstraintViolationList",

@@ -1,5 +1,16 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace App;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -12,7 +23,6 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use Doctrine\ORM\EntityManagerInterface;
-use ReflectionClass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -20,6 +30,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
+
 use function App\DependencyInjection\configure;
 use function App\Playground\request;
 
@@ -27,7 +38,8 @@ class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    public function __construct(string $environment, bool $debug, private string $guide = '') {
+    public function __construct(string $environment, bool $debug, private string $guide = '')
+    {
         parent::__construct($environment ?? 'test', $debug ?? true);
         $this->guide = $_ENV['GUIDE_NAME'] ?? 'test';
     }
@@ -42,8 +54,7 @@ class Kernel extends BaseKernel
         $services = $container->services()
             ->defaults()
                 ->autowire()
-                ->autoconfigure()
-        ;
+                ->autoconfigure();
 
         $services->load('ApiPlatform\PDGBundle\Tests\TestBundle\\', '../../TestBundle/');
 
@@ -51,7 +62,7 @@ class Kernel extends BaseKernel
         $resources = [];
 
         foreach ($classes as $class) {
-            $refl = new ReflectionClass($class);
+            $refl = new \ReflectionClass($class);
             $ns = $refl->getNamespaceName();
             if (0 !== strpos($ns, 'App')) {
                 continue;
@@ -71,14 +82,14 @@ class Kernel extends BaseKernel
             sprintf('sqlite:///%s/%s', $this->getDBDir(), 'data.db')
         );
 
-        if (function_exists('App\DependencyInjection\configure')) {
+        if (\function_exists('App\DependencyInjection\configure')) {
             configure($container);
         }
     }
 
     public function request(?Request $request = null): void
     {
-        if (null === $request && function_exists('App\Playground\request')) {
+        if (null === $request && \function_exists('App\Playground\request')) {
             $request = request();
         }
 
@@ -90,12 +101,12 @@ class Kernel extends BaseKernel
 
     public function getCacheDir(): string
     {
-        return (new \ApiPlatform\PDGBundle\Kernel('test', true))->getCacheDir() . $this->guide;
+        return (new \ApiPlatform\PDGBundle\Kernel('test', true))->getCacheDir().$this->guide;
     }
 
     public function getDBDir(): string
     {
-        return (new \ApiPlatform\PDGBundle\Kernel('test', true))->getProjectDir() . '/var/databases/'.$this->guide;
+        return (new \ApiPlatform\PDGBundle\Kernel('test', true))->getProjectDir().'/var/databases/'.$this->guide;
     }
 
     public function executeMigrations(string $direction = Direction::UP): void
@@ -109,7 +120,7 @@ class Kernel extends BaseKernel
         @mkdir('var/databases/'.$this->guide, recursive: true);
 
         foreach ($migrationClasses as $migrationClass) {
-            if ("Doctrine\Migrations\AbstractMigration" !== (new ReflectionClass($migrationClass))->getParentClass()->getName()) {
+            if ("Doctrine\Migrations\AbstractMigration" !== (new \ReflectionClass($migrationClass))->getParentClass()->getName()) {
                 continue;
             }
             $conf = new Configuration();
@@ -151,7 +162,7 @@ class Kernel extends BaseKernel
         }
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         foreach ($fixtureClasses as $class) {
-            if ("Doctrine\Bundle\FixturesBundle\Fixture" !== ((new ReflectionClass($class))->getParentClass()->getName())) {
+            if ("Doctrine\Bundle\FixturesBundle\Fixture" !== (new \ReflectionClass($class))->getParentClass()->getName()) {
                 continue;
             }
             (new $class())->load($em);
@@ -165,4 +176,3 @@ class Kernel extends BaseKernel
         });
     }
 }
-

@@ -1,47 +1,59 @@
 <?php
-// --- 
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+// ---
 // slug: validate-incoming-data
 // name: Validate incoming Data
-// position: 3 
+// position: 3
 // executable: true
 // ---
 
 // ## Using Validation Groups
 // Without specific configuration, the default validation group is always used, but this behavior is customizable: the framework
 // is able to leverage Symfony's [validation groups](https://symfony.com/doc/current/validation/groups.html).
+
 namespace App\ApiResource {
-    use App\Validator\MySequencedGroup;
     use ApiPlatform\Metadata\ApiResource;
     use ApiPlatform\Metadata\Get;
     use ApiPlatform\Metadata\GetCollection;
     use ApiPlatform\Metadata\Post;
+    use App\Validator\MySequencedGroup;
     use Symfony\Component\Validator\Constraints as Assert;
 
     // We can specify groups on the [ApiResource::validationContext](http://localhost:3000/reference/Metadata/ApiResource#validationContext) property.
     #[ApiResource(
         validationContext: ['groups' => ['a', 'b']],
         operations: [
-            // When configured on a specific operation the configuration takes precedence over the one declared on the ApiResource. 
+            // When configured on a specific operation the configuration takes precedence over the one declared on the ApiResource.
             // You can use a [callable](https://www.php.net/manual/en/language.types.callable.php) instead of strings.
             new Get(validationContext: ['groups' => [Book::class, 'validationGroups']]),
             new GetCollection(),
-            // You sometimes want to specify in which order groups must be tested against. On the Post operation, we use a Symfony service 
+            // You sometimes want to specify in which order groups must be tested against. On the Post operation, we use a Symfony service
             // to use a [group sequence](http://symfony.com/doc/current/validation/sequence_provider.html).
-            new Post(validationContext: ['groups' => MySequencedGroup::class])
+            new Post(validationContext: ['groups' => MySequencedGroup::class]),
         ]
     )]
     final class Book
     {
-        #[Assert\NotBlank(groups: ['a'])]  
+        #[Assert\NotBlank(groups: ['a'])]
         public string $name;
 
-        #[Assert\NotNull(groups: ['b'])] 
+        #[Assert\NotNull(groups: ['b'])]
         public string $author;
 
         /**
          * Return dynamic validation groups.
          *
-         * @param self $book Contains the instance of Book to validate.
+         * @param self $book contains the instance of Book to validate
          *
          * @return string[]
          */

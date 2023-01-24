@@ -1,5 +1,16 @@
 <?php
-// --- 
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+// ---
 // slug: provide-the-resource-state
 // name: Provide the Resource State
 // position: 2
@@ -8,12 +19,13 @@
 
 // # Provide the Resource State
 // Our model is the same then in the previous guide ([Declare a Resource](./declare-a-resource). API Platform will declare
-// CRUD operations if we don't declare them. 
+// CRUD operations if we don't declare them.
+
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ApiResource;
     use App\State\BookProvider;
 
-    // We use a `BookProvider` as the [ApiResource::provider](/reference/Metadata/ApiResource#provider) option. 
+    // We use a `BookProvider` as the [ApiResource::provider](/reference/Metadata/ApiResource#provider) option.
     #[ApiResource(provider: BookProvider::class)]
     class Book
     {
@@ -27,7 +39,7 @@ namespace App\State {
     use ApiPlatform\State\ProviderInterface;
     use App\ApiResource\Book;
 
-    // The BookProvider is where we retrieve the data in our persistence layer. 
+    // The BookProvider is where we retrieve the data in our persistence layer.
     // In this provider we choose to handle the retrieval of a single Book but also a list of Books.
     final class BookProvider implements ProviderInterface
     {
@@ -43,6 +55,7 @@ namespace App\State {
             $book = new Book();
             // The value at `$uriVariables['id']` is the one that matches the `{id}` variable of the **[URI template](/explanation/uri#uri-template)**.
             $book->id = $uriVariables['id'];
+
             return $book;
         }
     }

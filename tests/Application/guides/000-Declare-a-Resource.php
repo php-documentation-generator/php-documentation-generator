@@ -1,5 +1,16 @@
 <?php
-// --- 
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+// ---
 // slug: declare-a-resource
 // name: Declare a Resource
 // position: 1
@@ -8,16 +19,17 @@
 
 // # Declare a Resource
 // This class represents an API resource
+
 namespace App\ApiResource;
 
 // The `#[ApiResource]` attribute registers this class as an HTTP resource.
 use ApiPlatform\Metadata\ApiResource;
 // These are the list of HTTP operations we use to declare a "CRUD" (Create, Read, Update, Delete).
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Validator\Exception\ValidationException;
 
 // Each resource has its set of Operations.
@@ -34,7 +46,7 @@ use ApiPlatform\Validator\Exception\ValidationException;
     ],
     // This is a configuration that is shared accross every operations. More details are available at [ApiResource::exceptionToStatus](/reference/Metadata/ApiResource#exceptionToStatus).
     exceptionToStatus: [
-        ValidationException::class => 422
+        ValidationException::class => 422,
     ]
 )]
 // If a property named `id` is found it is the property used in your URI template

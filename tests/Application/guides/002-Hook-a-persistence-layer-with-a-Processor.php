@@ -1,5 +1,16 @@
 <?php
-// --- 
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+// ---
 // slug: hook-a-persistence-layer-with-a-processor
 // name: Hook a Persistence Layer with a Processor
 // position: 2
@@ -7,11 +18,12 @@
 // ---
 
 // # Hook a Persistence Layer with a Processor
+
 namespace App\ApiResource {
     use ApiPlatform\Metadata\ApiResource;
     use App\State\BookProcessor;
 
-    // We use a `BookProcessor` as the [ApiResource::processor](http://localhost:3000/reference/Metadata/ApiResource#processor) option. 
+    // We use a `BookProcessor` as the [ApiResource::processor](http://localhost:3000/reference/Metadata/ApiResource#processor) option.
     #[ApiResource(processor: BookProcessor::class)]
     class Book
     {
@@ -34,9 +46,8 @@ namespace App\State {
         public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
         {
             file_put_contents(sprintf('book-%s.json', $uriVariables['id']), json_encode($data));
+
             return $data;
         }
     }
 }
-
-

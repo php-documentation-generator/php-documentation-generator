@@ -1,9 +1,19 @@
 <?php
 
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 // Should be a real guide
 
 namespace App\Entity {
-
     use ApiPlatform\Metadata\ApiResource;
     use Doctrine\ORM\Mapping as ORM;
 
@@ -40,9 +50,10 @@ namespace App\Playground {
     {
         $body = [
             'name' => 'bookToto',
-            'description' => 'abcd'
+            'description' => 'abcd',
         ];
-        return Request::create('/books.jsonld', 'POST',[], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($body));
+
+        return Request::create('/books.jsonld', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($body));
     }
 
     function setup(Kernel $kernel): void
@@ -54,13 +65,10 @@ namespace App\Playground {
 namespace App\Tests {
     use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
     use App\Entity\Book;
-    use App\Kernel;
-    use Symfony\Component\HttpKernel\KernelInterface;
-    use Zenstruck\Foundry\Test\ResetDatabase;
 
     final class BookTest extends ApiTestCase
     {
-        public function setUp(): void
+        protected function setUp(): void
         {
             static::createKernel()->executeMigrations();
         }
@@ -69,7 +77,7 @@ namespace App\Tests {
         {
             $response = static::createClient()->request('POST', '/books', ['json' => [
                 'description' => '0099740915',
-                'name' => 'The Handmaid\'s Tale'
+                'name' => 'The Handmaid\'s Tale',
             ]]);
 
             $this->assertResponseStatusCodeSame(201);
@@ -78,7 +86,7 @@ namespace App\Tests {
                 '@context' => '/contexts/Book',
                 '@type' => 'Book',
                 'description' => '0099740915',
-                'name' => 'The Handmaid\'s Tale'
+                'name' => 'The Handmaid\'s Tale',
             ]);
             $this->assertMatchesRegularExpression('~^/books/\d+$~', $response->toArray()['@id']);
             $this->assertMatchesResourceItemJsonSchema(Book::class);
@@ -87,7 +95,6 @@ namespace App\Tests {
 }
 
 namespace DoctrineMigrations {
-
     use Doctrine\DBAL\Schema\Schema;
     use Doctrine\Migrations\AbstractMigration;
 
@@ -111,7 +118,8 @@ namespace App\Fixtures {
     use Doctrine\Bundle\FixturesBundle\Fixture;
     use Doctrine\Persistence\ObjectManager;
     use Zenstruck\Foundry\AnonymousFactory;
-    use function Zenstruck\Foundry\faker;
+
+use function Zenstruck\Foundry\faker;
 
     final class BookFixtures extends Fixture
     {
@@ -121,7 +129,7 @@ namespace App\Fixtures {
             $factory->many(20)->create(static function (int $i): array {
                 return [
                     'name' => faker()->name,
-                    'description' => faker()->isbn10()
+                    'description' => faker()->isbn10(),
                 ];
             });
         }

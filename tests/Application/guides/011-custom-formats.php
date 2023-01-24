@@ -1,30 +1,41 @@
 <?php
-//The API Platform content negotiation system is extendable. You can add support for formats not available by default by creating custom normalizer and encoders. Refer to the Symfony documentation to learn how to create and register such classes.
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+// The API Platform content negotiation system is extendable. You can add support for formats not available by default by creating custom normalizer and encoders. Refer to the Symfony documentation to learn how to create and register such classes.
 //
-//Then, register the new format in the configuration:
+// Then, register the new format in the configuration:
 //
-//# api/config/packages/api_platform.yaml
-//api_platform:
+// # api/config/packages/api_platform.yaml
+// api_platform:
 //    formats:
 //        # ...
 //        myformat: ['application/vnd.myformat']
 //
-//API Platform will automatically call the serializer with your defined format name as format parameter during the deserialization process (myformat in the example). It will then return the result to the client with the requested MIME type using its built-in responder. For non-standard formats, a vendor, vanity or unregistered MIME type should be used.
-//Reusing the API Platform Infrastructure
+// API Platform will automatically call the serializer with your defined format name as format parameter during the deserialization process (myformat in the example). It will then return the result to the client with the requested MIME type using its built-in responder. For non-standard formats, a vendor, vanity or unregistered MIME type should be used.
+// Reusing the API Platform Infrastructure
 //
-//Using composition is the recommended way to implement a custom normalizer. You can use the following template to start your own implementation of CustomItemNormalizer:
+// Using composition is the recommended way to implement a custom normalizer. You can use the following template to start your own implementation of CustomItemNormalizer:
 //
-//# api/config/services.yaml
-//services:
-//'App\Serializer\CustomItemNormalizer':
-//arguments: [ '@api_platform.serializer.normalizer.item' ]
-# Uncomment if you don't use the autoconfigure feature
-#tags: [ 'serializer.normalizer' ]
+// # api/config/services.yaml
+// services:
+// 'App\Serializer\CustomItemNormalizer':
+// arguments: [ '@api_platform.serializer.normalizer.item' ]
+// Uncomment if you don't use the autoconfigure feature
+// tags: [ 'serializer.normalizer' ]
 
-# ...
+// ...
 
 // api/src/Serializer/CustomItemNormalizer.php
-//namespace App\Serializer {
+// namespace App\Serializer {
 //
 //    use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 //    use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -62,14 +73,12 @@
 //            return $this->normalizer->supportsNormalization($data, $format);
 //        }
 //    }
-//}
+// }
 
-
-//For example if you want to make the csv format work for even complex entities with a lot of hierarchy, you have to flatten or remove overly complex relations:
-
+// For example if you want to make the csv format work for even complex entities with a lot of hierarchy, you have to flatten or remove overly complex relations:
 
 // api/src/Serializer/CustomItemNormalizer.php
-//namespace App\Serializer {
+// namespace App\Serializer {
 //
 //    abstract class CustomCSVItemNormalizer implements NormalizerInterface, DenormalizerInterface
 //    {
@@ -94,9 +103,8 @@
 //
 //        // ...
 //    }
-//}
+// }
 
+// Contributing Support for New Formats
 
-//Contributing Support for New Formats
-
-//Adding support for standard formats upstream is welcome! We'll be glad to merge new encoders and normalizers in API Platform.
+// Adding support for standard formats upstream is welcome! We'll be glad to merge new encoders and normalizers in API Platform.

@@ -1,4 +1,16 @@
 <?php
+
+/*
+ * This file is part of the API Platform project.
+ *
+ * (c) Kévin Dunglas <dunglas@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace ApiPlatform\PDGBundle\Command;
 
 use ApiPlatform\PDGBundle\Services\Reference\OutputFormatter;
@@ -28,8 +40,7 @@ class GuideCommand extends Command
         $this
             ->setHelp('Creates a markdown guide based on a PHP code.')
             ->setDescription('Creates a markdown guide based on a PHP code.')
-            ->addArgument('file', InputArgument::REQUIRED, 'PHP file to make the guide of.')
-        ;
+            ->addArgument('file', InputArgument::REQUIRED, 'PHP file to make the guide of.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -41,6 +52,7 @@ class GuideCommand extends Command
 
         if (!$handle) {
             $stderr->info(sprintf('Error opening %s.', $file));
+
             return Command::INVALID;
         }
 
@@ -69,7 +81,7 @@ class GuideCommand extends Command
             // This is a line of text
             if (preg_match(self::REGEX, $line)) {
                 $text = preg_replace(self::REGEX, '', $line);
-                if (trim($text) === '---') {
+                if ('---' === trim($text)) {
                     $frontMatterOpen = !$frontMatterOpen;
                     $header[] = $text;
                     continue;
@@ -99,9 +111,9 @@ class GuideCommand extends Command
             if (false !== preg_match('/namespace (.+) \{$/', $line, $matches) && $matches) {
                 $line = str_replace(' {', ';', $line);
                 $namespaceOpen = true;
-            } else if ($namespaceOpen) {
-                if  ($line === "}".PHP_EOL) {
-                    $line = PHP_EOL;
+            } elseif ($namespaceOpen) {
+                if ($line === '}'.\PHP_EOL) {
+                    $line = \PHP_EOL;
                     $namespaceOpen = false;
                 } else {
                     $line = substr($line, 4);
@@ -109,7 +121,7 @@ class GuideCommand extends Command
             }
 
             if ($matches) {
-                $sections[$currentSection]['code'][] = '// src/' . str_replace('\\', '/', $matches[1]) . '.php' . PHP_EOL;
+                $sections[$currentSection]['code'][] = '// src/'.str_replace('\\', '/', $matches[1]).'.php'.\PHP_EOL;
             }
 
             $sections[$currentSection]['code'][] = $line;
@@ -119,7 +131,6 @@ class GuideCommand extends Command
                 ++$currentSection;
                 $linesOfCode = $linesOfText = 0;
             }
-
         }
 
         fclose($handle);
@@ -138,10 +149,9 @@ MD;
 
 MD;
             $text = implode('', $section['text'] ?: [\PHP_EOL]);
-            $a .= str_contains($text,'[codeSelector]')
+            $a .= str_contains($text, '[codeSelector]')
                 ? $this->outputFormatter->formatCodeSelector($text)
-                : $text
-            ;
+                : $text;
             $a .= <<<MD
     </div>
     <div className="content">
@@ -161,6 +171,7 @@ MD;
         $a .= '</div>';
 
         $output->write($a);
+
         return Command::SUCCESS;
     }
 }
