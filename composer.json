@@ -18,6 +18,7 @@
             "App\\": "tests/Application/src/"
         }
     },
+    "bin": ["bin/pdg"],
     "require-dev": {
         "symfony/dom-crawler": "^6.2",
         "symfony/serializer": "^6.2",
