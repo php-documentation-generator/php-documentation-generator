@@ -4,12 +4,33 @@
 use ApiPlatform\PDGBundle\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
-require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+if (isset($GLOBALS['_composer_autoload_path'])) {
+    require_once $GLOBALS['_composer_autoload_path'];
+} else {
+    require_once __DIR__.'/../vendor/autoload.php';
+}
 
-return function (array $context) {
+$app = function (array $context) {
     $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
 
     // returning an "Application" makes the Runtime run a Console
     // application instead of the HTTP Kernel
     return new Application($kernel);
 };
+
+$runtime = $_SERVER['APP_RUNTIME'] ?? $_ENV['APP_RUNTIME'] ?? 'Symfony\\Component\\Runtime\\SymfonyRuntime';
+$runtime = new $runtime(($_SERVER['APP_RUNTIME_OPTIONS'] ?? $_ENV['APP_RUNTIME_OPTIONS'] ?? []) + [
+  'project_dir' => dirname(__DIR__, 1),
+]);
+
+[$app, $args] = $runtime
+    ->getResolver($app)
+    ->resolve();
+
+$app = $app(...$args);
+
+exit(
+    $runtime
+        ->getRunner($app)
+        ->run()
+);
