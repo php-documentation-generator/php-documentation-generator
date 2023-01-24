@@ -5,8 +5,10 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-        <service id="pdg.helper.php_doc" class="ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper" />
         <service id="pdg.output_formatter" class="ApiPlatform\PDGBundle\Services\Reference\OutputFormatter" />
+        <service id="pdg.helper.php_doc" class="ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper">
+            <argument type="service" id="pdg.output_formatter"/>
+        </service>
         <service id="pdg.helper.reflection_property" class="ApiPlatform\PDGBundle\Services\Reference\Reflection\ReflectionPropertyHelper">
             <argument type="service" id="pdg.output_formatter" />
             <argument type="service" id="pdg.helper.php_doc" />

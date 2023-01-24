@@ -9,7 +9,7 @@
         <argument type="service" id="pdg.helper.php_doc" />
         <argument type="service" id="pdg.helper.reflection" />
         <argument type="service" id="pdg.output_formatter" />
-        <argument>%pdg.reference.src%</argument>
+        <argument>%pdg.reference.namespace%</argument>
         <tag>console.command</tag>
     </service>
 
@@ -19,6 +19,7 @@
         <argument>%pdg.reference.patterns%</argument>
         <argument>%pdg.sidebar.reference_path%</argument>
         <argument>%pdg.reference.src%</argument>
+        <argument>%pdg.reference.namespace%</argument>
         <tag>console.command</tag>
     </service>
 

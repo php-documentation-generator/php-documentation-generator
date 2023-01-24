@@ -27,30 +27,29 @@ use Symfony\Component\Finder\Finder;
 #[AsCommand(name: 'pdg:references')]
 class ReferencesCommand extends Command
 {
-    private readonly string $root;
-
     public function __construct(
         private readonly PhpDocHelper $phpDocHelper,
         private readonly ReflectionHelper $reflectionHelper,
         private readonly array $patterns = [],
         private readonly string $referencePath = '',
-        string $root = '',
+        private readonly string $root = '',
+        private readonly string $namespace = '',
         string $name = null
     ) {
         parent::__construct($name);
-        $this->root = Path::makeAbsolute($root, getcwd());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
 
-        $tagsToIgnore = $this->patterns['class-tags-to-ignore'];
+        $tagsToIgnore = $this->patterns['class_tags_to_ignore'];
         $filesToExclude = $this->patterns['exclude'];
 
         $files = [];
         $files = $this->findFilesByName($this->patterns['names'], $files, $filesToExclude);
         $files = $this->findFilesByDirectories($this->patterns['directories'], $files, $filesToExclude);
+        $files = array_unique($files);
 
         $namespaces = [];
 
@@ -58,9 +57,9 @@ class ReferencesCommand extends Command
             $relativeToSrc = Path::makeRelative($file->getPath(), $this->root);
             $relativeToDocs = Path::makeRelative($file->getRealPath(), getcwd());
 
-            // Todo make this non ApiPlatform related
-            $namespace = 'ApiPlatform\\'.str_replace(['/', '.php'], ['\\', ''], $relativeToSrc);
+            $namespace = sprintf('%s\\%s', $this->namespace, str_replace(['/', '.php'], ['\\', ''], $relativeToSrc));
             $className = sprintf('%s\\%s', $namespace, $file->getBasename('.php'));
+
             $refl = new \ReflectionClass($className);
 
             if (!($namespaces[$namespace] ?? false)) {
@@ -93,7 +92,7 @@ class ReferencesCommand extends Command
             $generateRefCommand = $this->getApplication()?->find('pdg:reference');
 
             $arguments = [
-                'filename' => $relativeToDocs,
+                'filename' => str_replace('src/', '', $relativeToDocs),
                 'output' => sprintf('%s%s%s%2$s%s.mdx', $this->referencePath, \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php')),
             ];
 
@@ -109,14 +108,14 @@ class ReferencesCommand extends Command
         // Creating an index like https://angular.io/api
         $content = '';
         foreach ($namespaces as $namespace => $classes) {
-            $content .= '<article class="api-list-container">' . PHP_EOL;
-            $content .= '## ' . $namespace . PHP_EOL;
-            $content .= '<ul class="api-list">' . PHP_EOL;
+            $content .= '<article class="api-list-container">'.\PHP_EOL;
+            $content .= '## '.$namespace.\PHP_EOL;
+            $content .= '<ul class="api-list">'.\PHP_EOL;
             foreach ($classes as $classObj) {
-                $content .= sprintf('<li class="api-item"><a href="%s"><span class="symbol %s">%2$s</span>%s</a></li>%s', $classObj['link'], $classObj['type'], $classObj['shortName'], PHP_EOL);
+                $content .= sprintf('<li class="api-item"><a href="%s"><span class="symbol %s">%2$s</span>%s</a></li>%s', $classObj['link'], $classObj['type'], $classObj['shortName'], \PHP_EOL);
             }
-            $content .='</ul>' . PHP_EOL;
-            $content .= '</article>' . PHP_EOL;
+            $content .= '</ul>'.\PHP_EOL;
+            $content .= '</article>'.\PHP_EOL;
         }
 
         fwrite(\STDOUT, $content);

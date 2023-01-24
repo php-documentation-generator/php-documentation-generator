@@ -31,7 +31,8 @@ final class ApiPlatformPDGExtension extends Extension
         $loader->load('command.xml');
 
         $container->setParameter('pdg.reference.src', $config['reference']['src']);
-        $container->setParameter('pdg.sidebar.reference_path', $config['sidebar']['directories']['reference'][0]);
+        $container->setParameter('pdg.reference.namespace', $config['reference']['namespace']);
+        $container->setParameter('pdg.sidebar.reference_path', $config['target']['directories']['reference_path']);
         $container->setParameter('pdg.reference.patterns', $config['reference']['patterns']);
     }
 }

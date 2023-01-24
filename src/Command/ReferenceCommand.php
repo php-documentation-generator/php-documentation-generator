@@ -24,23 +24,20 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Path;
 
 #[AsCommand(name: 'pdg:reference')]
 class ReferenceCommand extends Command
 {
-    private string $root;
     private \ReflectionClass $reflectionClass;
 
     public function __construct(
         private readonly PhpDocHelper $phpDocHelper,
         private readonly ReflectionHelper $reflectionHelper,
         private readonly OutputFormatter $outputFormatter,
-        string $root = '',
+        private string $namespace = '',
         string $name = null
     ) {
         parent::__construct($name);
-        $this->root = Path::makeAbsolute($root, getcwd());
     }
 
     protected function configure(): void
@@ -63,11 +60,8 @@ class ReferenceCommand extends Command
         $stderr = $style->getErrorStyle();
         $fileName = $input->getArgument('filename');
 
-        $file = Path::makeAbsolute($fileName, getcwd());
-        $relative = Path::makeRelative($file, $this->root);
-
-        $stderr->info(sprintf('Generating reference for %s', $relative));
-        $namespace = 'ApiPlatform\\'.str_replace(['/', '.php'], ['\\', ''], $relative);
+        $stderr->info(sprintf('Generating reference for %s', $fileName));
+        $namespace = sprintf('%s\\%s', $this->namespace, str_replace(['/', '.php'], ['\\', ''], $fileName));
         $content = '';
 
         $this->reflectionClass = new \ReflectionClass($namespace);
@@ -88,7 +82,7 @@ class ReferenceCommand extends Command
 
         if (!$outputFile) {
             fwrite(\STDOUT, $content);
-            $stderr->success('Reference successfully printed on stdout for '.$relative);
+            $stderr->success('Reference successfully printed on stdout for '.$fileName);
 
             return Command::SUCCESS;
         }
@@ -98,7 +92,7 @@ class ReferenceCommand extends Command
 
             return Command::FAILURE;
         }
-        $stderr->success('Reference successfully generated for '.$relative);
+        $stderr->success('Reference successfully generated for '.$fileName);
 
         return Command::SUCCESS;
     }
