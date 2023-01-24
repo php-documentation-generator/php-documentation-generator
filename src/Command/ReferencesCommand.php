@@ -34,7 +34,7 @@ class ReferencesCommand extends Command
     public function __construct(
         private readonly PhpDocHelper $phpDocHelper,
         private readonly ReflectionHelper $reflectionHelper,
-        string $name = null
+        string $name = 'pdg:references'
     ) {
         parent::__construct($name);
         $this->config = (require 'src/config.php')();
@@ -109,12 +109,14 @@ class ReferencesCommand extends Command
         // Creating an index like https://angular.io/api
         $content = '';
         foreach ($namespaces as $namespace => $classes) {
+            $content .= '<article class="api-list-container">' . PHP_EOL;
             $content .= '## ' . $namespace . PHP_EOL;
-            $content .= '<ul>' . PHP_EOL;
+            $content .= '<ul class="api-list">' . PHP_EOL;
             foreach ($classes as $classObj) {
-                $content .= sprintf('<li><a href="%s"><span class="symbol %s">%2$s</span>%s</a></li>%s', $classObj['link'], $classObj['type'], $classObj['shortName'], PHP_EOL);
+                $content .= sprintf('<li class="api-item"><a href="%s"><span class="symbol %s">%2$s</span>%s</a></li>%s', $classObj['link'], $classObj['type'], $classObj['shortName'], PHP_EOL);
             }
             $content .='</ul>' . PHP_EOL;
+            $content .= '</article>' . PHP_EOL;
         }
 
         fwrite(\STDOUT, $content);
