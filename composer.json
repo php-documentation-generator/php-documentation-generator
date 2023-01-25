@@ -9,12 +9,12 @@
     ],
     "autoload": {
         "psr-4": {
+            "ApiPlatform\\PDGBundle\\Tests\\": "tests",
             "ApiPlatform\\PDGBundle\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ApiPlatform\\PDGBundle\\Tests\\": "tests",
             "App\\": "tests/Application/src/"
         }
     },
