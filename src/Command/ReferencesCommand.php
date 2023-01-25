@@ -55,7 +55,6 @@ class ReferencesCommand extends Command
 
         foreach ($files as $file) {
             $relativeToSrc = Path::makeRelative($file->getPath(), $this->root);
-            $relativeToDocs = Path::makeRelative($file->getRealPath(), getcwd());
 
             $namespace = sprintf('%s\\%s', $this->namespace, str_replace(['/', '.php'], ['\\', ''], $relativeToSrc));
             $className = sprintf('%s\\%s', $namespace, $file->getBasename('.php'));
@@ -92,7 +91,7 @@ class ReferencesCommand extends Command
             $generateRefCommand = $this->getApplication()?->find('pdg:reference');
 
             $arguments = [
-                'filename' => str_replace('src/', '', $relativeToDocs),
+                'filename' => str_replace($this->namespace.'\\', '', $className ).'.php',
                 'output' => sprintf('%s%s%s%2$s%s.mdx', $this->referencePath, \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php')),
             ];
 
