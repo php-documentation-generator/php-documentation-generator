@@ -69,7 +69,7 @@ class ReferencesCommand extends Command
                 'className' => $className,
                 'shortName' => $file->getBasename('.php'),
                 'type' => $this->getClassType($refl),
-                'link' => '/reference/'.($relativeToSrc.$file->getBaseName('.php')),
+                'link' => '/reference/'.($relativeToSrc.'/'.$file->getBaseName('.php')),
             ];
 
             foreach ($tagsToIgnore as $tagToIgnore) {
