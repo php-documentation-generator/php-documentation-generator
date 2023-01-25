@@ -5,5 +5,9 @@ api_platform:
 
   doctrine:
     enabled: true
+
   graphql:
+    enabled: false
+
+  doctrine_mongodb_odm:
     enabled: false
