@@ -10,12 +10,8 @@
     "autoload": {
         "psr-4": {
             "ApiPlatform\\PDGBundle\\Tests\\": "tests",
-            "ApiPlatform\\PDGBundle\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "App\\": "tests/Application/src/"
+            "ApiPlatform\\PDGBundle\\": "src/",
+            "App\\": "tests/Application/src"
         }
     },
     "bin": ["bin/pdg"],
