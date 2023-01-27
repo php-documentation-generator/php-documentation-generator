@@ -14,33 +14,28 @@ declare(strict_types=1);
 namespace ApiPlatform\PDGBundle\Command;
 
 use ApiPlatform\PDGBundle\Services\Reference\OutputFormatter;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-// the name of the command is what users type after "php bin/console"
-#[AsCommand(name: 'pdg:guide')]
-class GuideCommand extends Command
+final class GuideCommand extends Command
 {
     // Regular expression to match comment
     private const REGEX = '/^\s*\/\/\s/';
 
-    public function __construct(
-        private readonly OutputFormatter $outputFormatter,
-        string $name = null
-    ) {
-        parent::__construct($name);
+    public function __construct(private readonly OutputFormatter $outputFormatter)
+    {
+        parent::__construct(name: 'guide');
     }
 
     protected function configure(): void
     {
         $this
-            ->setHelp('Creates a markdown guide based on a PHP code.')
-            ->setDescription('Creates a markdown guide based on a PHP code.')
-            ->addArgument('file', InputArgument::REQUIRED, 'PHP file to make the guide of.');
+            ->setHelp(help: 'Creates a markdown guide based on a PHP code.')
+            ->setDescription(description: 'Creates a markdown guide based on a PHP code.')
+            ->addArgument(name: 'file', mode: InputArgument::REQUIRED, description: 'PHP file to make the guide of.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

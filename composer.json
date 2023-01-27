@@ -7,29 +7,8 @@
             "email": "soyuka@users.noreply.github.com"
         }
     ],
-    "autoload": {
-        "psr-4": {
-            "ApiPlatform\\PDGBundle\\Tests\\": "tests",
-            "ApiPlatform\\PDGBundle\\": "src/",
-            "App\\": "tests/Application/src"
-        }
-    },
-    "bin": ["bin/pdg"],
-    "require-dev": {
-        "symfony/dom-crawler": "^6.2",
-        "symfony/serializer": "^6.2",
-        "doctrine/annotations": "^2.0",
-        "phpdocumentor/reflection-docblock": "^5.3",
-        "symfony/asset": "^6.2",
-        "symfony/dotenv": "^6.2",
-        "symfony/expression-language": "^6.2",
-        "symfony/property-access": "^6.2",
-        "symfony/property-info": "^6.2",
-        "symfony/security-bundle": "^6.2",
-        "symfony/validator": "^6.2",
-        "symfony/yaml": "^6.2"
-    },
     "require": {
+        "php": ">=8.2",
         "phpunit/phpunit": "^9.5",
         "api-platform/core": "^3.0",
         "symfony/phpunit-bridge": "^6.2",
@@ -46,12 +25,34 @@
         "symfony/browser-kit": "^6.2",
         "symfony/css-selector": "^6.2",
         "symfony/http-client": "^6.2",
-        "symfony/framework-bundle": "^6.2",
+        "symfony/yaml": "^6.2",
         "spatie/yaml-front-matter": "^2.0",
         "dama/doctrine-test-bundle": "^7.1",
         "justinrainbow/json-schema": "^5.2",
         "zenstruck/foundry": "^1.27"
     },
+    "require-dev": {
+        "symfony/dom-crawler": "^6.2",
+        "symfony/serializer": "^6.2",
+        "doctrine/annotations": "^2.0",
+        "phpdocumentor/reflection-docblock": "^5.3",
+        "symfony/asset": "^6.2",
+        "symfony/dotenv": "^6.2",
+        "symfony/expression-language": "^6.2",
+        "symfony/framework-bundle": "^6.2",
+        "symfony/property-access": "^6.2",
+        "symfony/property-info": "^6.2",
+        "symfony/security-bundle": "^6.2",
+        "symfony/validator": "^6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "ApiPlatform\\PDGBundle\\Tests\\": "tests",
+            "ApiPlatform\\PDGBundle\\": "src/",
+            "App\\": "tests/Application/src"
+        }
+    },
+    "bin": ["bin/pdg"],
     "config": {
         "allow-plugins": {
             "symfony/runtime": true

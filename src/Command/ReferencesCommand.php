@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace ApiPlatform\PDGBundle\Command;
 
+use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
 use ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper;
 use ApiPlatform\PDGBundle\Services\Reference\Reflection\ReflectionHelper;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,39 +24,35 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 
-#[AsCommand(name: 'pdg:references')]
-class ReferencesCommand extends Command
+final class ReferencesCommand extends Command
 {
     public function __construct(
         private readonly PhpDocHelper $phpDocHelper,
         private readonly ReflectionHelper $reflectionHelper,
-        private readonly array $patterns = [],
-        private readonly string $referencePath = '',
-        private readonly string $root = '',
-        private readonly string $namespace = '',
-        string $name = null
+        private readonly ConfigurationHandler $configuration
     ) {
-        parent::__construct($name);
+        parent::__construct(name: 'references');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
 
-        $tagsToIgnore = $this->patterns['class_tags_to_ignore'];
-        $filesToExclude = $this->patterns['exclude'];
+        $patterns = $this->configuration->get('reference.patterns');
+        $tagsToIgnore = $patterns['class_tags_to_ignore'] ?? ['@internal', '@experimental'];
+        $filesToExclude = $patterns['exclude'] ?? [];
 
         $files = [];
-        $files = $this->findFilesByName($this->patterns['names'], $files, $filesToExclude);
-        $files = $this->findFilesByDirectories($this->patterns['directories'], $files, $filesToExclude);
+        $files = $this->findFilesByName($patterns['names'] ?? ['*.php'], $files, $filesToExclude);
+        $files = $this->findFilesByDirectories($patterns['directories'] ?? [], $files, $filesToExclude);
         $files = array_unique($files);
 
         $namespaces = [];
 
         foreach ($files as $file) {
-            $relativeToSrc = Path::makeRelative($file->getPath(), $this->root);
+            $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('reference.src'));
 
-            $namespace = sprintf('%s\\%s', $this->namespace, str_replace(['/', '.php'], ['\\', ''], $relativeToSrc));
+            $namespace = rtrim(sprintf('%s\\%s', $this->configuration->get('reference.namespace'), str_replace(['/', '.php'], ['\\', ''], $relativeToSrc)), '\\');
             $className = sprintf('%s\\%s', $namespace, $file->getBasename('.php'));
 
             $refl = new \ReflectionClass($className);
@@ -82,17 +78,17 @@ class ReferencesCommand extends Command
                 continue;
             }
 
-            if (!@mkdir($concurrentDirectory = $this->referencePath.'/'.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
+            if (!@mkdir($concurrentDirectory = $this->configuration->get('target.directories.reference_path').'/'.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
                 $style->error(sprintf('Directory "%s" was not created', $concurrentDirectory));
 
                 return Command::FAILURE;
             }
 
-            $generateRefCommand = $this->getApplication()?->find('pdg:reference');
+            $generateRefCommand = $this->getApplication()?->find('reference');
 
             $arguments = [
-                'filename' => str_replace($this->namespace.'\\', '', $className).'.php',
-                'output' => sprintf('%s%s%s%2$s%s.mdx', $this->referencePath, \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php')),
+                'filename' => $file->getPathName(),
+                'output' => sprintf('%s%s%s%2$s%s.mdx', $this->configuration->get('target.directories.reference_path'), \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php')),
             ];
 
             $commandInput = new ArrayInput($arguments);
@@ -125,7 +121,7 @@ class ReferencesCommand extends Command
     private function findFilesByDirectories(array $directories, array $files, array $filesToExclude = []): array
     {
         foreach ($directories as $pattern) {
-            foreach ((new Finder())->files()->in($this->root.'/'.$pattern)->name('*.php')->notName($filesToExclude) as $file) {
+            foreach ((new Finder())->files()->in($this->configuration->get('reference.src').'/'.$pattern)->name('*.php')->notName($filesToExclude) as $file) {
                 $files[] = $file;
             }
         }
@@ -135,7 +131,7 @@ class ReferencesCommand extends Command
 
     private function findFilesByName(array $names, array $files, array $filesToExclude = []): array
     {
-        foreach ((new Finder())->files()->in($this->root)->name($names)->notName($filesToExclude) as $file) {
+        foreach ((new Finder())->files()->in($this->configuration->get('reference.src'))->name($names)->notName($filesToExclude) as $file) {
             $files[] = $file;
         }
 

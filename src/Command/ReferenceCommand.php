@@ -13,20 +13,19 @@ declare(strict_types=1);
 
 namespace ApiPlatform\PDGBundle\Command;
 
+use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
 use ApiPlatform\PDGBundle\Services\Reference\OutputFormatter;
 use ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper;
 use ApiPlatform\PDGBundle\Services\Reference\Reflection\ReflectionHelper;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'pdg:reference')]
-class ReferenceCommand extends Command
+final class ReferenceCommand extends Command
 {
     private \ReflectionClass $reflectionClass;
 
@@ -34,23 +33,19 @@ class ReferenceCommand extends Command
         private readonly PhpDocHelper $phpDocHelper,
         private readonly ReflectionHelper $reflectionHelper,
         private readonly OutputFormatter $outputFormatter,
-        private string $namespace = '',
-        string $name = null
+        private readonly ConfigurationHandler $configuration
     ) {
-        parent::__construct($name);
+        parent::__construct(name: 'reference');
     }
 
     protected function configure(): void
     {
         $this
+            ->addArgument(name: 'filename', mode: InputArgument::REQUIRED)
             ->addArgument(
-                'filename',
-                InputArgument::REQUIRED
-            )
-            ->addArgument(
-                'output',
-                InputArgument::OPTIONAL,
-                'The path to the mdx file where the reference will be printed.Leave empty for screen printing'
+                name: 'output',
+                mode: InputArgument::OPTIONAL,
+                description: 'The path to the mdx file where the reference will be printed. Leave empty for screen printing'
             );
     }
 
@@ -60,8 +55,11 @@ class ReferenceCommand extends Command
         $stderr = $style->getErrorStyle();
         $fileName = $input->getArgument('filename');
 
-        $stderr->info(sprintf('Generating reference for %s', $fileName));
-        $namespace = sprintf('%s\\%s', $this->namespace, str_replace(['/', '.php'], ['\\', ''], $fileName));
+        $stderr->info(sprintf('Generating reference for "%s"', $fileName));
+        $namespace = sprintf('%s\\%s',
+            $this->configuration->get('reference.namespace'),
+            str_replace(['/', '.php'], ['\\', ''], preg_replace(sprintf('#^%s/#i', $this->configuration->get('reference.src')), '', $fileName))
+        );
         $content = '';
 
         $this->reflectionClass = new \ReflectionClass($namespace);

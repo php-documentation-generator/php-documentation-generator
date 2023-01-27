@@ -1,0 +1,64 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="pdg.configuration_handler" class="ApiPlatform\PDGBundle\Services\ConfigurationHandler"/>
+
+        <!-- Commands -->
+        <service id="pdg.command.reference" class="ApiPlatform\PDGBundle\Command\ReferenceCommand">
+            <argument type="service" id="pdg.helper.php_doc"/>
+            <argument type="service" id="pdg.helper.reflection"/>
+            <argument type="service" id="pdg.output_formatter"/>
+            <argument type="service" id="pdg.configuration_handler"/>
+            <tag>console.command</tag>
+        </service>
+
+        <service id="pdg.command.references" class="ApiPlatform\PDGBundle\Command\ReferencesCommand">
+            <argument type="service" id="pdg.helper.php_doc"/>
+            <argument type="service" id="pdg.helper.reflection"/>
+            <argument type="service" id="pdg.configuration_handler"/>
+            <tag>console.command</tag>
+        </service>
+
+        <service id="pdg.command.index" class="ApiPlatform\PDGBundle\Command\IndexCommand">
+            <tag>console.command</tag>
+        </service>
+
+        <service id="pdg.command.guide" class="ApiPlatform\PDGBundle\Command\GuideCommand">
+            <argument type="service" id="pdg.output_formatter"/>
+            <tag>console.command</tag>
+        </service>
+
+        <service id="pdg.command.test_guide" class="ApiPlatform\PDGBundle\Command\TestGuideCommand">
+            <tag>console.command</tag>
+        </service>
+
+        <!-- Helpers -->
+        <service id="pdg.output_formatter" class="ApiPlatform\PDGBundle\Services\Reference\OutputFormatter"/>
+
+        <service id="pdg.helper.php_doc" class="ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper">
+            <argument type="service" id="pdg.output_formatter"/>
+        </service>
+
+        <service id="pdg.helper.reflection_property"
+                 class="ApiPlatform\PDGBundle\Services\Reference\Reflection\ReflectionPropertyHelper">
+            <argument type="service" id="pdg.output_formatter"/>
+            <argument type="service" id="pdg.helper.php_doc"/>
+        </service>
+
+        <service id="pdg.helper.reflection_method"
+                 class="ApiPlatform\PDGBundle\Services\Reference\Reflection\ReflectionMethodHelper">
+            <argument type="service" id="pdg.output_formatter"/>
+        </service>
+
+        <service id="pdg.helper.reflection"
+                 class="ApiPlatform\PDGBundle\Services\Reference\Reflection\ReflectionHelper">
+            <argument type="service" id="pdg.helper.php_doc"/>
+            <argument type="service" id="pdg.output_formatter"/>
+            <argument type="service" id="pdg.helper.reflection_property"/>
+            <argument type="service" id="pdg.helper.reflection_method"/>
+        </service>
+    </services>
+</container>

@@ -1,0 +1,17 @@
+# Example file for tests
+api_platform_pdg:
+    autoload: 'vendor/autoload.php'
+    reference:
+        src: 'src'
+        namespace: 'App'
+        patterns:
+            directories: [ 'Controller', 'Validator' ]
+            names: [ '*.php' ]
+            exclude: [ '*Interface.php' ]
+            class_tags_to_ignore: [ '@internal', '@experimental' ]
+    target:
+        directories:
+            guide_path: 'pages/guides'
+            reference_path: 'pages/references'
+        # For URLs
+        base_path: 'pages'

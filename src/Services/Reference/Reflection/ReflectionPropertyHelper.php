@@ -134,6 +134,10 @@ class ReflectionPropertyHelper
         $visitor = new PropertyDefaultValueNodeVisitor($property);
         $traverser->addVisitor($visitor);
 
+        if ($property->getDeclaringClass()->isInternal()) {
+            return '';
+        }
+
         $stmts = $this->parser->parse(file_get_contents($property->getDeclaringClass()->getFileName()));
         $traverser->traverse($stmts);
 

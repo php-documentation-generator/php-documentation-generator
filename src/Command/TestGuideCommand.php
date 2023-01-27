@@ -16,22 +16,25 @@ namespace ApiPlatform\PDGBundle\Command;
 use ApiPlatform\PDGBundle\Tests\TestBundle\Command\PhpUnitCommand;
 use App\Kernel;
 use PHPUnit\Framework\TestSuite;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'pdg:test:guide')]
-class TestGuideCommand extends Command
+final class TestGuideCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct(name: 'test:guide');
+    }
+
     protected function configure(): void
     {
         $this->addArgument(
-            'guide',
-            InputArgument::REQUIRED,
-            'the path to the guide to test'
+            name: 'guide',
+            mode: InputArgument::REQUIRED,
+            description: 'The path to the guide to test'
         );
     }
 

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\PDGBundle\Command;
 
 use Spatie\YamlFrontMatter\YamlFrontMatter;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,25 +24,24 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Exception\ParseException;
 
-// the name of the command is what users type after "php bin/console"
-#[AsCommand(name: 'pdg:index')]
-class IndexCommand extends Command
+final class IndexCommand extends Command
 {
+    public function __construct()
+    {
+        parent::__construct(name: 'index');
+    }
+
     protected function configure(): void
     {
         $this
-            ->setDescription('Creates an index based on a directory of markdown files.')
+            ->setDescription(description: 'Creates an index based on a directory of markdown files.')
             ->addArgument(
                 name: 'directory',
                 mode: InputArgument::IS_ARRAY,
                 description: 'PHP file to make the guide of.',
                 default: ['pages/guide', 'pages/reference']
             )
-            ->addOption(
-                name: 'basePath',
-                default: 'pages',
-                mode: InputOption::VALUE_OPTIONAL
-            );
+            ->addOption(name: 'basePath', mode: InputOption::VALUE_OPTIONAL, default: 'pages');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

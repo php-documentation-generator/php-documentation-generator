@@ -13,49 +13,40 @@ declare(strict_types=1);
 
 namespace ApiPlatform\PDGBundle;
 
-use ApiPlatform\PDGBundle\DependencyInjection\ApiPlatformPDGExtension;
-use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
-use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 
 class Kernel extends BaseKernel
 {
-    use MicroKernelTrait;
-
-    private function configureContainer(ContainerConfigurator $container, LoaderInterface $loader, ContainerBuilder $builder): void
-    {
-        $configDir = $this->getConfigDir();
-
-        $container->import($configDir.'/{packages}/*.{php,yaml}');
-        $container->import($configDir.'/{packages}/'.$this->environment.'/*.{php,yaml}');
-
-        $builder->registerExtension(new ApiPlatformPDGExtension());
-
-        $pdgConfig = getenv('PDG_CONFIG') ?? 'pdg.config.yaml';
-        if ($pdgConfig && is_file(getcwd().\DIRECTORY_SEPARATOR.$pdgConfig)) {
-            $container->import(getcwd().\DIRECTORY_SEPARATOR.$pdgConfig);
-        }
-
-        if (is_file($configDir.'/services.yaml')) {
-            $container->import($configDir.'/services.yaml');
-            $container->import($configDir.'/{services}_'.$this->environment.'.yaml');
-        } else {
-            $container->import($configDir.'/{services}.php');
-        }
-    }
-
-    public function getProjectDir(): string
-    {
-        return \dirname(__DIR__);
-    }
-
     public function registerBundles(): iterable
     {
-        return [
-            new FrameworkBundle(),
-        ];
+        return [];
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader): void
+    {
+        $loader->load(function (ContainerBuilder $container): void {
+            // Load services
+            (new XmlFileLoader($container, new FileLocator(__DIR__.'/../config')))->load('services.xml');
+
+            // Create Application service (required in "pdg" binary)
+            $container
+                ->register(Application::class, Application::class)
+                ->setArgument('$name', 'pdg')
+                ->setArgument('$version', '0.0.1')
+                ->setPublic(true);
+
+            // Add each command to the Application service (required for a standalone Symfony console app)
+            foreach ($container->findTaggedServiceIds('console.command') as $serviceId => $tags) {
+                $container
+                    ->getDefinition(Application::class)
+                    ->addMethodCall('add', [new Reference($serviceId)]);
+            }
+        });
     }
 }

@@ -2,7 +2,7 @@
 <?php
 
 use ApiPlatform\PDGBundle\Kernel;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Application;
 
 if (isset($GLOBALS['_composer_autoload_path'])) {
     require_once $GLOBALS['_composer_autoload_path'];
@@ -12,10 +12,11 @@ if (isset($GLOBALS['_composer_autoload_path'])) {
 
 $app = function (array $context) {
     $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+    $kernel->boot();
 
     // returning an "Application" makes the Runtime run a Console
     // application instead of the HTTP Kernel
-    return new Application($kernel);
+    return $kernel->getContainer()->get(Application::class);
 };
 
 $runtime = $_SERVER['APP_RUNTIME'] ?? $_ENV['APP_RUNTIME'] ?? 'Symfony\\Component\\Runtime\\SymfonyRuntime';
