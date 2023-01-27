@@ -19,8 +19,6 @@
         "symfony/dom-crawler": "^6.2",
         "symfony/serializer": "^6.2",
         "api-platform/core": "^3.0",
-        "phpunit/phpunit": "^9.5",
-        "symfony/phpunit-bridge": "^6.2",
         "doctrine/annotations": "^2.0",
         "phpdocumentor/reflection-docblock": "^5.3",
         "symfony/asset": "^6.2",
@@ -33,6 +31,8 @@
         "symfony/yaml": "^6.2"
     },
     "require": {
+        "phpunit/phpunit": "^9.5",
+        "symfony/phpunit-bridge": "^6.2",
         "nelmio/cors-bundle": "^2.2",
         "doctrine/doctrine-bundle": "^2.8",
         "doctrine/orm": "^2.14",
