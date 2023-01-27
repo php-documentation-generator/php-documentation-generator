@@ -13,42 +13,60 @@ declare(strict_types=1);
 
 namespace ApiPlatform\PDGBundle\Command;
 
-use ApiPlatform\PDGBundle\Services\Reference\OutputFormatter;
+use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
+use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Twig\Environment;
 
 final class GuideCommand extends Command
 {
+    use CommandTrait;
+
     // Regular expression to match comment
     private const REGEX = '/^\s*\/\/\s/';
 
-    public function __construct(private readonly OutputFormatter $outputFormatter)
-    {
+    public function __construct(
+        private readonly ConfigurationHandler $configuration,
+        private readonly Environment $environment,
+        private readonly string $templatePath
+    ) {
         parent::__construct(name: 'guide');
     }
 
     protected function configure(): void
     {
         $this
-            ->setHelp(help: 'Creates a markdown guide based on a PHP code.')
-            ->setDescription(description: 'Creates a markdown guide based on a PHP code.')
-            ->addArgument(name: 'file', mode: InputArgument::REQUIRED, description: 'PHP file to make the guide of.');
+            ->setDescription(description: 'Creates a markdown guide based on a PHP code')
+            ->addArgument(name: 'filename', mode: InputArgument::REQUIRED)
+            ->addArgument(
+                name: 'output',
+                mode: InputArgument::OPTIONAL,
+                description: 'The path to the file where the guide will be printed. Leave empty for screen printing'
+            )
+            ->addOption(
+                name: 'template-path',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The path to the template files to use to generate the output file',
+                default: $this->templatePath
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $stderr = $io->getErrorStyle();
-        $file = $input->getArgument('file');
-        $handle = fopen($file, 'r');
+        $file = new SplFileInfo($input->getArgument('filename'));
 
+        $style = new SymfonyStyle($input, $output);
+
+        $handle = fopen($file->getPathName(), 'r');
         if (!$handle) {
-            $stderr->info(sprintf('Error opening %s.', $file));
+            $style->error(sprintf('Error opening "%s".', $file->getPathName()));
 
-            return Command::INVALID;
+            return self::INVALID;
         }
 
         // Let's split the code between an array of code and an array of text
@@ -60,9 +78,9 @@ final class GuideCommand extends Command
         // We need to put front matter headers at the start of the markdown file
         $frontMatterOpen = false;
         // we keep the headers as-is in this array
-        $header = [];
+        $headers = [];
 
-        $stderr->info(sprintf('Creating guide %s.', $file));
+        $style->info(sprintf('Creating guide "%s".', $file->getPathName()));
 
         while (($line = fgets($handle)) !== false) {
             if (!isset($sections[$currentSection]['text'])) {
@@ -78,12 +96,12 @@ final class GuideCommand extends Command
                 $text = preg_replace(self::REGEX, '', $line);
                 if ('---' === trim($text)) {
                     $frontMatterOpen = !$frontMatterOpen;
-                    $header[] = $text;
+                    $headers[] = $text;
                     continue;
                 }
 
                 if ($frontMatterOpen) {
-                    $header[] = $text;
+                    $headers[] = $text;
                     continue;
                 }
 
@@ -116,7 +134,8 @@ final class GuideCommand extends Command
             }
 
             if ($matches) {
-                $sections[$currentSection]['code'][] = '// src/'.str_replace('\\', '/', $matches[1]).'.php'.\PHP_EOL;
+                // todo "src" should be from configuration?
+                $sections[$currentSection]['code'][] = '// src'.\DIRECTORY_SEPARATOR.str_replace('\\', \DIRECTORY_SEPARATOR, $matches[1]).'.php'.\PHP_EOL;
             }
 
             $sections[$currentSection]['code'][] = $line;
@@ -130,43 +149,30 @@ final class GuideCommand extends Command
 
         fclose($handle);
 
-        $a = implode('', $header);
-        $a .= <<<MD
-<div className="sections">
+        $content = $this->environment->render(
+            $this->getTemplateFile($input->getOption('template-path'), 'guide.*.twig')->getFilename(),
+            ['headers' => $headers, 'sections' => $sections]
+        );
 
-MD;
+        $out = $input->getArgument('output');
+        if (!$out) {
+            $style->block($content);
 
-        foreach ($sections as $i => $section) {
-            $a .= <<<MD
-  <div className="section" id="section-$i">
-    <div className="annotation">
-    <a className="anchor" href="#section-$i">&#x00a7;</a>
-
-MD;
-            $text = implode('', $section['text'] ?: [\PHP_EOL]);
-            $a .= str_contains($text, '[codeSelector]')
-                ? $this->outputFormatter->formatCodeSelector($text)
-                : $text;
-            $a .= <<<MD
-    </div>
-    <div className="content">
-
-```php
-
-MD;
-            $a .= implode('', $section['code'] ?: [\PHP_EOL]);
-            $a .= <<<MD
-```
-    </div>
-  </div>
-
-MD;
+            return self::SUCCESS;
         }
 
-        $a .= '</div>';
+        $dirName = pathinfo($out, \PATHINFO_DIRNAME);
+        if (!is_dir($dirName)) {
+            mkdir($dirName, 0777, true);
+        }
+        if (!file_put_contents($out, $content)) {
+            $style->error(sprintf('Cannot write in "%s".', $out));
 
-        $output->write($a);
+            return self::FAILURE;
+        }
 
-        return Command::SUCCESS;
+        $style->success(sprintf('Guide "%s" successfully created.', $file->getPathname()));
+
+        return self::SUCCESS;
     }
 }

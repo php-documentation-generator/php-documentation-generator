@@ -1,0 +1,15 @@
+{% extends 'layout.mdx.twig' %}
+
+{% block head %}
+<Head><title>{{ class.shortName }}</title></Head>
+{% endblock %}
+
+{% block title %}
+# Configuration Reference
+{% endblock %}
+
+{%- block content -%}
+```yaml
+{{ configuration|raw -}}
+```
+{%- endblock -%}

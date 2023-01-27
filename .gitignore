@@ -8,3 +8,5 @@ bin/pdg.phar
 
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
+
+tests/Command/pages/

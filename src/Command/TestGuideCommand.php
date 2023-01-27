@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace ApiPlatform\PDGBundle\Command;
 
-use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
 use ApiPlatform\PDGBundle\Tests\TestBundle\Command\PhpUnitCommand;
 use ApiPlatform\PDGBundle\Tests\TestBundle\Guide\PlaygroundTestCase;
 use App\Kernel;
@@ -26,7 +25,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class TestGuideCommand extends Command
 {
-    public function __construct(private readonly ConfigurationHandler $configurationHandler)
+    public function __construct()
     {
         parent::__construct(name: 'test:guide');
     }

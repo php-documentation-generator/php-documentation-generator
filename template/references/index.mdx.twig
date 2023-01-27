@@ -1,0 +1,16 @@
+{% for namespace, classes in namespaces %}
+<article class="api-list-container">
+## {{ namespace }}
+<ul class="api-list">
+{% for class in classes %}
+    <li class="api-item">
+        <a href="{{ class|mdx_url }}">
+            <span class="symbol {{ class.isInterface ? 'I' : (class.getAttributes('Attribute')|length > 0 ? 'A' : (class.isTrait ? 'T' : 'C')) }}">
+                {{ class.shortName }}
+            </span>
+        </a>
+    </li>
+{% endfor %}
+</ul>
+</article>
+{% endfor %}

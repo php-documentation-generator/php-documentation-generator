@@ -11,12 +11,8 @@
 
 declare(strict_types=1);
 
-require dirname(__DIR__).'/vendor/autoload.php';
+namespace ApiPlatform\PDGBundle\Parser;
 
-if (file_exists($bootstrap = dirname(__DIR__).'/config/bootstrap.php')) {
-    require $bootstrap;
-}
-
-if ($_SERVER['APP_DEBUG']) {
-    umask(0000);
+interface ParserInterface
+{
 }

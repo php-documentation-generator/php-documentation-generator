@@ -1,0 +1,16 @@
+{{ headers|join('') }}
+<div className="sections">
+    {% for section in sections %}
+        <div className="section" id="section-{{ loop.index }}">
+            <div className="annotation">
+                <a className="anchor" href="#section-{{ loop.index }}">&#x00a7;</a>
+                {{ section.text|join('')|mdx_sanitize }}
+            </div>
+            <div className="content">
+                ```php
+                {{ section.code|join('') }}
+                ```
+            </div>
+        </div>
+    {% endfor %}
+</div>
