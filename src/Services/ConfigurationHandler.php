@@ -45,6 +45,8 @@ final class ConfigurationHandler
 
     private function parse(): void
     {
+        $cwd = getcwd();
+
         // First, load config file from PHP_DOC_CONFIG environment variable
         $configFile = getenv('PHP_DOC_CONFIG');
         if ($configFile && !is_file($configFile)) {
@@ -54,14 +56,14 @@ final class ConfigurationHandler
         // If PHP_DOC_CONFIG environment variable is not set, try to load config file from default ordered ones
         if (!$configFile) {
             $files = [
-                getcwd().'/pdg.config.yaml',
-                getcwd().'/pdg.config.yml',
-                getcwd().'/pdg.config.dist.yaml',
-                getcwd().'/pdg.config.dist.yml',
+                'pdg.config.yaml',
+                'pdg.config.yml',
+                'pdg.config.dist.yaml',
+                'pdg.config.dist.yml',
             ];
 
             foreach ($files as $filename) {
-                if (is_file($filename)) {
+                if (is_file(sprintf('%s/%s', $cwd, $filename))) {
                     $configFile = $filename;
                     break;
                 }
@@ -77,7 +79,7 @@ final class ConfigurationHandler
         $this->config = (new Processor())->processConfiguration(new Configuration(), Yaml::parse(file_get_contents($configFile)));
 
         // Autoload project autoloader
-        $autoload = sprintf('%s/%s', getcwd(), $this->config['autoload']);
+        $autoload = sprintf('%s/%s', $cwd, $this->config['autoload']);
         if (!file_exists($autoload)) {
             throw new \RuntimeException(sprintf('Autoload file "%s" does not exist.', $autoload));
         }
