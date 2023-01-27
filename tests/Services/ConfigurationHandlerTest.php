@@ -23,7 +23,7 @@ final class ConfigurationHandlerTest extends TestCase
      */
     public function testItGetsAConfigurationValueFromTheConfigFile(string $key, mixed $expected): void
     {
-        putenv(sprintf('PHP_DOC_CONFIG=%s/pdg.config.yaml', __DIR__));
+        putenv(sprintf('PDG_CONFIG_FILE=%s/pdg.config.yaml', __DIR__));
 
         $this->assertEquals($expected, (new ConfigurationHandler())->get($key));
     }

@@ -47,13 +47,13 @@ final class ConfigurationHandler
     {
         $cwd = getcwd();
 
-        // First, load config file from PHP_DOC_CONFIG environment variable
-        $configFile = getenv('PHP_DOC_CONFIG');
+        // First, load config file from PDG_CONFIG_FILE environment variable
+        $configFile = getenv('PDG_CONFIG_FILE');
         if ($configFile && !is_file($configFile)) {
             throw new \RuntimeException(sprintf('Configuration file "%s" does not exist.', $configFile));
         }
 
-        // If PHP_DOC_CONFIG environment variable is not set, try to load config file from default ordered ones
+        // If PDG_CONFIG_FILE environment variable is not set, try to load config file from default ordered ones
         if (!$configFile) {
             $files = [
                 'pdg.config.yaml',
