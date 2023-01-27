@@ -91,7 +91,7 @@ class ReferencesCommand extends Command
             $generateRefCommand = $this->getApplication()?->find('pdg:reference');
 
             $arguments = [
-                'filename' => str_replace($this->namespace.'\\', '', $className ).'.php',
+                'filename' => str_replace($this->namespace.'\\', '', $className).'.php',
                 'output' => sprintf('%s%s%s%2$s%s.mdx', $this->referencePath, \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php')),
             ];
 

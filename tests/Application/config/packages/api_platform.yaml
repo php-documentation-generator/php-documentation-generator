@@ -2,27 +2,3 @@ api_platform:
   formats:
     jsonld: [ 'application/ld+json' ]
     json: ['application/json']
-
-  doctrine:
-    enabled: true
-
-  graphql:
-    enabled: false
-
-  doctrine_mongodb_odm:
-    enabled: false
-
-  mercure:
-    # Enabled by default with installed symfony/mercure-bundle.
-    enabled: false
-
-    # The URL sent in the Link HTTP header. If not set, will default to MercureBundle's default hub URL.
-    hub_url: null
-
-  messenger:
-    # Enabled by default with installed symfony/messenger and not installed symfony/symfony.
-    enabled: false
-
-  elasticsearch:
-    # To enable or disable Elasticsearch support.
-    enabled: false

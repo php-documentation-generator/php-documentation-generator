@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\PDGBundle;
 
+use ApiPlatform\PDGBundle\DependencyInjection\ApiPlatformPDGExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -31,9 +32,11 @@ class Kernel extends BaseKernel
         $container->import($configDir.'/{packages}/*.{php,yaml}');
         $container->import($configDir.'/{packages}/'.$this->environment.'/*.{php,yaml}');
 
-        $pdgConfig = getenv('PDG_CONFIG');
-        if ($pdgConfig && is_file(getcwd(). DIRECTORY_SEPARATOR. $pdgConfig)) {
-            $container->import(getcwd().DIRECTORY_SEPARATOR.$pdgConfig);
+        $builder->registerExtension(new ApiPlatformPDGExtension());
+
+        $pdgConfig = getenv('PDG_CONFIG') ?? 'pdg.config.yaml';
+        if ($pdgConfig && is_file(getcwd().\DIRECTORY_SEPARATOR.$pdgConfig)) {
+            $container->import(getcwd().\DIRECTORY_SEPARATOR.$pdgConfig);
         }
 
         if (is_file($configDir.'/services.yaml')) {
@@ -53,7 +56,6 @@ class Kernel extends BaseKernel
     {
         return [
             new FrameworkBundle(),
-            new ApiPlatformPDGBundle()
         ];
     }
 }
