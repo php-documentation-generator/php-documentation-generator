@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  pull_request: ~
+  schedule:
+    # Every Sunday at 02:00
+    - cron: 0 2 * * 0
+  workflow_dispatch: ~
+
+jobs:
+  tests:
+    name: Tests PHP ${{ matrix.php }} / Symfony ${{ matrix.symfony }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.2']
+        include:
+          - php: '8.2'
+            quality: true
+            deprecations: true
+      fail-fast: false
+    env:
+      # PHP CS Fixer does not support PHP 8.2 yet
+      PHP_CS_FIXER_IGNORE_ENV: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: oci8
+          coverage: xdebug
+          tools: composer:v2, php-cs-fixer, phpstan, phpdoc
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-
+      - name: Update project dependencies
+        run: composer update --no-progress --ansi --prefer-stable
+      - name: Install PHPUnit
+        if: matrix.quality
+        run: vendor/bin/simple-phpunit --version
+      - name: Run php-cs-fixer tests
+        if: matrix.quality
+        run: php-cs-fixer fix --diff --dry-run --ansi --verbose
+      - name: Cache PHPStan
+        if: matrix.quality
+        uses: actions/cache@v3
+        with:
+          path: .phpstan/
+          key: phpstan-${{ github.sha }}
+          restore-keys: phpstan-
+      - name: Run PHPStan tests
+        if: matrix.quality
+        run: phpstan analyze
+      - name: Run PHPUnit tests
+        run: vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-php${{ matrix.php }}
+          path: build
