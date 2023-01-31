@@ -31,8 +31,8 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 
-use function App\DependencyInjection\configure;
-use function App\Playground\request;
+use function App\DependencyInjection\configure; // @phpstan-ignore-line
+use function App\Playground\request; // @phpstan-ignore-line
 
 class Kernel extends BaseKernel
 {
