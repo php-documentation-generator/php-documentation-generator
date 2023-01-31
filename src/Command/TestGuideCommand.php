@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace ApiPlatform\PDGBundle\Command;
 
+use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
 use ApiPlatform\PDGBundle\Tests\TestBundle\Command\PhpUnitCommand;
 use App\Kernel;
 use PHPUnit\Framework\TestSuite;
@@ -24,7 +25,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class TestGuideCommand extends Command
 {
-    public function __construct()
+    public function __construct(private readonly ConfigurationHandler $configurationHandler)
     {
         parent::__construct(name: 'test:guide');
     }
@@ -40,6 +41,8 @@ final class TestGuideCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // This requires the configured autoloader
+        $this->configurationHandler->parse();
         $style = new SymfonyStyle($input, $output);
         $guide = $input->getArgument('guide');
         $style->info('Testing guide: '.$guide);

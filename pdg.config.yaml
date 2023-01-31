@@ -1,0 +1,16 @@
+api_platform_pdg:
+  autoload: 'vendor/autoload.php'
+  reference:
+    src: '/home/user/path/to/project/src'
+    namespace: 'ApiPlatform'
+    patterns:
+      directories: ['Metadata', 'OpenApi/Model']
+      names: ["*Interface.php", "*Trait.php", "Configuration.php"]]
+      exclude: ['*Factory.php']
+      class_tags_to_ignore: ['@experimental', '@internal']
+  target:
+    directories:
+      guide_path: 'pages/guide'
+      reference_path: 'pages/reference'
+
+    base_path: 'pages'

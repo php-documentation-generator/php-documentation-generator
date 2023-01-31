@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace ApiPlatform\PDGBundle\Tests\TestBundle\Command;
 
+use DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\TextUI\Command;
+use PHPUnit\TextUI\XmlConfiguration\Extension;
 
 class PhpUnitCommand extends Command
 {
@@ -31,5 +33,7 @@ class PhpUnitCommand extends Command
     protected function handleCustomTestSuite(): void
     {
         $this->arguments['test'] = self::$suite;
+        $ext = new Extension(PHPUnitExtension::class, '', []);
+        $this->arguments['extensions'] = [$ext];
     }
 }

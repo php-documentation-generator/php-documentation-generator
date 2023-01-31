@@ -2,3 +2,12 @@ api_platform:
   formats:
     jsonld: [ 'application/ld+json' ]
     json: ['application/json']
+## still have to figure how to remove these
+  graphql:
+    enabled: false
+
+  doctrine_mongodb_odm:
+    enabled: false
+
+  mercure:
+    enabled: false

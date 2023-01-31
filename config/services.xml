@@ -32,6 +32,7 @@
         </service>
 
         <service id="pdg.command.test_guide" class="ApiPlatform\PDGBundle\Command\TestGuideCommand">
+            <argument type="service" id="pdg.configuration_handler"/>
             <tag>console.command</tag>
         </service>
 

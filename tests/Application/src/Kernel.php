@@ -79,7 +79,7 @@ class Kernel extends BaseKernel
 
         $container->parameters()->set(
             'database_url',
-            sprintf('sqlite:///%s/%s', $this->getDBDir(), 'data.db')
+            sprintf('sqlite:///%s/%s', $this->getCacheDir(), 'data.db')
         );
 
         if (\function_exists('App\DependencyInjection\configure')) {
@@ -104,11 +104,6 @@ class Kernel extends BaseKernel
         return (new \ApiPlatform\PDGBundle\Kernel('test', true))->getCacheDir().$this->guide;
     }
 
-    public function getDBDir(): string
-    {
-        return (new \ApiPlatform\PDGBundle\Kernel('test', true))->getProjectDir().'/var/databases/'.$this->guide;
-    }
-
     public function executeMigrations(string $direction = Direction::UP): void
     {
         $migrationClasses = $this->getDeclaredClassesForNamespace('DoctrineMigrations');
@@ -117,7 +112,6 @@ class Kernel extends BaseKernel
             return;
         }
         $this->boot();
-        @mkdir('var/databases/'.$this->guide, recursive: true);
 
         foreach ($migrationClasses as $migrationClass) {
             if ("Doctrine\Migrations\AbstractMigration" !== (new \ReflectionClass($migrationClass))->getParentClass()->getName()) {

@@ -43,7 +43,7 @@ final class ConfigurationHandler
         return $config;
     }
 
-    private function parse(): void
+    public function parse(): void
     {
         $cwd = getcwd();
 
