@@ -63,7 +63,7 @@ jobs:
           restore-keys: phpstan-
       - name: Run PHPStan tests
         if: matrix.quality
-        run: phpstan analyze
+        run: phpstan analyze src tests
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml
       - name: Upload test artifacts
