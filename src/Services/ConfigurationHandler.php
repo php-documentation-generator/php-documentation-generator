@@ -22,28 +22,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 final class ConfigurationHandler
 {
-    private ?array $config = null;
-
-    public function get(string $name, $default = null): mixed
-    {
-        $this->parse();
-
-        // Convert "foo.bar" in "['foo' => ['bar' => ...]]"
-        $config = $this->config;
-        $keys = explode('.', $name);
-        foreach ($keys as $key) {
-            if (\array_key_exists($key, $config)) {
-                $config = $config[$key];
-                continue;
-            }
-
-            return $default;
-        }
-
-        return $config;
-    }
-
-    public function parse(): void
+    public function __construct()
     {
         $cwd = getcwd();
 
@@ -83,6 +62,30 @@ final class ConfigurationHandler
         if (!file_exists($autoload)) {
             throw new \RuntimeException(sprintf('Autoload file "%s" does not exist.', $autoload));
         }
+
         require_once $autoload;
+    }
+
+    private ?array $config = null;
+
+    public function get(string $name, $default = null): mixed
+    {
+        if (!$this->config) {
+            throw new \RuntimeException('No configuration.');
+        }
+
+        // Convert "foo.bar" in "['foo' => ['bar' => ...]]"
+        $config = $this->config;
+        $keys = explode('.', $name);
+        foreach ($keys as $key) {
+            if (\array_key_exists($key, $config)) {
+                $config = $config[$key];
+                continue;
+            }
+
+            return $default;
+        }
+
+        return $config;
     }
 }
