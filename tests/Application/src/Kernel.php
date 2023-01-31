@@ -154,6 +154,7 @@ class Kernel extends BaseKernel
         if (!$fixtureClasses) {
             return;
         }
+        $this->boot();
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         foreach ($fixtureClasses as $class) {
             if ("Doctrine\Bundle\FixturesBundle\Fixture" !== (new \ReflectionClass($class))->getParentClass()->getName()) {
