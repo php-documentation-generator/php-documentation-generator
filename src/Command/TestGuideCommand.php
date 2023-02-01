@@ -15,6 +15,7 @@ namespace ApiPlatform\PDGBundle\Command;
 
 use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
 use ApiPlatform\PDGBundle\Tests\TestBundle\Command\PhpUnitCommand;
+use ApiPlatform\PDGBundle\Tests\TestBundle\Guide\PlaygroundTestCase;
 use App\Kernel;
 use PHPUnit\Framework\TestSuite;
 use Symfony\Component\Console\Command\Command;
@@ -55,6 +56,7 @@ final class TestGuideCommand extends Command
         foreach ($testClasses as $testClass) {
             $suite->addTestSuite($testClass);
         }
+        $suite->addTestSuite(PlaygroundTestCase::class);
 
         PhpUnitCommand::setSuite($suite);
         $_ENV['KERNEL_CLASS'] = Kernel::class;

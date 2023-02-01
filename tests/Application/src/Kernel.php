@@ -31,12 +31,13 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\Request; // @phpstan-ignore-line
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 
 use function App\DependencyInjection\configure;
 use function App\Playground\request;
 
- // @phpstan-ignore-line
+// @phpstan-ignore-line
 
 class Kernel extends BaseKernel
 {
@@ -91,7 +92,7 @@ class Kernel extends BaseKernel
         }
     }
 
-    public function request(?Request $request = null): void
+    public function request(?Request $request = null): Response
     {
         if (null === $request && \function_exists('App\Playground\request')) {
             $request = request();
@@ -101,6 +102,8 @@ class Kernel extends BaseKernel
         $response = $this->handle($request);
         $response->send();
         $this->terminate($request, $response);
+
+        return $response;
     }
 
     public function getCacheDir(): string
