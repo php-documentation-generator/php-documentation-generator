@@ -4,6 +4,7 @@ var
 
 .phpunit.result.cache
 bin/.phpunit.result.cache
+bin/pdg.phar
 
 /.php-cs-fixer.php
 /.php-cs-fixer.cache

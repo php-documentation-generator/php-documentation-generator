@@ -28,6 +28,16 @@ class Kernel extends BaseKernel
         return [];
     }
 
+    public function getCacheDir(): string
+    {
+        return '/tmp/pdg/cache';
+    }
+
+    public function getLogDir(): string
+    {
+        return '/tmp/pdg/log';
+    }
+
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(function (ContainerBuilder $container): void {
