@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace App;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\PDGBundle\Tests\TestBundle\DependencyInjection\Compiler\AttributeFilterPass;
 use ApiPlatform\PDGBundle\Tests\TestBundle\Metadata\Resource\Factory\StaticResourceNameCollectionFactory;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
@@ -28,6 +29,7 @@ use ReflectionClass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\Request; // @phpstan-ignore-line
@@ -81,6 +83,8 @@ class Kernel extends BaseKernel
         }
 
         $services->set(StaticResourceNameCollectionFactory::class)->args(['$classes' => $resources]);
+
+        $builder->addCompilerPass(new AttributeFilterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101);
 
         $container->parameters()->set(
             'database_url',
