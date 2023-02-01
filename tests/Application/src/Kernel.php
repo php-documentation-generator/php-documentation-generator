@@ -23,16 +23,20 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use Doctrine\ORM\EntityManagerInterface;
+use ReflectionAttribute;
+use ReflectionClass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Request; // @phpstan-ignore-line
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 
-use function App\DependencyInjection\configure; // @phpstan-ignore-line
-use function App\Playground\request; // @phpstan-ignore-line
+use function App\DependencyInjection\configure;
+use function App\Playground\request;
+
+ // @phpstan-ignore-line
 
 class Kernel extends BaseKernel
 {
@@ -62,7 +66,7 @@ class Kernel extends BaseKernel
         $resources = [];
 
         foreach ($classes as $class) {
-            $refl = new \ReflectionClass($class);
+            $refl = new ReflectionClass($class);
             $ns = $refl->getNamespaceName();
             if (0 !== strpos($ns, 'App')) {
                 continue;
@@ -70,7 +74,7 @@ class Kernel extends BaseKernel
 
             $services->set($class);
 
-            if ($refl->getAttributes(ApiResource::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+            if ($refl->getAttributes(ApiResource::class, ReflectionAttribute::IS_INSTANCEOF)) {
                 $resources[] = $class;
             }
         }
@@ -114,7 +118,7 @@ class Kernel extends BaseKernel
         $this->boot();
 
         foreach ($migrationClasses as $migrationClass) {
-            if ("Doctrine\Migrations\AbstractMigration" !== (new \ReflectionClass($migrationClass))->getParentClass()->getName()) {
+            if ("Doctrine\Migrations\AbstractMigration" !== (new ReflectionClass($migrationClass))->getParentClass()->getName()) {
                 continue;
             }
             $conf = new Configuration();
@@ -157,7 +161,7 @@ class Kernel extends BaseKernel
         $this->boot();
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         foreach ($fixtureClasses as $class) {
-            if ("Doctrine\Bundle\FixturesBundle\Fixture" !== (new \ReflectionClass($class))->getParentClass()->getName()) {
+            if ("Doctrine\Bundle\FixturesBundle\Fixture" !== (new ReflectionClass($class))->getParentClass()->getName()) {
                 continue;
             }
             (new $class())->load($em);

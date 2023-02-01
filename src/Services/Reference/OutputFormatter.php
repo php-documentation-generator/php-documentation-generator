@@ -19,6 +19,9 @@ use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
+use ReflectionClass;
+use ReflectionNamedType;
+use ReflectionType;
 
 class OutputFormatter
 {
@@ -27,7 +30,7 @@ class OutputFormatter
         return sprintf('<span className="%s">%s</span>', implode(' ', $classes), $element);
     }
 
-    public function addLink(\ReflectionClass $class): string
+    public function addLink(ReflectionClass $class): string
     {
         if (!class_exists($name = $class->getName()) && !interface_exists($name) && !trait_exists($name)) {
             return $name;
@@ -45,10 +48,10 @@ class OutputFormatter
         return $name;
     }
 
-    public function linkClasses(\ReflectionType|\ReflectionNamedType $reflectionNamedType): string
+    public function linkClasses(ReflectionType|ReflectionNamedType $reflectionNamedType): string
     {
         if (!class_exists($name = $reflectionNamedType->getName()) && !interface_exists($name)) {
-            if ($reflectionNamedType instanceof \ReflectionNamedType && $reflectionNamedType->allowsNull()) {
+            if ($reflectionNamedType instanceof ReflectionNamedType && $reflectionNamedType->allowsNull()) {
                 return '?'.$name;
             }
 
@@ -163,7 +166,7 @@ class OutputFormatter
         return $return;
     }
 
-    public function writePageTitle(\ReflectionClass $reflectionClass, string $content): string
+    public function writePageTitle(ReflectionClass $reflectionClass, string $content): string
     {
         $content .= 'import Head from "next/head";'.\PHP_EOL.\PHP_EOL;
         $content .= '<Head><title>'.$reflectionClass->getShortName().'</title></Head> '.\PHP_EOL.\PHP_EOL;
@@ -171,7 +174,7 @@ class OutputFormatter
         return $content;
     }
 
-    public function writeClassName(\ReflectionClass $reflectionClass, string $content): string
+    public function writeClassName(ReflectionClass $reflectionClass, string $content): string
     {
         return $content."# \\{$reflectionClass->getName()}".\PHP_EOL;
     }

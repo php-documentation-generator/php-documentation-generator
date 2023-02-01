@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\PDGBundle\Services;
 
 use ApiPlatform\PDGBundle\DependencyInjection\Configuration;
+use RuntimeException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Yaml\Yaml;
 
@@ -29,7 +30,7 @@ final class ConfigurationHandler
         // First, load config file from PDG_CONFIG_FILE environment variable
         $configFile = getenv('PDG_CONFIG_FILE');
         if ($configFile && !is_file($configFile)) {
-            throw new \RuntimeException(sprintf('Configuration file "%s" does not exist.', $configFile));
+            throw new RuntimeException(sprintf('Configuration file "%s" does not exist.', $configFile));
         }
 
         // If PDG_CONFIG_FILE environment variable is not set, try to load config file from default ordered ones
@@ -51,7 +52,7 @@ final class ConfigurationHandler
 
         // No config file detected
         if (!$configFile) {
-            throw new \RuntimeException('Configuration file "pdg.config.yaml" does not exist.');
+            throw new RuntimeException('Configuration file "pdg.config.yaml" does not exist.');
         }
 
         // Config file detected: read it and parse it
@@ -60,7 +61,7 @@ final class ConfigurationHandler
         // Autoload project autoloader
         $autoload = sprintf('%s/%s', $cwd, $this->config['autoload']);
         if (!file_exists($autoload)) {
-            throw new \RuntimeException(sprintf('Autoload file "%s" does not exist.', $autoload));
+            throw new RuntimeException(sprintf('Autoload file "%s" does not exist.', $autoload));
         }
 
         require_once $autoload;
@@ -71,7 +72,7 @@ final class ConfigurationHandler
     public function get(string $name, $default = null): mixed
     {
         if (!$this->config) {
-            throw new \RuntimeException('No configuration.');
+            throw new RuntimeException('No configuration.');
         }
 
         // Convert "foo.bar" in "['foo' => ['bar' => ...]]"

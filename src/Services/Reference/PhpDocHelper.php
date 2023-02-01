@@ -22,7 +22,11 @@ use PHPStan\PhpDocParser\Parser\ConstExprParser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPStan\PhpDocParser\Parser\TokenIterator;
 use PHPStan\PhpDocParser\Parser\TypeParser;
+use ReflectionClass;
+use ReflectionClassConstant;
 use ReflectionException;
+use ReflectionMethod;
+use ReflectionProperty;
 
 class PhpDocHelper
 {
@@ -36,7 +40,7 @@ class PhpDocHelper
         $this->parser = new PhpDocParser(new TypeParser(new ConstExprParser()), new ConstExprParser());
     }
 
-    public function getPropertiesConstructorDocumentation(\ReflectionClass $reflectionClass): array
+    public function getPropertiesConstructorDocumentation(ReflectionClass $reflectionClass): array
     {
         $propertiesConstructorDocumentation = [];
         if ($reflectionClass->hasMethod('__construct')) {
@@ -49,7 +53,7 @@ class PhpDocHelper
         return $propertiesConstructorDocumentation;
     }
 
-    public function handleClassDoc(\ReflectionClass $class, string $content): string
+    public function handleClassDoc(ReflectionClass $class, string $content): string
     {
         $rawDocNode = $class->getDocComment();
 
@@ -76,7 +80,7 @@ class PhpDocHelper
         return $content;
     }
 
-    public function getPhpDoc(\ReflectionMethod|\ReflectionProperty|\ReflectionClassConstant $reflection): PhpDocNode
+    public function getPhpDoc(ReflectionMethod|ReflectionProperty|ReflectionClassConstant $reflection): PhpDocNode
     {
         if (!($docComment = $reflection->getDocComment())) {
             return new PhpDocNode([]);
@@ -94,7 +98,7 @@ class PhpDocHelper
         return str_contains($textNode->text, '{@inheritdoc}');
     }
 
-    public function getInheritedDoc(\ReflectionMethod $method): string
+    public function getInheritedDoc(ReflectionMethod $method): string
     {
         $content = '';
         try {
@@ -111,7 +115,7 @@ class PhpDocHelper
         }
     }
 
-    public function classDocContainsTag(\ReflectionClass $class, string $searchedTag): bool
+    public function classDocContainsTag(ReflectionClass $class, string $searchedTag): bool
     {
         $doc = $class->getDocComment();
         if (!$doc) {

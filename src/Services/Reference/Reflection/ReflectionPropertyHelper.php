@@ -21,6 +21,10 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
+use ReflectionIntersectionType;
+use ReflectionNamedType;
+use ReflectionProperty;
+use ReflectionUnionType;
 
 class ReflectionPropertyHelper
 {
@@ -35,12 +39,12 @@ class ReflectionPropertyHelper
         $this->parser = (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
     }
 
-    public function propertyHasToBeSkipped(\ReflectionProperty $property): bool
+    public function propertyHasToBeSkipped(ReflectionProperty $property): bool
     {
         return str_contains($this->getModifier($property), 'private') && !$this->getAccessors($property);
     }
 
-    public function getAccessors(\ReflectionProperty $property): array
+    public function getAccessors(ReflectionProperty $property): array
     {
         $propertyName = ucfirst($property->getName());
         $accessors = [];
@@ -60,7 +64,7 @@ class ReflectionPropertyHelper
         return $accessors;
     }
 
-    public function getPromotedPropertyDefaultValueString(\ReflectionProperty $reflection): string
+    public function getPromotedPropertyDefaultValueString(ReflectionProperty $reflection): string
     {
         $traverser = new NodeTraverser();
         $visitor = new PromotedPropertyDefaultValueNodeVisitor($reflection);
@@ -82,7 +86,7 @@ class ReflectionPropertyHelper
         };
     }
 
-    public function getTypeString(\ReflectionProperty $reflectionProperty): string
+    public function getTypeString(ReflectionProperty $reflectionProperty): string
     {
         $type = $reflectionProperty->getType();
 
@@ -90,28 +94,28 @@ class ReflectionPropertyHelper
             return '';
         }
 
-        if ($type instanceof \ReflectionUnionType) {
-            $namedTypes = array_map(function (\ReflectionNamedType $namedType) {
+        if ($type instanceof ReflectionUnionType) {
+            $namedTypes = array_map(function (ReflectionNamedType $namedType) {
                 return $this->outputFormatter->linkClasses($namedType);
             }, $type->getTypes());
 
             return implode('|', $namedTypes);
         }
-        if ($type instanceof \ReflectionIntersectionType) {
-            $namedTypes = array_map(function (\ReflectionNamedType $namedType) {
+        if ($type instanceof ReflectionIntersectionType) {
+            $namedTypes = array_map(function (ReflectionNamedType $namedType) {
                 return $this->outputFormatter->linkClasses($namedType);
             }, $type->getTypes());
 
             return implode('&', $namedTypes);
         }
-        if ($type instanceof \ReflectionNamedType) {
+        if ($type instanceof ReflectionNamedType) {
             return $this->outputFormatter->linkClasses($type);
         }
 
         return sprintf('`%s`', $type);
     }
 
-    public function getAdditionalTypeInfo(\ReflectionProperty $reflectionProperty, array $constructorDocumentation): string
+    public function getAdditionalTypeInfo(ReflectionProperty $reflectionProperty, array $constructorDocumentation): string
     {
         // Read the php doc
         $propertyTypes = $this->phpDocHelper->getPhpDoc($reflectionProperty);
@@ -128,7 +132,7 @@ class ReflectionPropertyHelper
         return '';
     }
 
-    public function getPropertyDefaultValueString(\ReflectionProperty $property): string
+    public function getPropertyDefaultValueString(ReflectionProperty $property): string
     {
         $traverser = new NodeTraverser();
         $visitor = new PropertyDefaultValueNodeVisitor($property);

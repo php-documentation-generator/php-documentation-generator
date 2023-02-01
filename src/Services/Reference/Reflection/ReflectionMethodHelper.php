@@ -19,6 +19,12 @@ use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
+use ReflectionClass;
+use ReflectionIntersectionType;
+use ReflectionMethod;
+use ReflectionNamedType;
+use ReflectionParameter;
+use ReflectionUnionType;
 
 class ReflectionMethodHelper
 {
@@ -32,7 +38,7 @@ class ReflectionMethodHelper
         $this->parser = (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
     }
 
-    public function methodHasToBeSkipped(\ReflectionMethod $method, \ReflectionClass $reflectionClass): bool
+    public function methodHasToBeSkipped(ReflectionMethod $method, ReflectionClass $reflectionClass): bool
     {
         return $this->isFromExternalClass($method, $reflectionClass)
             || str_contains($this->getModifier($method), 'private')
@@ -43,17 +49,17 @@ class ReflectionMethodHelper
     /**
      * Checks if a method is actually from a Trait or an extended class.
      */
-    private function isFromExternalClass(\ReflectionMethod $method, \ReflectionClass $class): bool
+    private function isFromExternalClass(ReflectionMethod $method, ReflectionClass $class): bool
     {
         return $method->getFileName() !== $class->getFileName();
     }
 
-    private function isConstruct(\ReflectionMethod $method): bool
+    private function isConstruct(ReflectionMethod $method): bool
     {
         return '__construct' === $method->getName();
     }
 
-    private function isAccessor(\ReflectionMethod $method): bool
+    private function isAccessor(ReflectionMethod $method): bool
     {
         foreach ($method->getDeclaringClass()->getProperties() as $property) {
             if (str_contains($method->getName(), ucfirst($property->getName()))) {
@@ -67,7 +73,7 @@ class ReflectionMethodHelper
     /**
      * @return array<string, string>
      */
-    public function getParametersWithType(\ReflectionMethod $method): array
+    public function getParametersWithType(ReflectionMethod $method): array
     {
         $typedParameters = [];
         foreach ($method->getParameters() as $parameter) {
@@ -77,21 +83,21 @@ class ReflectionMethodHelper
                 $typedParameters[] = $this->outputFormatter->addCssClasses($parameterName, ['token', 'variable']).$this->getParameterDefaultValueString($parameter);
                 continue;
             }
-            if ($type instanceof \ReflectionUnionType) {
-                $namedTypes = array_map(function (\ReflectionNamedType $namedType) {
+            if ($type instanceof ReflectionUnionType) {
+                $namedTypes = array_map(function (ReflectionNamedType $namedType) {
                     return $this->outputFormatter->linkClasses($namedType);
                 }, $type->getTypes());
 
                 $typedParameters[] = implode('|', $namedTypes).' '.$this->outputFormatter->addCssClasses($parameterName, ['token', 'variable']).$this->getParameterDefaultValueString($parameter);
             }
-            if ($type instanceof \ReflectionIntersectionType) {
-                $namedTypes = array_map(function (\ReflectionNamedType $namedType) {
+            if ($type instanceof ReflectionIntersectionType) {
+                $namedTypes = array_map(function (ReflectionNamedType $namedType) {
                     return $this->outputFormatter->linkClasses($namedType);
                 }, $type->getTypes());
 
                 $typedParameters[] = implode('&', $namedTypes).' '.$this->outputFormatter->addCssClasses($parameterName, ['token', 'variable']).$this->getParameterDefaultValueString($parameter);
             }
-            if ($type instanceof \ReflectionNamedType) {
+            if ($type instanceof ReflectionNamedType) {
                 $typedParameters[] = $this->outputFormatter->linkClasses($type).' '.$this->outputFormatter->addCssClasses($parameterName, ['token', 'variable']).$this->getParameterDefaultValueString($parameter);
             }
         }
@@ -99,7 +105,7 @@ class ReflectionMethodHelper
         return $typedParameters;
     }
 
-    public function getReturnType(\ReflectionMethod $method): string
+    public function getReturnType(ReflectionMethod $method): string
     {
         $type = $method->getReturnType();
 
@@ -107,14 +113,14 @@ class ReflectionMethodHelper
             return '';
         }
 
-        if ($type instanceof \ReflectionUnionType) {
-            return implode('|', array_map(function (\ReflectionNamedType $reflectionNamedType): string {
+        if ($type instanceof ReflectionUnionType) {
+            return implode('|', array_map(function (ReflectionNamedType $reflectionNamedType): string {
                 return $this->outputFormatter->linkClasses($reflectionNamedType);
             }, $type->getTypes()
             ));
         }
-        if ($type instanceof \ReflectionIntersectionType) {
-            return implode('&', array_map(function (\ReflectionNamedType $reflectionNamedType): string {
+        if ($type instanceof ReflectionIntersectionType) {
+            return implode('&', array_map(function (ReflectionNamedType $reflectionNamedType): string {
                 return $this->outputFormatter->linkClasses($reflectionNamedType);
             }, $type->getTypes()
             ));
@@ -123,7 +129,7 @@ class ReflectionMethodHelper
         return $this->outputFormatter->linkClasses($type);
     }
 
-    private function getParameterDefaultValueString(\ReflectionParameter $parameter): string
+    private function getParameterDefaultValueString(ReflectionParameter $parameter): string
     {
         $traverser = new NodeTraverser();
         $visitor = new MethodParameterDefaultValuedNodeVisitor($parameter);

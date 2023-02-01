@@ -16,6 +16,7 @@ namespace ApiPlatform\PDGBundle\Command;
 use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
 use ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper;
 use ApiPlatform\PDGBundle\Services\Reference\Reflection\ReflectionHelper;
+use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -55,7 +56,7 @@ final class ReferencesCommand extends Command
             $namespace = rtrim(sprintf('%s\\%s', $this->configuration->get('reference.namespace'), str_replace(['/', '.php'], ['\\', ''], $relativeToSrc)), '\\');
             $className = sprintf('%s\\%s', $namespace, $file->getBasename('.php'));
 
-            $refl = new \ReflectionClass($className);
+            $refl = new ReflectionClass($className);
 
             if (!($namespaces[$namespace] ?? false)) {
                 $namespaces[$namespace] = [];
@@ -138,7 +139,7 @@ final class ReferencesCommand extends Command
         return $files;
     }
 
-    private function getClassType(\ReflectionClass $refl): string
+    private function getClassType(ReflectionClass $refl): string
     {
         if ($refl->isInterface()) {
             return 'I';

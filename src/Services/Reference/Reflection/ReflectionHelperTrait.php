@@ -13,17 +13,22 @@ declare(strict_types=1);
 
 namespace ApiPlatform\PDGBundle\Services\Reference\Reflection;
 
+use Reflection;
+use ReflectionMethod;
+use ReflectionParameter;
+use ReflectionProperty;
+
 /**
  * Contains helper methods applicable to different kinds of Reflection objects.
  */
 trait ReflectionHelperTrait
 {
-    private function getModifier(\ReflectionMethod|\ReflectionProperty $reflection): string
+    private function getModifier(ReflectionMethod|ReflectionProperty $reflection): string
     {
-        return implode(' ', \Reflection::getModifierNames($reflection->getModifiers()));
+        return implode(' ', Reflection::getModifierNames($reflection->getModifiers()));
     }
 
-    private function getParameterName(\ReflectionParameter $parameter): string
+    private function getParameterName(ReflectionParameter $parameter): string
     {
         return $parameter->isPassedByReference() ? '&$'.$parameter->getName() : '$'.$parameter->getName();
     }

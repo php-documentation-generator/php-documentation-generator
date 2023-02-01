@@ -15,11 +15,12 @@ namespace ApiPlatform\PDGBundle\Services\Reference\Parser;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use ReflectionProperty;
 
 class PropertyDefaultValueNodeVisitor extends NodeVisitorAbstract
 {
     public function __construct(
-        private readonly \ReflectionProperty $property,
+        private readonly ReflectionProperty $property,
         public mixed $defaultValue = null
     ) {
     }

@@ -17,6 +17,9 @@ use ApiPlatform\PDGBundle\Services\Reference\OutputFormatter;
 use ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocChildNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
+use Reflection;
+use ReflectionClass;
+use ReflectionClassConstant;
 
 class ReflectionHelper
 {
@@ -30,7 +33,7 @@ class ReflectionHelper
     ) {
     }
 
-    public function handleParent(\ReflectionClass $reflectionClass, string $content): string
+    public function handleParent(ReflectionClass $reflectionClass, string $content): string
     {
         if (!$parent = $reflectionClass->getParentClass()) {
             return $content;
@@ -41,7 +44,7 @@ class ReflectionHelper
         return $content;
     }
 
-    public function handleImplementations(\ReflectionClass $reflectionClass, string $content): string
+    public function handleImplementations(ReflectionClass $reflectionClass, string $content): string
     {
         if (!$interfaces = $reflectionClass->getInterfaces()) {
             return $content;
@@ -56,9 +59,9 @@ class ReflectionHelper
         return $content;
     }
 
-    public function handleClassConstants(\ReflectionClass $reflectionClass, string $content): string
+    public function handleClassConstants(ReflectionClass $reflectionClass, string $content): string
     {
-        if (!$constants = $reflectionClass->getReflectionConstants(\ReflectionClassConstant::IS_PUBLIC)) {
+        if (!$constants = $reflectionClass->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC)) {
             return $content;
         }
 
@@ -88,7 +91,7 @@ class ReflectionHelper
         return $content;
     }
 
-    public function handleProperties(\ReflectionClass $reflectionClass, string $content): string
+    public function handleProperties(ReflectionClass $reflectionClass, string $content): string
     {
         $classProperties = [];
         foreach ($reflectionClass->getProperties() as $property) {
@@ -134,7 +137,7 @@ class ReflectionHelper
         return $content;
     }
 
-    public function handleMethods(\ReflectionClass $reflectionClass, string $content): string
+    public function handleMethods(ReflectionClass $reflectionClass, string $content): string
     {
         $methods = [];
         foreach ($reflectionClass->getMethods() as $method) {
@@ -190,7 +193,7 @@ class ReflectionHelper
         return $content;
     }
 
-    public function containsOnlyPrivateMethods(\ReflectionClass $reflectionClass): bool
+    public function containsOnlyPrivateMethods(ReflectionClass $reflectionClass): bool
     {
         // Do not skip empty interfaces
         if (interface_exists($reflectionClass->getName()) || trait_exists($reflectionClass->getName())) {
@@ -202,7 +205,7 @@ class ReflectionHelper
         }
 
         foreach ($reflectionClass->getMethods() as $method) {
-            if (!\in_array('private', \Reflection::getModifierNames($method->getModifiers()), true)) {
+            if (!\in_array('private', Reflection::getModifierNames($method->getModifiers()), true)) {
                 return false;
             }
         }

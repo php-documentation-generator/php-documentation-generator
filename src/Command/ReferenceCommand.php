@@ -17,6 +17,7 @@ use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
 use ApiPlatform\PDGBundle\Services\Reference\OutputFormatter;
 use ApiPlatform\PDGBundle\Services\Reference\PhpDocHelper;
 use ApiPlatform\PDGBundle\Services\Reference\Reflection\ReflectionHelper;
+use ReflectionClass;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Console\Command\Command;
@@ -27,7 +28,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class ReferenceCommand extends Command
 {
-    private \ReflectionClass $reflectionClass;
+    private ReflectionClass $reflectionClass;
 
     public function __construct(
         private readonly PhpDocHelper $phpDocHelper,
@@ -62,7 +63,7 @@ final class ReferenceCommand extends Command
         );
         $content = '';
 
-        $this->reflectionClass = new \ReflectionClass($namespace);
+        $this->reflectionClass = new ReflectionClass($namespace);
         $outputFile = $input->getArgument('output');
 
         if ($this->reflectionClass->implementsInterface(ConfigurationInterface::class)) {

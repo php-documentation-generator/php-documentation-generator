@@ -43,6 +43,9 @@ return (new PhpCsFixer\Config())
         ],
         'explicit_indirect_variable' => true,
         'fully_qualified_strict_types' => true,
+        'global_namespace_import' => [
+            'import_classes' => true,
+        ],
         'header_comment' => [
             'header' => $header,
             'location' => 'after_open',
