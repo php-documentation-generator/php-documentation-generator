@@ -14,15 +14,11 @@ on:
 
 jobs:
   tests:
-    name: Tests PHP ${{ matrix.php }} / Symfony ${{ matrix.symfony }}
+    name: Tests PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         php: ['8.2']
-        include:
-          - php: '8.2'
-            quality: true
-            deprecations: true
       fail-fast: false
     env:
       # PHP CS Fixer does not support PHP 8.2 yet
@@ -34,8 +30,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: oci8
-          coverage: xdebug
           tools: composer:v2, php-cs-fixer, phpstan, phpdoc
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -49,20 +43,16 @@ jobs:
       - name: Update project dependencies
         run: composer update --no-progress --ansi --prefer-stable
       - name: Install PHPUnit
-        if: matrix.quality
         run: vendor/bin/simple-phpunit --version
       - name: Run php-cs-fixer tests
-        if: matrix.quality
         run: php-cs-fixer fix --diff --dry-run --ansi --verbose
       - name: Cache PHPStan
-        if: matrix.quality
         uses: actions/cache@v3
         with:
           path: .phpstan/
           key: phpstan-${{ github.sha }}
           restore-keys: phpstan-
       - name: Run PHPStan tests
-        if: matrix.quality
         run: phpstan analyze src tests
       - name: Run PHPUnit tests
         run: vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml
