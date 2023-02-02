@@ -112,7 +112,7 @@ class Kernel extends BaseKernel
 
     public function getCacheDir(): string
     {
-        return (new \ApiPlatform\PDGBundle\Kernel('test', true))->getCacheDir().$this->guide;
+        return parent::getCacheDir().\DIRECTORY_SEPARATOR.$this->guide;
     }
 
     public function executeMigrations(string $direction = Direction::UP): void

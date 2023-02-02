@@ -19,12 +19,12 @@ use function App\Playground\request;
 
 class PlaygroundTestCase extends ApiTestCase
 {
+    use TestGuideTrait;
+
     public function testGuideRequest(): void
     {
         if (!\function_exists('App\Playground\request')) {
             $this->markTestSkipped('No function request defined');
-
-            return;
         }
 
         $kernel = static::createKernel();
