@@ -1,0 +1,17 @@
+post_bump_hooks = [
+    "git push",
+    "git push origin {{version}}",
+]
+
+[changelog]
+path = "CHANGELOG.md"
+template = "remote"
+remote = "github.com"
+repository = "php-documentation-generator"
+owner = "php-documentation-generator"
+authors = [
+    { signature = "Hugo Nicolas", username = "JacquesDurand" },
+    { signature = "Antoine Bluchet", username = "soyuka" },
+    { signature = "Vincent Chalamon", username = "vincentchalamon" },
+]
+
