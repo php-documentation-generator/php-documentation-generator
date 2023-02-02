@@ -76,7 +76,7 @@ final class ReferenceCommand extends Command
         if ($reflectionClass->implementsInterface(ConfigurationInterface::class)) {
             $yaml = (new YamlReferenceDumper())->dump($reflectionClass->newInstance());
             if (!$yaml) {
-                $style->error(sprintf('No configuration available in "%s".', $file->getPathname()));
+                $style->getErrorStyle()->error(sprintf('No configuration available in "%s".', $file->getPathname()));
 
                 return self::FAILURE;
             }
@@ -102,7 +102,7 @@ final class ReferenceCommand extends Command
             mkdir($dirName, 0777, true);
         }
         if (!file_put_contents($out, $content)) {
-            $style->error(sprintf('Cannot write in "%s".', $out));
+            $style->getErrorStyle()->error(sprintf('Cannot write in "%s".', $out));
 
             return self::FAILURE;
         }

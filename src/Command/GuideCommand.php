@@ -64,7 +64,7 @@ final class GuideCommand extends Command
 
         $handle = fopen($file->getPathName(), 'r');
         if (!$handle) {
-            $style->error(sprintf('Error opening "%s".', $file->getPathName()));
+            $style->getErrorStyle()->error(sprintf('Error opening "%s".', $file->getPathName()));
 
             return self::INVALID;
         }
@@ -166,7 +166,7 @@ final class GuideCommand extends Command
             mkdir($dirName, 0777, true);
         }
         if (!file_put_contents($out, $content)) {
-            $style->error(sprintf('Cannot write in "%s".', $out));
+            $style->getErrorStyle()->error(sprintf('Cannot write in "%s".', $out));
 
             return self::FAILURE;
         }

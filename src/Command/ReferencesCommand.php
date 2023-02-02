@@ -79,7 +79,7 @@ final class ReferencesCommand extends Command
             try {
                 $reflectionClass = new ClassParser(new ReflectionClass(sprintf('%s\\%s', $namespace, $file->getBasename('.php'))));
             } catch (\ReflectionException) {
-                $style->error(sprintf('File "%s" does not seem to be a valid PHP class.', $file->getPathname()));
+                $style->getErrorStyle()->error(sprintf('File "%s" does not seem to be a valid PHP class.', $file->getPathname()));
 
                 return self::FAILURE;
             }
@@ -106,7 +106,7 @@ final class ReferencesCommand extends Command
                 $fileOutputPath = sprintf('%s%s%s%2$s%s.%s', rtrim($fileOutputPath, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php'), $referenceExtension);
 
                 if (!@mkdir($concurrentDirectory = $this->configuration->get('target.directories.reference_path').\DIRECTORY_SEPARATOR.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
-                    $style->error(sprintf('Cannot create directory "%s".', $concurrentDirectory));
+                    $style->getErrorStyle()->error(sprintf('Cannot create directory "%s".', $concurrentDirectory));
 
                     return self::FAILURE;
                 }
@@ -118,7 +118,7 @@ final class ReferencesCommand extends Command
                     '--template-path' => $templatePath,
                 ]), $output)
             ) {
-                $style->error(sprintf('Failed creating reference "%s".', $file->getPathname()));
+                $style->getErrorStyle()->error(sprintf('Failed creating reference "%s".', $file->getPathname()));
 
                 return self::FAILURE;
             }
@@ -146,7 +146,7 @@ final class ReferencesCommand extends Command
             mkdir($dirName, 0777, true);
         }
         if (!file_put_contents($fileName, $content)) {
-            $style->error(sprintf('Cannot write in "%s".', $fileName));
+            $style->getErrorStyle()->error(sprintf('Cannot write in "%s".', $fileName));
 
             return self::FAILURE;
         }
