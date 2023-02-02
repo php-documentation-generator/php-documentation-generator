@@ -6,19 +6,8 @@ import Head from "next/head";
 
 ```yaml
 app_orm:
-    enable_profiler:      false
     mock:
         enabled:              false
         path:                 '%kernel.project_dir%/tests/mocks'
         mode:                 read # One of "read"; "write"
-    connections:
-
-        # Prototype
-        name:
-
-            # Oracle database url with credentials.
-            url:                  ~ # Required
-
-            # Directory where the entity configuration is stored.
-            path:                 '%kernel.project_dir%/src/Entity'
 ```

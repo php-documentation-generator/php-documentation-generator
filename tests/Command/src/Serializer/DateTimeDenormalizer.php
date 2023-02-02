@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace ApiPlatform\PDGBundle\Tests\Command\App\Serializer;
 
 use DateTimeInterface;
-use DateTimeZone;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
@@ -31,10 +30,7 @@ final class DateTimeDenormalizer implements DenormalizerInterface, DenormalizerA
      */
     public function denormalize($data, string $type, string $format = null, array $context = []): DateTimeInterface
     {
-        $result = $this->denormalizer->denormalize($data, $type, $format, $context + [self::class => true]);
-        $result->setTimezone(new DateTimeZone(date_default_timezone_get()));
-
-        return $result;
+        return $data;
     }
 
     /**
@@ -42,6 +38,6 @@ final class DateTimeDenormalizer implements DenormalizerInterface, DenormalizerA
      */
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
-        return !isset($context[self::class]) && is_a($type, DateTimeInterface::class, true);
+        return true;
     }
 }
