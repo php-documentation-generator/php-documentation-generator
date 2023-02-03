@@ -45,10 +45,10 @@ final class ReferenceCommand extends Command
         $this
             ->setDescription('Creates a reference documentation for a PHP class')
             ->addArgument(name: 'filename', mode: InputArgument::REQUIRED)
-            ->addArgument(
+            ->addOption(
                 name: 'output',
-                mode: InputArgument::OPTIONAL,
-                description: 'The path to the file where the reference will be printed. Leave empty for screen printing'
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The path to the file where the reference will be printed'
             )
             ->addOption(
                 name: 'template-path',
@@ -89,7 +89,7 @@ final class ReferenceCommand extends Command
             $templateContext
         );
 
-        $out = $input->getArgument('output');
+        $out = $input->getOption('output');
         if (!$out) {
             $style->block($content);
 

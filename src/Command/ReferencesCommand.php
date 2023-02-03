@@ -42,8 +42,8 @@ final class ReferencesCommand extends AbstractReferencesCommand
             ->setDescription('Creates references documentation for PHP classes')
             ->addArgument(
                 name: 'output',
-                mode: InputArgument::OPTIONAL,
-                description: 'The path where the references will be printed. Leave empty for screen printing'
+                mode: InputArgument::REQUIRED,
+                description: 'The path where the references will be printed'
             )
             ->addOption(
                 name: 'template-path',
@@ -56,7 +56,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $templatePath = $input->getOption('template-path');
-        $outputPath = $input->getArgument('output');
+        $out = $input->getArgument('output');
 
         // get the output extension for a reference
         $referenceExtension = pathinfo($this->getTemplateFile($templatePath, 'reference.*.twig')->getBasename('.twig'), \PATHINFO_EXTENSION);
@@ -67,22 +67,18 @@ final class ReferencesCommand extends AbstractReferencesCommand
         foreach ($this->getFiles() as $file) {
             $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('reference.src'));
 
-            // run "reference" command
-            $fileOutputPath = $outputPath;
-            if ($fileOutputPath) {
-                $fileOutputPath = sprintf('%s%s%s%2$s%s.%s', rtrim($fileOutputPath, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php'), $referenceExtension);
+            if (!@mkdir($concurrentDirectory = $this->configuration->get('target.directories.reference_path').\DIRECTORY_SEPARATOR.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
+                $style->getErrorStyle()->error(sprintf('Cannot create directory "%s".', $concurrentDirectory));
 
-                if (!@mkdir($concurrentDirectory = $this->configuration->get('target.directories.reference_path').\DIRECTORY_SEPARATOR.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
-                    $style->getErrorStyle()->error(sprintf('Cannot create directory "%s".', $concurrentDirectory));
-
-                    return self::FAILURE;
-                }
+                return self::FAILURE;
             }
+
+            // run "reference" command
             if (
                 self::FAILURE === $this->getApplication()?->find('reference')->run(new ArrayInput([
                     'filename' => $file->getPathName(),
-                    'output' => $fileOutputPath,
                     '--template-path' => $templatePath,
+                    '--output' => sprintf('%s%s%s%2$s%s.%s', rtrim($out, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php'), $referenceExtension),
                 ]), $output)
             ) {
                 $style->getErrorStyle()->error(sprintf('Failed creating reference "%s".', $file->getPathname()));

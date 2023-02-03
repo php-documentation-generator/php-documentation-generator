@@ -38,25 +38,6 @@ final class ReferencesCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    public function testItOutputsEachReferenceInCommandOutput(): void
-    {
-        $this->tester->run([
-            'command' => 'references',
-        ]);
-
-        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        // cannot test full output cause the output size differs locally or on GitHub
-        $this->assertStringContainsString(<<<EOT
-import Head from "next/head";
-
-<Head><title>IndexController</title></Head>
-
-# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
-EOT
-            , $display);
-    }
-
     public function testItOutputsEachReferenceInAFile(): void
     {
         $output = 'tests/Command/pages/references';

@@ -16,7 +16,6 @@ namespace PhpDocumentGenerator\Command;
 use PhpDocumentGenerator\Parser\ClassParser;
 use PhpDocumentGenerator\Services\ConfigurationHandler;
 use ReflectionClass;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,10 +38,10 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
     {
         $this
             ->setDescription('Creates references index')
-            ->addArgument(
+            ->addOption(
                 name: 'output',
-                mode: InputArgument::OPTIONAL,
-                description: 'The path where the references will be printed. Leave empty for screen printing'
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The path to the file where the index will be printed'
             )
             ->addOption(
                 name: 'template-path',
@@ -64,17 +63,17 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
 
         // Creating an index like https://angular.io/api
         $templatePath = $input->getOption('template-path');
-        $outputPath = $input->getArgument('output');
+        $out = $input->getOption('output');
         $templateFile = $this->getTemplateFile($templatePath, 'index.*.twig');
         $content = $this->environment->render($templateFile->getFilename(), ['namespaces' => $namespaces]);
-        if (!$outputPath) {
+        if (!$out) {
             $style->block($content);
 
             return self::SUCCESS;
         }
 
         $indexExtension = pathinfo($templateFile->getBasename('.twig'), \PATHINFO_EXTENSION);
-        $fileName = sprintf('%s%sindex.%s', rtrim($outputPath, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $indexExtension);
+        $fileName = sprintf('%s%sindex.%s', rtrim($out, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $indexExtension);
         $dirName = pathinfo($fileName, \PATHINFO_DIRNAME);
         if (!is_dir($dirName)) {
             mkdir($dirName, 0777, true);

@@ -58,7 +58,7 @@ EOT
         $output = 'tests/Command/pages/references';
         $this->tester->run([
             'command' => 'references-index',
-            'output' => $output,
+            '--output' => $output,
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
