@@ -150,7 +150,7 @@ final class GuideCommand extends Command
         fclose($handle);
 
         $content = $this->environment->render(
-            $this->getTemplateFile($input->getOption('template-path'), 'guide.*.twig')->getFilename(),
+            $this->loadTemplate($input->getOption('template')),
             ['headers' => $headers, 'sections' => $sections]
         );
 

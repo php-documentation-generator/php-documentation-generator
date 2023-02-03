@@ -31,7 +31,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
     public function __construct(
         private readonly ConfigurationHandler $configuration,
         private readonly Environment $environment,
-        private readonly string $templatePath
+        private readonly string $defaultTemplate
     ) {
         parent::__construct($configuration, name: 'references');
     }
@@ -46,20 +46,20 @@ final class ReferencesCommand extends AbstractReferencesCommand
                 description: 'The path where the references will be printed'
             )
             ->addOption(
-                name: 'template-path',
+                name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the template files to use to create each reference output file',
-                default: $this->templatePath
+                description: 'The path to the template file to use to generate each reference',
+                default: $this->defaultTemplate
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $templatePath = $input->getOption('template-path');
+        $template = $input->getOption('template');
         $out = $input->getArgument('output');
 
         // get the output extension for a reference
-        $referenceExtension = pathinfo($this->getTemplateFile($templatePath, 'reference.*.twig')->getBasename('.twig'), \PATHINFO_EXTENSION);
+        $referenceExtension = pathinfo(preg_replace('/\.twig$/i', '', $template), \PATHINFO_EXTENSION);
 
         $style = new SymfonyStyle($input, $output);
         $style->progressStart();
@@ -77,7 +77,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
             if (
                 self::FAILURE === $this->getApplication()?->find('reference')->run(new ArrayInput([
                     'filename' => $file->getPathName(),
-                    '--template-path' => $templatePath,
+                    '--template' => $template,
                     '--output' => sprintf('%s%s%s%2$s%s.%s', rtrim($out, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php'), $referenceExtension),
                 ]), $output)
             ) {

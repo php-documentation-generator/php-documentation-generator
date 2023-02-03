@@ -55,17 +55,17 @@ EOT
 
     public function testItOutputsIndexInAFile(): void
     {
-        $output = 'tests/Command/pages/references';
+        $output = 'tests/Command/pages/references/index.mdx.twig';
         $this->tester->run([
             'command' => 'references:index',
             '--output' => $output,
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertFileExists(sprintf('%s/index.mdx', $output));
+        $this->assertFileExists($output);
         $this->assertFileEquals(
             sprintf('%s/expected/references/index.mdx', __DIR__),
-            sprintf('%s/index.mdx', $output)
+            $output
         );
     }
 }

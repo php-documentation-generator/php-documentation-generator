@@ -36,21 +36,21 @@
         <service id="pdg.command.reference" class="PhpDocumentGenerator\Command\ReferenceCommand">
             <argument type="service" id="pdg.configuration_handler"/>
             <argument type="service" id="pdg.twig"/>
-            <argument>%kernel.project_dir%/template/references</argument>
+            <argument>%kernel.project_dir%/template/references/reference.mdx.twig</argument>
             <tag>console.command</tag>
         </service>
 
         <service id="pdg.command.references" class="PhpDocumentGenerator\Command\ReferencesCommand">
             <argument type="service" id="pdg.configuration_handler"/>
             <argument type="service" id="pdg.twig"/>
-            <argument>%kernel.project_dir%/template/references</argument>
+            <argument>%kernel.project_dir%/template/references/reference.mdx.twig</argument>
             <tag>console.command</tag>
         </service>
 
         <service id="pdg.command.references_index" class="PhpDocumentGenerator\Command\ReferencesIndexCommand">
             <argument type="service" id="pdg.configuration_handler"/>
             <argument type="service" id="pdg.twig"/>
-            <argument>%kernel.project_dir%/template/references</argument>
+            <argument>%kernel.project_dir%/template/references/index.mdx.twig</argument>
             <tag>console.command</tag>
         </service>
 

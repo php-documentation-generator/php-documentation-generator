@@ -29,7 +29,7 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
     public function __construct(
         private readonly ConfigurationHandler $configuration,
         private readonly Environment $environment,
-        private readonly string $templatePath
+        private readonly string $defaultTemplate
     ) {
         parent::__construct($configuration, name: 'references:index');
     }
@@ -44,10 +44,10 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
                 description: 'The path to the file where the index will be printed'
             )
             ->addOption(
-                name: 'template-path',
+                name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the template files to use to generate the output file',
-                default: $this->templatePath
+                description: 'The path to the template file to use to generate the index',
+                default: $this->defaultTemplate
             );
     }
 
@@ -62,24 +62,24 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
         }
 
         // Creating an index like https://angular.io/api
-        $templatePath = $input->getOption('template-path');
+        $content = $this->environment->render(
+            $this->loadTemplate($input->getOption('template')),
+            ['namespaces' => $namespaces]
+        );
+
         $out = $input->getOption('output');
-        $templateFile = $this->getTemplateFile($templatePath, 'index.*.twig');
-        $content = $this->environment->render($templateFile->getFilename(), ['namespaces' => $namespaces]);
         if (!$out) {
             $style->block($content);
 
             return self::SUCCESS;
         }
 
-        $indexExtension = pathinfo($templateFile->getBasename('.twig'), \PATHINFO_EXTENSION);
-        $fileName = sprintf('%s%sindex.%s', rtrim($out, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $indexExtension);
-        $dirName = pathinfo($fileName, \PATHINFO_DIRNAME);
+        $dirName = pathinfo($out, \PATHINFO_DIRNAME);
         if (!is_dir($dirName)) {
             mkdir($dirName, 0777, true);
         }
-        if (!file_put_contents($fileName, $content)) {
-            $style->getErrorStyle()->error(sprintf('Cannot write in "%s".', $fileName));
+        if (!file_put_contents($out, $content)) {
+            $style->getErrorStyle()->error(sprintf('Cannot write in "%s".', $out));
 
             return self::FAILURE;
         }

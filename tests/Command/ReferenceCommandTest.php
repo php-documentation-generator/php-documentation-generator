@@ -55,10 +55,9 @@ EOT
 
     public function testItOutputsAReferenceInCommandOutput(): void
     {
-        $filename = 'tests/Command/src/Controller/IndexController.php';
         $this->tester->run([
             'command' => 'reference',
-            'filename' => $filename,
+            'filename' => 'tests/Command/src/Controller/IndexController.php',
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
@@ -79,10 +78,9 @@ EOT
     public function testItOutputsAReferenceInAFile(string $name): void
     {
         $output = sprintf('tests/Command/pages/references/%s.mdx', $name);
-        $filename = sprintf('tests/Command/src/%s.php', $name);
         $this->tester->run([
             'command' => 'reference',
-            'filename' => $filename,
+            'filename' => sprintf('tests/Command/src/%s.php', $name),
             '--output' => $output,
         ]);
 

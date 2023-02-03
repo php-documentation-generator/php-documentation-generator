@@ -5,11 +5,26 @@
 {% endblock %}
 
 {% block title %}
-# \{{ class.name }}
+# {% if configuration is defined %}Configuration Reference{% else %}\{{ class.name }}{% endif %}
 {% endblock %}
 
 {% block content %}
 {% apply spaceless %}
+{% if configuration is defined %}
+{{ block('configuration') }}
+{% else %}
+{{ block('class') }}
+{% endif %}
+{% endapply %}
+{% endblock %}
+
+{% block configuration %}
+```yaml
+{{ configuration|raw -}}
+```
+{% endblock %}
+
+{% block class %}
 {# block description #}
 {% if class.summary|mdx_sanitize|length > 0 %}
 
@@ -89,5 +104,4 @@
 {% endfor %}
 {% endif %}
 {# endblock methods #}
-{% endapply %}
 {% endblock %}
