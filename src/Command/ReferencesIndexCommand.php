@@ -31,7 +31,7 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
         private readonly Environment $environment,
         private readonly string $templatePath
     ) {
-        parent::__construct($configuration, name: 'references-index');
+        parent::__construct($configuration, name: 'references:index');
     }
 
     protected function configure(): void

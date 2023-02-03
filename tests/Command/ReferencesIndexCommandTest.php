@@ -41,7 +41,7 @@ final class ReferencesIndexCommandTest extends KernelTestCase
     public function testItOutputsIndexInCommandOutput(): void
     {
         $this->tester->run([
-            'command' => 'references-index',
+            'command' => 'references:index',
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
@@ -57,7 +57,7 @@ EOT
     {
         $output = 'tests/Command/pages/references';
         $this->tester->run([
-            'command' => 'references-index',
+            'command' => 'references:index',
             '--output' => $output,
         ]);
 
