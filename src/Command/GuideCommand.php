@@ -80,6 +80,8 @@ final class GuideCommand extends Command
         // we keep the headers as-is in this array
         $headers = [];
 
+        $previousLine = 'text';
+
         $style->info(sprintf('Creating guide "%s".', $file->getPathName()));
 
         while (($line = fgets($handle)) !== false) {
@@ -88,6 +90,10 @@ final class GuideCommand extends Command
             }
 
             if (!trim($line)) {
+                continue;
+            }
+
+            if ('<?php' === trim($line)) {
                 continue;
             }
 
@@ -109,14 +115,13 @@ final class GuideCommand extends Command
                     continue;
                 }
 
-                if ($linesOfCode && ($linesOfText || $currentSection > 0)) {
+                if ('code' === $previousLine) {
                     ++$currentSection;
                     $sections[$currentSection] = ['text' => [], 'code' => []];
-                    $linesOfCode = $linesOfText = 0;
                 }
-
                 $sections[$currentSection]['text'][] = $text;
-                ++$linesOfText;
+
+                $previousLine = 'text';
 
                 continue;
             }
@@ -139,12 +144,7 @@ final class GuideCommand extends Command
             }
 
             $sections[$currentSection]['code'][] = $line;
-            ++$linesOfCode;
-
-            if ($linesOfText && $linesOfCode >= $linesOfText) {
-                ++$currentSection;
-                $linesOfCode = $linesOfText = 0;
-            }
+            $previousLine = 'code';
         }
 
         fclose($handle);
