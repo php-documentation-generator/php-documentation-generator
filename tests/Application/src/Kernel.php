@@ -15,6 +15,7 @@ namespace App;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\PDGBundle\Tests\TestBundle\DependencyInjection\Compiler\AttributeFilterPass;
+use ApiPlatform\PDGBundle\Tests\TestBundle\DependencyInjection\Compiler\FilterPass;
 use ApiPlatform\PDGBundle\Tests\TestBundle\Metadata\Resource\Factory\StaticResourceNameCollectionFactory;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
@@ -85,6 +86,7 @@ class Kernel extends BaseKernel
         $services->set(StaticResourceNameCollectionFactory::class)->args(['$classes' => $resources]);
 
         $builder->addCompilerPass(new AttributeFilterPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 101);
+        $builder->addCompilerPass(new FilterPass());
 
         $container->parameters()->set(
             'database_url',
