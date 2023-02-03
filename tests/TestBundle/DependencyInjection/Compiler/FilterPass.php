@@ -15,8 +15,8 @@ namespace ApiPlatform\PDGBundle\Tests\TestBundle\DependencyInjection\Compiler;
 
 use ApiPlatform\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Injects filters.
@@ -27,6 +27,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 final class FilterPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     /**
      * {@inheritdoc}
      *
@@ -34,17 +36,8 @@ final class FilterPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        $filters = [];
-        foreach ($container->findTaggedServiceIds('api_platform.filter', true) as $serviceId => $tags) {
-            foreach ($tags as $tag) {
-                if (!isset($tag['id'])) {
-                    $tag['id'] = $serviceId;
-                }
-
-                $filters[$tag['id']] = new Reference($serviceId);
-            }
-        }
-
-        $container->getDefinition('api_platform.filter_locator')->addArgument($filters);
+        $container
+            ->getDefinition('api_platform.filter_locator')
+            ->addArgument($this->findAndSortTaggedServices('api_platform.filter', $container));
     }
 }
