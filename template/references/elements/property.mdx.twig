@@ -1,0 +1,19 @@
+{% block property %}
+### <a className="anchor" href="#property-{{ property.name }}" id="property-{{ property.name }}">§</a> {{ property.modifier }}{% if property.hasType %} {{ property.type }}{% endif %} <span className="token keyword">${{ property.name }}</span>{% if property.hasDefaultValue and property.defaultValue|length > 0 %} = `{{ property.defaultValue|md_value }}`{% endif %}
+
+{% if property.summary|mdx_sanitize|raw|length > 0 %}
+
+{{ property.summary|mdx_sanitize|raw }}
+
+{% endif %}
+{% if property.additionalTypes|length > 0 %}
+
+Types:
+
+> {{ property.additionalTypes|mdx_link }}
+{% endif %}
+{% if property.accessors|length > 0 %}
+
+**Accessors**: `{{ property.accessors|map(accessor => accessor.name)|join('`, `') }}`
+{% endif %}
+{% endblock %}

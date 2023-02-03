@@ -1,0 +1,93 @@
+{% extends 'layout.mdx.twig' %}
+
+{% block head %}
+<Head><title>{{ class.shortName }}</title></Head>
+{% endblock %}
+
+{% block title %}
+# \{{ class.name }}
+{% endblock %}
+
+{% block content %}
+{% apply spaceless %}
+{# block description #}
+{% if class.summary|mdx_sanitize|length > 0 %}
+
+{{ class.summary|mdx_sanitize|raw }}
+
+{% endif %}
+{# endblock description #}
+{# block extends #}
+{% if class.parentClass %}
+
+### Extends:
+
+> {{ class.parentClass|mdx_link -}}
+
+{% endif %}
+{# endblock extends #}
+
+{# block implements #}
+{% if class.interfaces|length > 0 %}
+
+### Implements:
+
+{% for interface in class.interfaces %}
+> {{ interface|mdx_link }}
+{% if not loop.last %}
+>
+{% endif %}
+{% endfor %}
+{% endif %}
+{# endblock implements #}
+{# block constants #}
+{% if class.constants|length > 0 %}
+
+## Constants:
+
+{% for constant in class.constants %}
+{% apply spaceless %}
+{{ block('constant') }}
+{% endapply %}
+{% endfor %}
+
+{% endif %}
+{# endblock constants #}
+{# block properties #}
+{% if class.properties|length > 0 %}
+
+## Properties:
+
+{% for property in class.properties %}
+{% apply spaceless %}
+{{ block('property') }}
+{% endapply %}
+
+{% if not loop.last %}
+
+---
+
+{% endif %}
+{% endfor %}
+{% endif %}
+{# endblock properties #}
+{# block methods #}
+{% if class.methods|length > 0 %}
+
+## Methods:
+
+{% for method in class.methods %}
+{% apply spaceless %}
+{{ block('method') }}
+{% endapply %}
+
+{% if not loop.last %}
+
+---
+
+{% endif %}
+{% endfor %}
+{% endif %}
+{# endblock methods #}
+{% endapply %}
+{% endblock %}

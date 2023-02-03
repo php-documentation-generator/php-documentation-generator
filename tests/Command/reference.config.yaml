@@ -1,0 +1,17 @@
+# Example file for tests
+api_platform_pdg:
+    autoload: 'vendor/autoload.php'
+    reference:
+        src: 'tests/Command/src'
+        namespace: 'ApiPlatform\PDGBundle\Tests\Command\App'
+        patterns:
+            directories: [ '*' ]
+            names: [ '*.php' ]
+            exclude: [ '*Interface.php' ]
+            class_tags_to_ignore: [ '@internal', '@experimental' ]
+    target:
+        directories:
+            guide_path: 'tests/Command/pages/guides'
+            reference_path: 'tests/Command/pages/references'
+        # For URLs
+        base_path: '/pages'

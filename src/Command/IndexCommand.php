@@ -105,6 +105,6 @@ final class IndexCommand extends Command
             }
         }
 
-        return Command::SUCCESS;
+        return self::SUCCESS;
     }
 }

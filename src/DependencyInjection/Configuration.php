@@ -76,7 +76,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('base_path')
-                            ->defaultValue('pages')
+                            ->defaultValue('/pages')
                             ->cannotBeEmpty()
                         ->end()
                     ->end()
