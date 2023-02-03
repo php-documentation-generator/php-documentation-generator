@@ -68,7 +68,6 @@ final class ReferenceCommand extends Command
         $reflectionClass = new ReflectionClass($this->getNamespace($file));
 
         $style = new SymfonyStyle($input, $output);
-        $style->info(sprintf('Creating reference "%s".', $file->getPathname()));
 
         $templateFileName = 'reference.*.twig';
         $templateContext = ['class' => new ClassParser($reflectionClass)];
@@ -106,8 +105,6 @@ final class ReferenceCommand extends Command
 
             return self::FAILURE;
         }
-
-        $style->success(sprintf('Reference "%s" successfully created.', $file->getPathname()));
 
         return self::SUCCESS;
     }

@@ -62,8 +62,6 @@ EOT
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating reference', $this->tester->getDisplay(true));
-        $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
         $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
         $this->assertStringContainsString(<<<EOT
 import Head from "next/head";
@@ -89,8 +87,6 @@ EOT
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating reference', $this->tester->getDisplay(true));
-        $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
         $this->assertFileExists($output);
         $this->assertFileEquals(
             sprintf('%s/expected/references/%s.mdx', __DIR__, $name),

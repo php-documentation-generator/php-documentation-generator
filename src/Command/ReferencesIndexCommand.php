@@ -85,8 +85,6 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
             return self::FAILURE;
         }
 
-        $style->success('References index successfully created.');
-
         return self::SUCCESS;
     }
 }
