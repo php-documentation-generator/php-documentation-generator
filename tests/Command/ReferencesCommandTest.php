@@ -45,18 +45,23 @@ final class ReferencesCommandTest extends KernelTestCase
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating reference "tests/Command/src/Controller/IndexController.php".', $this->tester->getDisplay(true));
-        $this->assertStringContainsString(
-            // must use an output file because cli cuts long lines
-            file_get_contents(sprintf('%s/expected/references/Controller/IndexController.output.mdx', __DIR__)),
-            // clean display
-            preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)))
-        );
-        $this->assertStringContainsString(
-            file_get_contents(sprintf('%s/expected/references/index.output.mdx', __DIR__)),
-            // clean display
-            preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)))
-        );
+        $this->assertStringContainsString('[INFO] Creating reference', $this->tester->getDisplay(true));
+        $this->assertStringContainsString('"tests/Command/src/Controller/IndexController.php"', $this->tester->getDisplay(true));
+        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
+        // cannot test full output cause the output size differs locally or on GitHub
+        $this->assertStringContainsString(<<<EOT
+import Head from "next/head";
+
+<Head><title>IndexController</title></Head>
+
+# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
+EOT
+            , $display);
+        $this->assertStringContainsString(<<<EOT
+<article class="api-list-container">
+## PhpDocumentGenerator\Tests\Command\App\Controller
+EOT
+            , $display);
     }
 
     public function testItOutputsEachReferenceInAFile(): void

@@ -11,16 +11,9 @@ on:
   workflow_dispatch: ~
 
 jobs:
-  tests:
-    name: Tests PHP ${{ matrix.php }}
+  conventional-commit:
+    name: Conventional Commit Check
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php: ['8.2']
-      fail-fast: false
-    env:
-      # PHP CS Fixer does not support PHP 8.2 yet
-      PHP_CS_FIXER_IGNORE_ENV: 1
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -31,6 +24,17 @@ jobs:
         uses: cocogitto/cocogitto-action@v3
         with:
           check-latest-tag-only: true
+
+  tests:
+    name: Tests PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.2']
+      fail-fast: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -50,16 +54,23 @@ jobs:
       - name: Install PHPUnit
         run: vendor/bin/simple-phpunit --version
       - name: Run php-cs-fixer tests
+        if: ${{ !cancelled() }}
+        env:
+          # PHP CS Fixer does not support PHP 8.2 yet
+          PHP_CS_FIXER_IGNORE_ENV: 1
         run: php-cs-fixer fix --diff --dry-run --ansi --verbose
       - name: Cache PHPStan
+        if: ${{ !cancelled() }}
         uses: actions/cache@v3
         with:
           path: .phpstan/
           key: phpstan-${{ github.sha }}
           restore-keys: phpstan-
       - name: Run PHPStan tests
+        if: ${{ !cancelled() }}
         run: phpstan analyze src tests
       - name: Run PHPUnit tests
+        if: ${{ !cancelled() }}
         run: vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v3

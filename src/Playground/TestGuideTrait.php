@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Tests\TestBundle\Guide;
+namespace PhpDocumentGenerator\Playground;
 
 trait TestGuideTrait
 {

@@ -14,9 +14,6 @@ declare(strict_types=1);
 namespace App;
 
 use ApiPlatform\Metadata\ApiResource;
-use PhpDocumentGenerator\Tests\TestBundle\DependencyInjection\Compiler\AttributeFilterPass;
-use PhpDocumentGenerator\Tests\TestBundle\DependencyInjection\Compiler\FilterPass;
-use PhpDocumentGenerator\Tests\TestBundle\Metadata\Resource\Factory\StaticResourceNameCollectionFactory;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
@@ -25,6 +22,9 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use Doctrine\ORM\EntityManagerInterface;
+use PhpDocumentGenerator\Bridge\ApiPlatform\DependencyInjection\Compiler\AttributeFilterPass;
+use PhpDocumentGenerator\Bridge\ApiPlatform\DependencyInjection\Compiler\FilterPass;
+use PhpDocumentGenerator\Bridge\ApiPlatform\Metadata\Resource\Factory\StaticResourceNameCollectionFactory;
 use ReflectionAttribute;
 use ReflectionClass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -33,14 +33,12 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\HttpFoundation\Request; // @phpstan-ignore-line
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 
-use function App\DependencyInjection\configure;
-use function App\Playground\request;
-
-// @phpstan-ignore-line
+use function App\DependencyInjection\configure; // @phpstan-ignore-line
+use function App\Playground\request; // @phpstan-ignore-line
 
 class Kernel extends BaseKernel
 {
@@ -48,7 +46,7 @@ class Kernel extends BaseKernel
 
     public function __construct(string $environment, bool $debug, private string $guide = '')
     {
-        parent::__construct($environment ?? 'test', $debug ?? true);
+        parent::__construct($environment, $debug);
         $this->guide = $_ENV['GUIDE_NAME'] ?? 'test';
     }
 
@@ -63,8 +61,6 @@ class Kernel extends BaseKernel
             ->defaults()
                 ->autowire()
                 ->autoconfigure();
-
-        $services->load('PhpDocumentGenerator\Tests\TestBundle\\', '../../TestBundle/');
 
         $classes = get_declared_classes();
         $resources = [];

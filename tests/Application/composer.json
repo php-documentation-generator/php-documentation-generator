@@ -1,5 +1,0 @@
-{
-  "name": "api-platform/minimal-test-application",
-  "description": "ApiPlatform application for testing purposes (composer.json needed for project dir resolving)",
-  "license": "MIT"
-}

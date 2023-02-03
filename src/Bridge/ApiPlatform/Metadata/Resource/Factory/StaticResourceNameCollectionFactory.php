@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Tests\TestBundle\Metadata\Resource\Factory;
+namespace PhpDocumentGenerator\Bridge\ApiPlatform\Metadata\Resource\Factory;
 
 use ApiPlatform\Metadata\Resource\Factory\ResourceNameCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceNameCollection;

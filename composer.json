@@ -47,13 +47,13 @@
     },
     "autoload": {
         "psr-4": {
-            "PhpDocumentGenerator\\Tests\\": "tests",
             "PhpDocumentGenerator\\": "src/",
-            "App\\": "tests/Application/src"
+            "App\\": "tests/Fixtures/app/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
+            "PhpDocumentGenerator\\Tests\\": "tests/",
             "PhpDocumentGenerator\\Tests\\Command\\App\\": "tests/Command/src/"
         }
     },

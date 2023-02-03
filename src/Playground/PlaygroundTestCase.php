@@ -11,11 +11,12 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Tests\TestBundle\Guide;
+namespace PhpDocumentGenerator\Playground;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use LogicException;
 
-use function App\Playground\request;
+use function App\Playground\request; // @phpstan-ignore-line
 
 class PlaygroundTestCase extends ApiTestCase
 {
@@ -28,6 +29,10 @@ class PlaygroundTestCase extends ApiTestCase
         }
 
         $kernel = static::createKernel();
+        if (!\function_exists('App\Playground\request')) {
+            throw new LogicException('Unable to perform a request. Did you forget to setup the request?');
+        }
+
         $request = request();
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);

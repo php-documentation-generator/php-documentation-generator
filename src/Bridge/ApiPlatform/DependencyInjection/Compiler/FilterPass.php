@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Tests\TestBundle\DependencyInjection\Compiler;
+namespace PhpDocumentGenerator\Bridge\ApiPlatform\DependencyInjection\Compiler;
 
 use ApiPlatform\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -19,11 +19,7 @@ use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Injects filters.
- *
- * @internal
- *
- * @author Kévin Dunglas <dunglas@gmail.com>
+ * Injects API Platform filters.
  */
 final class FilterPass implements CompilerPassInterface
 {

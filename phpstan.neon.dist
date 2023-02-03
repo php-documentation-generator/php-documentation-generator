@@ -1,0 +1,9 @@
+parameters:
+    tmpDir: .phpstan
+    level: 1
+    paths:
+        - src
+        - tests/Fixtures/app
+    excludePaths:
+        - tests/Fixtures/app/guides/*
+        - tests/Command/src/*

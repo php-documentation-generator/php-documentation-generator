@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use PhpDocumentGenerator\Tests\TestBundle\Command\PhpUnitCommand;
-use PhpDocumentGenerator\Tests\TestBundle\Guide\PlaygroundTestCase;
 use App\Kernel;
+use PhpDocumentGenerator\Playground\Command\PhpUnitCommand;
+use PhpDocumentGenerator\Playground\PlaygroundTestCase;
 use PHPUnit\Framework\TestSuite;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

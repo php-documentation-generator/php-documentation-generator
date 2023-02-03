@@ -1,0 +1,2 @@
+# API Platform
+%The "ApiPlatform\\Util\\AttributeFilterExtractorTrait" trait is considered internal. It may change without further notice. You should not use it from "PhpDocumentGenerator\\Bridge\\ApiPlatform\\DependencyInjection\\Compiler\\AttributeFilterPass"\.%

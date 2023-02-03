@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Tests\TestBundle\DependencyInjection\Compiler;
+namespace PhpDocumentGenerator\Bridge\ApiPlatform\DependencyInjection\Compiler;
 
 use ApiPlatform\Util\AttributeFilterExtractorTrait;
 use ReflectionClass;

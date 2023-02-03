@@ -62,13 +62,17 @@ EOT
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString(sprintf('[INFO] Creating reference "%s".', $filename), $this->tester->getDisplay(true));
-        $this->assertStringContainsString(
-            // must use an output file because cli cuts long lines
-            file_get_contents(sprintf('%s/expected/references/Controller/IndexController.output.mdx', __DIR__)),
-            // clean display
-            preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)))
-        );
+        $this->assertStringContainsString('[INFO] Creating reference', $this->tester->getDisplay(true));
+        $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
+        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
+        $this->assertStringContainsString(<<<EOT
+import Head from "next/head";
+
+<Head><title>IndexController</title></Head>
+
+# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
+EOT
+            , $display);
     }
 
     /**
@@ -85,7 +89,8 @@ EOT
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString(sprintf('[INFO] Creating reference "%s".', $filename), $this->tester->getDisplay(true));
+        $this->assertStringContainsString('[INFO] Creating reference', $this->tester->getDisplay(true));
+        $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
         $this->assertFileExists($output);
         $this->assertFileEquals(
             sprintf('%s/expected/references/%s.mdx', __DIR__, $name),
