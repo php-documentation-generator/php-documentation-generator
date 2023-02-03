@@ -46,11 +46,7 @@ final class ReferencesIndexCommandTest extends KernelTestCase
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString(<<<EOT
-<article className="api-list-container">
-## PhpDocumentGenerator\Tests\Command\App\Controller
-EOT
-            , $display);
+        $this->assertStringContainsString('## PhpDocumentGenerator\Tests\Command\App\Controller', $display);
     }
 
     public function testItOutputsIndexInAFile(): void

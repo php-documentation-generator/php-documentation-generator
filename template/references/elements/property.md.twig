@@ -1,0 +1,19 @@
+{% block property %}
+### {{ property.modifier }}{% if property.hasType %} {{ property.type }}{% endif %} ${{ property.name }}{% if property.hasDefaultValue and property.defaultValue|length > 0 %} = `{{ property.defaultValue|md_value }}`{% endif %}
+
+{% if property.summary|md_sanitize|raw|length > 0 %}
+
+{{ property.summary|md_sanitize|raw }}
+
+{% endif %}
+{% if property.additionalTypes|length > 0 %}
+
+Types:
+
+> {{ property.additionalTypes|md_link }}
+{% endif %}
+{% if property.accessors|length > 0 %}
+
+**Accessors**: `{{ property.accessors|map(accessor => accessor.name)|join('`, `') }}`
+{% endif %}
+{% endblock %}

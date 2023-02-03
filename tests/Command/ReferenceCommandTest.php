@@ -47,10 +47,7 @@ final class ReferenceCommandTest extends KernelTestCase
         ]);
 
         $this->assertEquals(Command::FAILURE, $this->tester->getStatusCode());
-        $this->assertStringContainsString(<<<EOT
-File "tests/Command/src/Invalid/Invalid.php" does not exist.
-EOT
-            , $this->tester->getDisplay(true));
+        $this->assertStringContainsString('File "tests/Command/src/Invalid/Invalid.php" does not exist.', $this->tester->getDisplay(true));
     }
 
     public function testItOutputsAReferenceInCommandOutput(): void
@@ -62,14 +59,7 @@ EOT
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString(<<<EOT
-import Head from "next/head";
-
-<Head><title>IndexController</title></Head>
-
-# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
-EOT
-            , $display);
+        $this->assertStringContainsString('# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController', $display);
     }
 
     /**

@@ -1,0 +1,11 @@
+{% apply spaceless %}
+{% for namespace, classes in namespaces %}
+## {{ namespace }}
+
+{% for class in classes %}
+* [`{{ class.shortName }}`]({{ class|md_url }})
+
+{% endfor %}
+{% endfor %}
+{% endapply %}
+

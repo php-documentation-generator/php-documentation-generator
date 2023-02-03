@@ -1,8 +1,4 @@
-{% extends 'layout.mdx.twig' %}
-
-{% block head %}
-<Head><title>{{ class.shortName }}</title></Head>
-{% endblock %}
+{% extends 'layout.md.twig' %}
 
 {% block title %}
 # {% if configuration is defined %}Configuration Reference{% else %}\{{ class.name }}{% endif %}
@@ -26,9 +22,9 @@
 
 {% block class %}
 {# block description #}
-{% if class.summary|mdx_sanitize|length > 0 %}
+{% if class.summary|md_sanitize|length > 0 %}
 
-{{ class.summary|mdx_sanitize|raw }}
+{{ class.summary|md_sanitize|raw }}
 
 {% endif %}
 {# endblock description #}
@@ -37,7 +33,7 @@
 
 ### Extends:
 
-> {{ class.parentClass|mdx_link -}}
+> {{ class.parentClass|md_link -}}
 
 {% endif %}
 {# endblock extends #}
@@ -48,7 +44,7 @@
 ### Implements:
 
 {% for interface in class.interfaces %}
-> {{ interface|mdx_link }}
+> {{ interface|md_link }}
 {% if not loop.last %}
 >
 {% endif %}

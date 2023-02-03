@@ -1,7 +1,3 @@
-import Head from "next/head";
-
-<Head><title>Configuration</title></Head>
-
 # Configuration Reference
 
 ```yaml

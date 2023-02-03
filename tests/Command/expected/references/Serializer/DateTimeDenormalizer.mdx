@@ -1,18 +1,14 @@
-import Head from "next/head";
-
-<Head><title>DateTimeDenormalizer</title></Head>
-
 # \PhpDocumentGenerator\Tests\Command\App\Serializer\DateTimeDenormalizer
 
 ### Implements:
 
-> [`\Symfony\Component\Serializer\Normalizer\DenormalizerInterface`](https://symfony.com/doc/current/index.html)
+> [`Symfony\Component\Serializer\Normalizer\DenormalizerInterface`](https://symfony.com/doc/current/index.html)
 >
-> [`\Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface`](https://symfony.com/doc/current/index.html)
+> [`Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface`](https://symfony.com/doc/current/index.html)
 
 ## Properties:
 
-### <a className="anchor" href="#property-denormalizer" id="property-denormalizer">§</a> protected <span className="token keyword">$denormalizer</span>
+### protected $denormalizer
 
 Types:
 
@@ -20,7 +16,7 @@ Types:
 
 ## Methods:
 
-### <a className="anchor" href="#method-denormalize" id="method-denormalize">§</a> public function <span className="token function">denormalize</span>($data, string $type, ?string $format``, array $context`[]`): <span className="token keyword">`DateTimeInterface`</span>
+### public function denormalize($data, string $type, ?string $format``, array $context`[]`): `DateTimeInterface`
 
 Denormalizes data back into an object of the given class.
 
@@ -40,17 +36,17 @@ Returns:
 
 Throws:
 
-> [`\BadMethodCallException`](https://php.net/class.badmethodcallexception) Occurs when the normalizer is not called in an expected context
+> [`BadMethodCallException`](https://php.net/class.badmethodcallexception) Occurs when the normalizer is not called in an expected context
 >
-> [`\InvalidArgumentException`](https://php.net/class.invalidargumentexception) Occurs when the arguments are not coherent or not supported
+> [`InvalidArgumentException`](https://php.net/class.invalidargumentexception) Occurs when the arguments are not coherent or not supported
 >
-> [`\UnexpectedValueException`](https://php.net/class.unexpectedvalueexception) Occurs when the item cannot be hydrated with the given data
+> [`UnexpectedValueException`](https://php.net/class.unexpectedvalueexception) Occurs when the item cannot be hydrated with the given data
 >
 > `ExtraAttributesException` Occurs when the item doesn't have attribute to receive given data
 >
-> [`\LogicException`](https://php.net/class.logicexception) Occurs when the normalizer is not supposed to denormalize
+> [`LogicException`](https://php.net/class.logicexception) Occurs when the normalizer is not supposed to denormalize
 >
-> [`\RuntimeException`](https://php.net/class.runtimeexception) Occurs if the class cannot be instantiated
+> [`RuntimeException`](https://php.net/class.runtimeexception) Occurs if the class cannot be instantiated
 >
 > `ExceptionInterface` Occurs for all the other cases of errors
 >
@@ -58,7 +54,7 @@ Throws:
 
 ---
 
-### <a className="anchor" href="#method-supportsDenormalization" id="method-supportsDenormalization">§</a> public function <span className="token function">supportsDenormalization</span>($data, string $type, ?string $format``, array $context`[]`): <span className="token keyword">`bool`</span>
+### public function supportsDenormalization($data, string $type, ?string $format``, array $context`[]`): `bool`
 
 Checks whether the given class is supported for denormalization by this normalizer.
 
@@ -78,4 +74,4 @@ Returns:
 
 ---
 
-### <a className="anchor" href="#method-setDenormalizer" id="method-setDenormalizer">§</a> public function <span className="token function">setDenormalizer</span>(Symfony\Component\Serializer\Normalizer\DenormalizerInterface $denormalizer)
+### public function setDenormalizer(Symfony\Component\Serializer\Normalizer\DenormalizerInterface $denormalizer)
