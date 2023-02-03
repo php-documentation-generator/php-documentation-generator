@@ -13,10 +13,7 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use PhpDocumentGenerator\Parser\ClassParser;
 use PhpDocumentGenerator\Services\ConfigurationHandler;
-use ReflectionClass;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,7 +24,7 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;
 
-final class ReferencesCommand extends Command
+final class ReferencesCommand extends AbstractReferencesCommand
 {
     use CommandTrait;
 
@@ -36,7 +33,7 @@ final class ReferencesCommand extends Command
         private readonly Environment $environment,
         private readonly string $templatePath
     ) {
-        parent::__construct(name: 'references');
+        parent::__construct($configuration, name: 'references');
     }
 
     protected function configure(): void
@@ -58,11 +55,6 @@ final class ReferencesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $patterns = $this->configuration->get('reference.patterns');
-        $tagsToIgnore = $patterns['class_tags_to_ignore'] ?? ['@internal', '@experimental'];
-        $files = $this->findFiles($patterns['directories'] ?? [], $patterns['names'] ?? ['*.php'], $patterns['exclude'] ?? []);
-        $namespaces = [];
-
         $templatePath = $input->getOption('template-path');
         $outputPath = $input->getArgument('output');
 
@@ -70,35 +62,10 @@ final class ReferencesCommand extends Command
         $referenceExtension = pathinfo($this->getTemplateFile($templatePath, 'reference.*.twig')->getBasename('.twig'), \PATHINFO_EXTENSION);
 
         $style = new SymfonyStyle($input, $output);
-        $style->progressStart(\count($files));
+        $style->progressStart();
 
-        foreach ($files as $file) {
+        foreach ($this->getFiles() as $file) {
             $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('reference.src'));
-            $namespace = rtrim(sprintf('%s\\%s', $this->configuration->get('reference.namespace'), str_replace([\DIRECTORY_SEPARATOR, '.php'], ['\\', ''], $relativeToSrc)), '\\');
-
-            try {
-                $reflectionClass = new ClassParser(new ReflectionClass(sprintf('%s\\%s', $namespace, $file->getBasename('.php'))));
-            } catch (\ReflectionException) {
-                $style->getErrorStyle()->error(sprintf('File "%s" does not seem to be a valid PHP class.', $file->getPathname()));
-
-                return self::FAILURE;
-            }
-
-            foreach ($tagsToIgnore as $tagToIgnore) {
-                if ($reflectionClass->hasTag($tagToIgnore)) {
-                    continue 2;
-                }
-            }
-
-            // class is not an interface nor a trait, and has no protected/public methods nor properties
-            if (
-                !$reflectionClass->isTrait()
-                && !$reflectionClass->isInterface()
-                && !\count($reflectionClass->getMethods())
-                && !\count($reflectionClass->getProperties())
-            ) {
-                continue;
-            }
 
             // run "reference" command
             $fileOutputPath = $outputPath;
@@ -123,35 +90,10 @@ final class ReferencesCommand extends Command
                 return self::FAILURE;
             }
 
-            $namespaces[$namespace][] = $reflectionClass;
-
             $style->progressAdvance();
         }
 
         $style->progressFinish();
-
-        // Creating an index like https://angular.io/api
-        $templateFile = $this->getTemplateFile($templatePath, 'index.*.twig');
-        $content = $this->environment->render($templateFile->getFilename(), ['namespaces' => $namespaces]);
-        if (!$outputPath) {
-            $style->block($content);
-
-            return self::SUCCESS;
-        }
-
-        $indexExtension = pathinfo($templateFile->getBasename('.twig'), \PATHINFO_EXTENSION);
-        $fileName = sprintf('%s%sindex.%s', rtrim($outputPath, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $indexExtension);
-        $dirName = pathinfo($fileName, \PATHINFO_DIRNAME);
-        if (!is_dir($dirName)) {
-            mkdir($dirName, 0777, true);
-        }
-        if (!file_put_contents($fileName, $content)) {
-            $style->getErrorStyle()->error(sprintf('Cannot write in "%s".', $fileName));
-
-            return self::FAILURE;
-        }
-
-        $style->success('References index successfully created.');
 
         return self::SUCCESS;
     }

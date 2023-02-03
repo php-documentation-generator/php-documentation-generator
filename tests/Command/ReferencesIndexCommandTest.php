@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-final class ReferencesCommandTest extends KernelTestCase
+final class ReferencesIndexCommandTest extends KernelTestCase
 {
     private ApplicationTester $tester;
 
@@ -38,41 +38,34 @@ final class ReferencesCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    public function testItOutputsEachReferenceInCommandOutput(): void
+    public function testItOutputsIndexInCommandOutput(): void
     {
         $this->tester->run([
-            'command' => 'references',
+            'command' => 'references-index',
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating reference', $this->tester->getDisplay(true));
-        $this->assertStringContainsString('"tests/Command/src/Controller/IndexController.php"', $this->tester->getDisplay(true));
         $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        // cannot test full output cause the output size differs locally or on GitHub
         $this->assertStringContainsString(<<<EOT
-import Head from "next/head";
-
-<Head><title>IndexController</title></Head>
-
-# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
+<article className="api-list-container">
+## PhpDocumentGenerator\Tests\Command\App\Controller
 EOT
             , $display);
     }
 
-    public function testItOutputsEachReferenceInAFile(): void
+    public function testItOutputsIndexInAFile(): void
     {
         $output = 'tests/Command/pages/references';
         $this->tester->run([
-            'command' => 'references',
+            'command' => 'references-index',
             'output' => $output,
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating reference "tests/Command/src/Controller/IndexController.php".', $this->tester->getDisplay(true));
-        $this->assertFileExists(sprintf('%s/Controller/IndexController.mdx', $output));
+        $this->assertFileExists(sprintf('%s/index.mdx', $output));
         $this->assertFileEquals(
-            sprintf('%s/expected/references/Controller/IndexController.mdx', __DIR__),
-            sprintf('%s/Controller/IndexController.mdx', $output)
+            sprintf('%s/expected/references/index.mdx', __DIR__),
+            sprintf('%s/index.mdx', $output)
         );
     }
 }
