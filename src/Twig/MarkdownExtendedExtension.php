@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Twig;
+namespace PhpDocumentGenerator\Twig;
 
-use ApiPlatform\PDGBundle\Parser\ParserInterface;
+use PhpDocumentGenerator\Parser\ParserInterface;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
 use Twig\TwigFilter;
 

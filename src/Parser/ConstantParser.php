@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Parser;
+namespace PhpDocumentGenerator\Parser;
 
 use ReflectionClassConstant;
 

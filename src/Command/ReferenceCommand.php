@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Command;
+namespace PhpDocumentGenerator\Command;
 
-use ApiPlatform\PDGBundle\Parser\ClassParser;
-use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
+use PhpDocumentGenerator\Parser\ClassParser;
+use PhpDocumentGenerator\Services\ConfigurationHandler;
 use ReflectionClass;
 use RuntimeException;
 use SplFileInfo;

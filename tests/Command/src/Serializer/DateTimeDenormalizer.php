@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Tests\Command\App\Serializer;
+namespace PhpDocumentGenerator\Tests\Command\App\Serializer;
 
 use DateTimeInterface;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;

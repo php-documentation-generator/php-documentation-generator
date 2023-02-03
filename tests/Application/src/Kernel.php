@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace App;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\PDGBundle\Tests\TestBundle\DependencyInjection\Compiler\AttributeFilterPass;
-use ApiPlatform\PDGBundle\Tests\TestBundle\DependencyInjection\Compiler\FilterPass;
-use ApiPlatform\PDGBundle\Tests\TestBundle\Metadata\Resource\Factory\StaticResourceNameCollectionFactory;
+use PhpDocumentGenerator\Tests\TestBundle\DependencyInjection\Compiler\AttributeFilterPass;
+use PhpDocumentGenerator\Tests\TestBundle\DependencyInjection\Compiler\FilterPass;
+use PhpDocumentGenerator\Tests\TestBundle\Metadata\Resource\Factory\StaticResourceNameCollectionFactory;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
@@ -64,7 +64,7 @@ class Kernel extends BaseKernel
                 ->autowire()
                 ->autoconfigure();
 
-        $services->load('ApiPlatform\PDGBundle\Tests\TestBundle\\', '../../TestBundle/');
+        $services->load('PhpDocumentGenerator\Tests\TestBundle\\', '../../TestBundle/');
 
         $classes = get_declared_classes();
         $resources = [];

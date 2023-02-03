@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Tests\TestBundle\Guide;
+namespace PhpDocumentGenerator\Tests\TestBundle\Guide;
 
 trait TestGuideTrait
 {

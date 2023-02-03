@@ -6,16 +6,16 @@
     <services>
         <defaults public="false"/>
 
-        <service id="pdg.configuration_handler" class="ApiPlatform\PDGBundle\Services\ConfigurationHandler"/>
+        <service id="pdg.configuration_handler" class="PhpDocumentGenerator\Services\ConfigurationHandler"/>
 
         <!-- Twig -->
         <service id="pdg.twig.loader.filesystem" class="Twig\Loader\FilesystemLoader"/>
 
-        <service id="pdg.twig.extension.markdown" class="ApiPlatform\PDGBundle\Twig\MarkdownExtension">
+        <service id="pdg.twig.extension.markdown" class="PhpDocumentGenerator\Twig\MarkdownExtension">
             <argument type="service" id="pdg.configuration_handler"/>
         </service>
 
-        <service id="pdg.twig.extension.markdown_extended" class="ApiPlatform\PDGBundle\Twig\MarkdownExtendedExtension">
+        <service id="pdg.twig.extension.markdown_extended" class="PhpDocumentGenerator\Twig\MarkdownExtendedExtension">
             <argument type="service" id="pdg.configuration_handler"/>
         </service>
 
@@ -33,32 +33,32 @@
         </service>
 
         <!-- Commands -->
-        <service id="pdg.command.reference" class="ApiPlatform\PDGBundle\Command\ReferenceCommand">
+        <service id="pdg.command.reference" class="PhpDocumentGenerator\Command\ReferenceCommand">
             <argument type="service" id="pdg.configuration_handler"/>
             <argument type="service" id="pdg.twig"/>
             <argument>%kernel.project_dir%/template/references</argument>
             <tag>console.command</tag>
         </service>
 
-        <service id="pdg.command.references" class="ApiPlatform\PDGBundle\Command\ReferencesCommand">
+        <service id="pdg.command.references" class="PhpDocumentGenerator\Command\ReferencesCommand">
             <argument type="service" id="pdg.configuration_handler"/>
             <argument type="service" id="pdg.twig"/>
             <argument>%kernel.project_dir%/template/references</argument>
             <tag>console.command</tag>
         </service>
 
-        <service id="pdg.command.index" class="ApiPlatform\PDGBundle\Command\IndexCommand">
+        <service id="pdg.command.index" class="PhpDocumentGenerator\Command\IndexCommand">
             <tag>console.command</tag>
         </service>
 
-        <service id="pdg.command.guide" class="ApiPlatform\PDGBundle\Command\GuideCommand">
+        <service id="pdg.command.guide" class="PhpDocumentGenerator\Command\GuideCommand">
             <argument type="service" id="pdg.configuration_handler"/>
             <argument type="service" id="pdg.twig"/>
             <argument>%kernel.project_dir%/template/guides</argument>
             <tag>console.command</tag>
         </service>
 
-        <service id="pdg.command.test_guide" class="ApiPlatform\PDGBundle\Command\TestGuideCommand">
+        <service id="pdg.command.test_guide" class="PhpDocumentGenerator\Command\TestGuideCommand">
             <argument type="service" id="pdg.configuration_handler"/>
             <tag>console.command</tag>
         </service>

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Tests\TestBundle\Command;
+namespace PhpDocumentGenerator\Tests\TestBundle\Command;
 
 use DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension;
 use PHPUnit\Framework\TestSuite;

@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Twig;
+namespace PhpDocumentGenerator\Twig;
 
-use ApiPlatform\PDGBundle\Parser\ClassParser;
-use ApiPlatform\PDGBundle\Parser\ParserInterface;
-use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
+use PhpDocumentGenerator\Parser\ClassParser;
+use PhpDocumentGenerator\Parser\ParserInterface;
+use PhpDocumentGenerator\Services\ConfigurationHandler;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser;

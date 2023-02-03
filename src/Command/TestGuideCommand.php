@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Command;
+namespace PhpDocumentGenerator\Command;
 
-use ApiPlatform\PDGBundle\Tests\TestBundle\Command\PhpUnitCommand;
-use ApiPlatform\PDGBundle\Tests\TestBundle\Guide\PlaygroundTestCase;
+use PhpDocumentGenerator\Tests\TestBundle\Command\PhpUnitCommand;
+use PhpDocumentGenerator\Tests\TestBundle\Guide\PlaygroundTestCase;
 use App\Kernel;
 use PHPUnit\Framework\TestSuite;
 use Symfony\Component\Console\Command\Command;

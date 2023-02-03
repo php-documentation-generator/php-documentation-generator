@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Tests\Command;
+namespace PhpDocumentGenerator\Tests\Command;
 
-use ApiPlatform\PDGBundle\Kernel;
+use PhpDocumentGenerator\Kernel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;

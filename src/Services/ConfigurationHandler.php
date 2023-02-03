@@ -11,10 +11,10 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Services;
+namespace PhpDocumentGenerator\Services;
 
-use ApiPlatform\PDGBundle\DependencyInjection\Configuration;
-use ApiPlatform\PDGBundle\Parser\ParserInterface;
+use PhpDocumentGenerator\DependencyInjection\Configuration;
+use PhpDocumentGenerator\Parser\ParserInterface;
 use Reflector;
 use RuntimeException;
 use Symfony\Component\Config\Definition\Processor;
