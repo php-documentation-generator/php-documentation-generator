@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Command;
+namespace PhpDocumentGenerator\Command;
 
 use RuntimeException;
 use Symfony\Component\Finder\Finder;

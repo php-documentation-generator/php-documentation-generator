@@ -3,7 +3,7 @@ api_platform_pdg:
     autoload: 'vendor/autoload.php'
     reference:
         src: 'tests/Command/src'
-        namespace: 'ApiPlatform\PDGBundle\Tests\Command\App'
+        namespace: 'PhpDocumentGenerator\Tests\Command\App'
         patterns:
             directories: [ '*' ]
             names: [ '*.php' ]

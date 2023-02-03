@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Command;
+namespace PhpDocumentGenerator\Command;
 
-use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
+use PhpDocumentGenerator\Services\ConfigurationHandler;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

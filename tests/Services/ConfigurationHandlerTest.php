@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Tests\Services;
+namespace PhpDocumentGenerator\Tests\Services;
 
-use ApiPlatform\PDGBundle\Services\ConfigurationHandler;
+use PhpDocumentGenerator\Services\ConfigurationHandler;
 use PHPUnit\Framework\TestCase;
 
 final class ConfigurationHandlerTest extends TestCase

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace ApiPlatform\PDGBundle\Command;
+namespace PhpDocumentGenerator\Command;
 
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 use Symfony\Component\Console\Command\Command;

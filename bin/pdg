@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use ApiPlatform\PDGBundle\Kernel;
+use PhpDocumentGenerator\Kernel;
 use Symfony\Component\Console\Application;
 
 if (isset($GLOBALS['_composer_autoload_path'])) {
