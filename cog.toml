@@ -1,3 +1,5 @@
+ignore_merge_commits = true
+
 post_bump_hooks = [
     "git push",
     "git push origin {{version}}",
