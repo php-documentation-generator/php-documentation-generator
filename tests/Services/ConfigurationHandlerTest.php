@@ -39,6 +39,6 @@ final class ConfigurationHandlerTest extends TestCase
         yield ['reference.patterns.class_tags_to_ignore', ['@internal', '@experimental']];
         yield ['target.directories.guide_path', 'pages/guides'];
         yield ['target.directories.reference_path', 'pages/references'];
-        yield ['target.base_path', 'pages'];
+        yield ['target.base_url', 'pages'];
     }
 }

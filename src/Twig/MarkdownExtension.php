@@ -92,7 +92,7 @@ class MarkdownExtension extends AbstractExtension
                     // get reference file path (e.g.: pages/references/Entity/Book.md)
                     $filePath = sprintf('%s/%s.%s', $this->configuration->get('target.directories.reference_path'), $fileName, $referenceExtension);
 
-                    return sprintf('%s/%s', $this->configuration->get('target.base_path'), $filePath);
+                    return sprintf('%s/%s', $this->configuration->get('target.base_url'), $filePath);
                 }
             }
 

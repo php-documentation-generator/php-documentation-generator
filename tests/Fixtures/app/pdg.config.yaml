@@ -13,4 +13,4 @@ api_platform_pdg:
       guide_path: 'pages/guide'
       reference_path: 'pages/reference'
 
-    base_path: 'pages'
+    base_url: 'pages'
