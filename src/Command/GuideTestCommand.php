@@ -23,11 +23,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-final class TestGuideCommand extends Command
+final class GuideTestCommand extends Command
 {
     public function __construct()
     {
-        parent::__construct(name: 'test:guide');
+        parent::__construct(name: 'guide:test');
     }
 
     protected function configure(): void
