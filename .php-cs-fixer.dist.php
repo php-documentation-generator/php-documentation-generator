@@ -14,7 +14,9 @@ HEADER;
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude([
-        'tests/Application/var',
+        'tests/Fixtures/var',
+        'tests/Fixtures/guides',
+        "tests/Command/guides",
         'var',
         'src/DependencyInjection/Configuration.php'
     ])

@@ -7,3 +7,4 @@ parameters:
     excludePaths:
         - tests/Fixtures/app/guides/*
         - tests/Command/src/*
+        - tests/Command/guides/*
