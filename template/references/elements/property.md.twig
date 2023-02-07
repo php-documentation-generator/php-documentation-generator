@@ -1,5 +1,5 @@
 {% block property %}
-### {{ property.modifier }}{% if property.hasType %} {{ property.type }}{% endif %} ${{ property.name }}{% if property.hasDefaultValue and property.defaultValue|length > 0 %} = `{{ property.defaultValue|md_value }}`{% endif %}
+### <a href="#property-{{ property.name }}" id="property-{{ property.name }}">§</a> {{ property.modifier }}{% if property.hasType %} {{ property.type }}{% endif %} ${{ property.name }}{% if property.hasDefaultValue and property.defaultValue|length > 0 %} = `{{ property.defaultValue|md_value }}`{% endif %}
 
 {% if property.summary|md_sanitize|raw|length > 0 %}
 
