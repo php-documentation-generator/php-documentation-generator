@@ -21,6 +21,7 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser;
 use ReflectionClass;
 use SplFileInfo;
+use Symfony\Component\Filesystem\Path;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -57,6 +58,11 @@ class MarkdownExtension extends AbstractExtension
 
         $url = $this->getUrl($data, $referenceExtension);
 
+        // Reference or guide
+        if (\is_string($data) && file_exists($data)) {
+            $name = pathinfo($data, \PATHINFO_FILENAME);
+        }
+
         return $url ? sprintf('[`%s`](%s)', $name, $url) : sprintf('`%s`', $name);
     }
 
@@ -92,7 +98,13 @@ class MarkdownExtension extends AbstractExtension
                     // get reference file path (e.g.: pages/references/Entity/Book.md)
                     $filePath = sprintf('%s/%s.%s', $this->configuration->get('target.directories.reference_path'), $fileName, $referenceExtension);
 
-                    return sprintf('%s/%s', $this->configuration->get('target.base_url'), $filePath);
+                    return str_replace([
+                        $this->configuration->get('target.directories.reference_path'),
+                        $this->configuration->get('target.directories.guide_path'),
+                    ], [
+                        $this->configuration->get('reference.base_url'),
+                        $this->configuration->get('guide.base_url'),
+                    ], $filePath);
                 }
             }
 
@@ -107,6 +119,17 @@ class MarkdownExtension extends AbstractExtension
         // Symfony
         if (str_starts_with($data, 'Symfony\\')) {
             return 'https://symfony.com/doc/current/index.html';
+        }
+
+        // Reference or guide
+        if (file_exists($data)) {
+            return str_replace([
+                $this->configuration->get('target.directories.reference_path'),
+                $this->configuration->get('target.directories.guide_path'),
+            ], [
+                $this->configuration->get('reference.base_url'),
+                $this->configuration->get('guide.base_url'),
+            ], $data);
         }
 
         return null;

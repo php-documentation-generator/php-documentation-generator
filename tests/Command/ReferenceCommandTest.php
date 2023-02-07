@@ -30,7 +30,7 @@ final class ReferenceCommandTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
+        putenv('PDG_CONFIG_FILE=tests/Command/reference.config.yaml');
 
         $kernel = self::bootKernel();
         /** @var Application $application */
@@ -48,18 +48,6 @@ final class ReferenceCommandTest extends KernelTestCase
 
         $this->assertEquals(Command::INVALID, $this->tester->getStatusCode());
         $this->assertStringContainsString('File "tests/Command/src/Invalid/Invalid.php" does not exist.', $this->tester->getDisplay(true));
-    }
-
-    public function testItOutputsAReferenceInCommandOutput(): void
-    {
-        $this->tester->run([
-            'command' => 'reference',
-            'filename' => 'tests/Command/src/Controller/IndexController.php',
-        ]);
-
-        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController', $display);
     }
 
     /**
@@ -87,5 +75,17 @@ final class ReferenceCommandTest extends KernelTestCase
         yield ['Controller/IndexController'];
         yield ['DependencyInjection/Configuration'];
         yield ['Serializer/DateTimeDenormalizer'];
+    }
+
+    public function testItOutputsAReferenceInCommandOutput(): void
+    {
+        $this->tester->run([
+            'command' => 'reference',
+            'filename' => 'tests/Command/src/Controller/IndexController.php',
+        ]);
+
+        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
+        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
+        $this->assertStringContainsString('# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController', $display);
     }
 }

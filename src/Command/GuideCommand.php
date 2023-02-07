@@ -43,10 +43,10 @@ final class GuideCommand extends Command
         $this
             ->setDescription(description: 'Creates a guide based on a PHP code')
             ->addArgument(name: 'filename', mode: InputArgument::REQUIRED)
-            ->addArgument(
+            ->addOption(
                 name: 'output',
-                mode: InputArgument::OPTIONAL,
-                description: 'The path to the file where the guide will be printed. Leave empty for screen printing'
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The path to the file where the reference will be printed. Leave empty for screen printing'
             )
             ->addOption(
                 name: 'template',
@@ -170,7 +170,7 @@ final class GuideCommand extends Command
             ['headers' => $headers, 'sections' => $sections]
         );
 
-        $out = $input->getArgument('output');
+        $out = $input->getOption('output');
         if (!$out) {
             $style->block($content);
 

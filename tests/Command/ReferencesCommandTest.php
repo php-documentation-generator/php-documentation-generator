@@ -29,7 +29,7 @@ final class ReferencesCommandTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
+        putenv('PDG_CONFIG_FILE=tests/Command/reference.config.yaml');
 
         $kernel = self::bootKernel();
         /** @var Application $application */

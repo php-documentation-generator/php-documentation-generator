@@ -55,6 +55,9 @@
         </service>
 
         <service id="pdg.command.index" class="PhpDocumentGenerator\Command\IndexCommand">
+            <argument type="service" id="pdg.configuration_handler"/>
+            <argument type="service" id="pdg.twig"/>
+            <argument>%kernel.project_dir%/template/index.md.twig</argument>
             <tag>console.command</tag>
         </service>
 

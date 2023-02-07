@@ -1,0 +1,29 @@
+## Guides
+
+{% for path, files in guides %}
+{% if path|length > 0 %}
+* {{ path }}
+{% for file in files %}
+  * {{ file|md_link }}
+{% endfor %}
+{% else %}
+{% for file in files %}
+* {{ file|md_link }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+## References
+
+{% for path, files in references %}
+{% if path|length > 0 %}
+* {{ path }}
+{% for file in files %}
+  * {{ file|md_link }}
+{% endfor %}
+{% else %}
+{% for file in files %}
+* {{ file|md_link }}
+{% endfor %}
+{% endif %}
+{% endfor %}

@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-final class ReferencesIndexCommandTest extends KernelTestCase
+final class IndexCommandTest extends KernelTestCase
 {
     private ApplicationTester $tester;
 
@@ -29,7 +29,7 @@ final class ReferencesIndexCommandTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/reference.config.yaml');
+        putenv('PDG_CONFIG_FILE=tests/Command/index.config.yaml');
 
         $kernel = self::bootKernel();
         /** @var Application $application */
@@ -40,16 +40,16 @@ final class ReferencesIndexCommandTest extends KernelTestCase
 
     public function testItOutputsIndexInAFile(): void
     {
-        $output = 'tests/Command/pages/references/index.md';
+        $output = 'tests/Command/pages/index.md';
         $this->tester->run([
-            'command' => 'references:index',
+            'command' => 'index',
             '--output' => $output,
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $this->assertFileExists($output);
         $this->assertFileEquals(
-            'tests/Command/expected/references/index.md',
+            'tests/Command/expected/index.md',
             $output
         );
     }
@@ -57,11 +57,25 @@ final class ReferencesIndexCommandTest extends KernelTestCase
     public function testItOutputsIndexInCommandOutput(): void
     {
         $this->tester->run([
-            'command' => 'references:index',
+            'command' => 'index',
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('## PhpDocumentGenerator\Tests\Command\App\Controller', $display);
+        $this->assertStringContainsString(<<<EOT
+## Guides
+
+* [`use-doctrine`](/pages/guides/use-doctrine.md)
+
+## References
+
+* Controller
+  * [`IndexController`](/pages/references/Controller/IndexController.md)
+* DependencyInjection
+  * [`Configuration`](/pages/references/DependencyInjection/Configuration.md)
+* Serializer
+  * [`DateTimeDenormalizer`](/pages/references/Serializer/DateTimeDenormalizer.md)
+EOT
+            , $display);
     }
 }

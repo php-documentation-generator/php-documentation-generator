@@ -1,0 +1,4 @@
+api_platform_pdg:
+    target:
+        directories:
+            guide_path: 'tests/Command/pages/references'

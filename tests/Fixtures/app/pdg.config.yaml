@@ -8,9 +8,8 @@ api_platform_pdg:
       names: ["*Interface.php", "*Trait.php", "Configuration.php"]]
       exclude: ['*Factory.php']
       class_tags_to_ignore: ['@experimental', '@internal']
+    base_url: 'pages/references'
   target:
     directories:
       guide_path: 'pages/guide'
       reference_path: 'pages/reference'
-
-    base_url: 'pages'

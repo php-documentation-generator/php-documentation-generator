@@ -37,8 +37,8 @@ final class ConfigurationHandlerTest extends TestCase
         yield ['reference.patterns.names', ['*.php']];
         yield ['reference.patterns.exclude', ['*Interface.php']];
         yield ['reference.patterns.class_tags_to_ignore', ['@internal', '@experimental']];
+        yield ['reference.base_url', '/pages/references'];
         yield ['target.directories.guide_path', 'pages/guides'];
         yield ['target.directories.reference_path', 'pages/references'];
-        yield ['target.base_url', 'pages'];
     }
 }
