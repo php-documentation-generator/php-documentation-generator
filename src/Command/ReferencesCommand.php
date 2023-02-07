@@ -25,8 +25,6 @@ use Symfony\Component\Finder\Finder;
 
 final class ReferencesCommand extends AbstractReferencesCommand
 {
-    use CommandTrait;
-
     public function __construct(
         private readonly ConfigurationHandler $configuration,
         private readonly string $defaultTemplate
