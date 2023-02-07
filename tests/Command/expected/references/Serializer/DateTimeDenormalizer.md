@@ -5,6 +5,8 @@
 > [`Symfony\Component\Serializer\Normalizer\DenormalizerInterface`](https://symfony.com/doc/current/index.html)
 >
 > [`Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface`](https://symfony.com/doc/current/index.html)
+>
+> `PhpDocumentGenerator\Tests\Command\App\Services\IgnoredInterface`
 
 ## Properties:
 

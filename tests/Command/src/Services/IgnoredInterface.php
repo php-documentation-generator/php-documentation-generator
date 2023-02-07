@@ -11,9 +11,8 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Parser;
+namespace PhpDocumentGenerator\Tests\Command\App\Services;
 
-interface ParserInterface
+interface IgnoredInterface
 {
-    public function isExcluded(): bool;
 }

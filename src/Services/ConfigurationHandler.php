@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Services;
 
 use PhpDocumentGenerator\DependencyInjection\Configuration;
+use PhpDocumentGenerator\Parser\ClassParser;
 use PhpDocumentGenerator\Parser\ParserInterface;
 use Reflector;
 use RuntimeException;
@@ -90,9 +91,22 @@ final class ConfigurationHandler
 
     public function isExcluded(Reflector|ParserInterface $reflection): bool
     {
+        $tagsToIgnore = $this->get('references.patterns')['class_tags_to_ignore'] ?? ['@internal', '@experimental'];
+        $fileName = $reflection->getFileName();
+
         foreach ($this->get('references.patterns.exclude') as $rule) {
-            if (preg_match(sprintf('/%s/', preg_quote($rule)), $reflection->getFileName())) {
+            if (preg_match(sprintf('/%s/', preg_quote($rule)), $fileName) || $reflection->isExcluded()) {
                 return true;
+            }
+
+            if (!$reflection instanceof ClassParser) {
+                continue;
+            }
+
+            foreach ($tagsToIgnore as $tagToIgnore) {
+                if ($reflection->hasTag($tagToIgnore)) {
+                    return true;
+                }
             }
         }
 

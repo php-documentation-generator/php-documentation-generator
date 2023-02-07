@@ -25,6 +25,11 @@ abstract class AbstractParser implements ParserInterface
 
     abstract public function getReflection();
 
+    public function isExcluded(): bool
+    {
+        return false;
+    }
+
     public function __call(string $name, array $arguments)
     {
         $reflection = $this->getReflection();

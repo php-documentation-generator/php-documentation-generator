@@ -23,6 +23,18 @@ final class ClassParser extends AbstractParser
     {
     }
 
+    /**
+     * Exclude interfaces, traits, and classes without protected/public methods and properties.
+     */
+    public function isExcluded(): bool
+    {
+        $reflection = $this->getReflection();
+
+        return $reflection->isTrait()
+            || $reflection->isInterface()
+            || (!\count($this->getMethods()) && !\count($this->getProperties()));
+    }
+
     public function hasTag(string $searchedTag): bool
     {
         // class has no doc (only search for class doc without inheritance)

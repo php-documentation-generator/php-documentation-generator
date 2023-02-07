@@ -11,9 +11,13 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Parser;
+namespace PhpDocumentGenerator\Tests\Command\App\Services;
 
-interface ParserInterface
+/**
+ * This class should be ignored because or the following tag:.
+ *
+ * @experimental
+ */
+final class ExperimentalClass
 {
-    public function isExcluded(): bool;
 }
