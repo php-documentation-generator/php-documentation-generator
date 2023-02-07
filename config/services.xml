@@ -47,20 +47,6 @@
             <tag>console.command</tag>
         </service>
 
-        <service id="pdg.command.references_index" class="PhpDocumentGenerator\Command\ReferencesIndexCommand">
-            <argument type="service" id="pdg.configuration_handler"/>
-            <argument type="service" id="pdg.twig"/>
-            <argument>%kernel.project_dir%/template/references/index.md.twig</argument>
-            <tag>console.command</tag>
-        </service>
-
-        <service id="pdg.command.index" class="PhpDocumentGenerator\Command\IndexCommand">
-            <argument type="service" id="pdg.configuration_handler"/>
-            <argument type="service" id="pdg.twig"/>
-            <argument>%kernel.project_dir%/template/index.md.twig</argument>
-            <tag>console.command</tag>
-        </service>
-
         <service id="pdg.command.guide" class="PhpDocumentGenerator\Command\GuideCommand">
             <argument type="service" id="pdg.configuration_handler"/>
             <argument type="service" id="pdg.twig"/>
