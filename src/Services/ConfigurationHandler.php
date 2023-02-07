@@ -95,12 +95,21 @@ final class ConfigurationHandler
         $fileName = $reflection->getFileName();
 
         foreach ($this->get('references.patterns.exclude') as $rule) {
-            if (preg_match(sprintf('/%s/', preg_quote($rule)), $fileName) || $reflection->isExcluded()) {
+            if (preg_match(sprintf('/%s/', preg_quote($rule)), $fileName)) {
                 return true;
             }
 
             if (!$reflection instanceof ClassParser) {
                 continue;
+            }
+
+            // Exclude interfaces, traits, and classes without protected/public methods and properties
+            if (
+                $reflection->isTrait()
+                || $reflection->isInterface()
+                || (!\count($reflection->getMethods()) && !\count($reflection->getProperties()))
+            ) {
+                return true;
             }
 
             foreach ($tagsToIgnore as $tagToIgnore) {

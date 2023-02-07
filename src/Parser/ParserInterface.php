@@ -15,5 +15,4 @@ namespace PhpDocumentGenerator\Parser;
 
 interface ParserInterface
 {
-    public function isExcluded(): bool;
 }

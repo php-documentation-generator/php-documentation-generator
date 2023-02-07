@@ -19,7 +19,7 @@ api_platform_pdg:
         namespace: 'App'
         patterns:
             # Directories to parse (supports pattern syntax)
-            directories: [ '*' ]
+            directories: [ '' ]
             # File names to parse (supports pattern syntax)
             names: [ '*.php' ]
             # Files or directories to ignore (supports pattern syntax)

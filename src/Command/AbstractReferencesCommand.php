@@ -49,8 +49,9 @@ abstract class AbstractReferencesCommand extends Command
                 throw new RuntimeException(sprintf('File "%s" does not seem to be a valid PHP class.', $file->getPathname()));
             }
 
-            // class has tags to ignore or should be excluded (@see ClassParser::isExcluded)
-            if ($this->configuration->isExcluded($reflectionClass) || $reflectionClass->isExcluded()) {
+            // Class has tags to ignore or should be excluded
+            // Exclude interfaces, traits, and classes without protected/public methods and properties
+            if ($this->configuration->isExcluded($reflectionClass)) {
                 continue;
             }
 
@@ -60,6 +61,10 @@ abstract class AbstractReferencesCommand extends Command
 
     private function findFiles(array $directories, array $names, array $exclude): Finder
     {
+        if (!$directories) {
+            $directories = [''];
+        }
+
         return (new Finder())->files()
             ->in(array_map(fn (string $directory) => $this->configuration->get('references.src').\DIRECTORY_SEPARATOR.$directory, $directories))
             ->name($names)
