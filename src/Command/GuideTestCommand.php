@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Command;
 
 use App\Kernel;
+use LogicException;
 use PhpDocumentGenerator\Playground\Command\PhpUnitCommand;
 use PhpDocumentGenerator\Playground\PlaygroundTestCase;
 use PHPUnit\Framework\TestSuite;
@@ -46,6 +47,9 @@ final class GuideTestCommand extends Command
         $guide = $input->getArgument('guide');
         $style->info('Testing guide: '.$guide);
 
+        $matter = $this->getFrontMatter($guide);
+        $executable = $matter['executable'] ?? false;
+
         $suite = new TestSuite();
 
         require $guide;
@@ -54,6 +58,9 @@ final class GuideTestCommand extends Command
 
         foreach ($testClasses as $testClass) {
             $suite->addTestSuite($testClass);
+        }
+        if ($executable && !\function_exists('App\Playground\request')) {
+            throw new LogicException(sprintf('The guide "%s" is set to be executable, but no function \'request\' is defined in the \'App\Playground\' namespace', $guide));
         }
         $suite->addTestSuite(PlaygroundTestCase::class);
 
@@ -79,5 +86,38 @@ final class GuideTestCommand extends Command
         $expl = explode('/', $guide);
 
         return str_replace('.php', '', end($expl));
+    }
+
+    private function getFrontMatter(string $guide): array
+    {
+        $handle = fopen($guide, 'r');
+
+        $frontMatterOpen = false;
+        $closing = false;
+        $matter = [];
+        while ($line = fgets($handle)) {
+            if (preg_match(GuideCommand::REGEX, $line)) {
+                $text = preg_replace(GuideCommand::REGEX, '', $line);
+                if ('---' === trim($text)) {
+                    if ($frontMatterOpen) {
+                        $closing = true;
+                    }
+                    $frontMatterOpen = !$frontMatterOpen;
+                    if ($closing) {
+                        break;
+                    }
+                    continue;
+                }
+
+                if ($frontMatterOpen) {
+                    $text = str_replace("\n", '', $text);
+                    $expl = explode(':', $text, 2);
+                    $matter[$expl[0]] = $expl[1];
+                }
+            }
+        }
+        fclose($handle);
+
+        return $matter;
     }
 }

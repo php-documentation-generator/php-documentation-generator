@@ -28,7 +28,7 @@ final class GuideCommand extends Command
     use CommandTrait;
 
     // Regular expression to match comment
-    private const REGEX = '/^\s*\/\/\s/';
+    public const REGEX = '/^\s*\/\/\s/';
 
     public function __construct(
         private readonly ConfigurationHandler $configuration,
