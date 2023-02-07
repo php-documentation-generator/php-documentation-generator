@@ -29,7 +29,7 @@ final class IndexCommandTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/index.config.yaml');
+        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
 
         $kernel = self::bootKernel();
         /** @var Application $application */

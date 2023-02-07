@@ -61,8 +61,8 @@ final class IndexCommand extends Command
 
         $sections = [];
         $directories = [
-            'guides' => $this->configuration->get('target.directories.guide_path'),
-            'references' => $this->configuration->get('target.directories.reference_path'),
+            'guides' => $this->configuration->get('guides.output'),
+            'references' => $this->configuration->get('references.output'),
         ];
         foreach ($directories as $section => $directory) {
             foreach ((new Finder())->files()->in($directory)->sortByName() as $file) {

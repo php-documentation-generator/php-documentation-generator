@@ -1,9 +1,0 @@
-api_platform_pdg:
-    reference:
-        base_url: '/pages/references'
-    guide:
-        base_url: '/pages/guides'
-    target:
-        directories:
-            guide_path: 'tests/Command/expected/guides'
-            reference_path: 'tests/Command/expected/references'

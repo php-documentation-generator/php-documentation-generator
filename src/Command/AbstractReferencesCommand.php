@@ -35,13 +35,13 @@ abstract class AbstractReferencesCommand extends Command
      */
     protected function getFiles(): iterable
     {
-        $patterns = $this->configuration->get('reference.patterns');
+        $patterns = $this->configuration->get('references.patterns');
         $tagsToIgnore = $patterns['class_tags_to_ignore'] ?? ['@internal', '@experimental'];
         $files = $this->findFiles($patterns['directories'] ?? [], $patterns['names'] ?? ['*.php'], $patterns['exclude'] ?? []);
 
         foreach ($files as $file) {
-            $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('reference.src'));
-            $namespace = rtrim(sprintf('%s\\%s', $this->configuration->get('reference.namespace'), str_replace([\DIRECTORY_SEPARATOR, '.php'], ['\\', ''], $relativeToSrc)), '\\');
+            $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('references.src'));
+            $namespace = rtrim(sprintf('%s\\%s', $this->configuration->get('references.namespace'), str_replace([\DIRECTORY_SEPARATOR, '.php'], ['\\', ''], $relativeToSrc)), '\\');
             $className = sprintf('%s\\%s', $namespace, $file->getBasename('.php'));
 
             try {
@@ -73,7 +73,7 @@ abstract class AbstractReferencesCommand extends Command
     private function findFiles(array $directories, array $names, array $exclude): Finder
     {
         return (new Finder())->files()
-            ->in(array_map(fn (string $directory) => $this->configuration->get('reference.src').\DIRECTORY_SEPARATOR.$directory, $directories))
+            ->in(array_map(fn (string $directory) => $this->configuration->get('references.src').\DIRECTORY_SEPARATOR.$directory, $directories))
             ->name($names)
             ->notName($exclude);
     }

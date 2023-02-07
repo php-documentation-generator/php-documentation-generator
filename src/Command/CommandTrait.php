@@ -38,11 +38,11 @@ trait CommandTrait
     private function getNamespace(SplFileInfo $file): string
     {
         // Remove root path from file path
-        $namespace = preg_replace(sprintf('#^%s%s?#i', $this->configuration->get('reference.src'), \DIRECTORY_SEPARATOR), '', $file->getPath());
+        $namespace = preg_replace(sprintf('#^%s%s?#i', $this->configuration->get('references.src'), \DIRECTORY_SEPARATOR), '', $file->getPath());
         // Convert it to namespace format
         $namespace = str_replace(\DIRECTORY_SEPARATOR, '\\', $namespace);
         // Prepend main namespace
-        $namespace = rtrim(sprintf('%s\\%s', $this->configuration->get('reference.namespace'), $namespace), '\\');
+        $namespace = rtrim(sprintf('%s\\%s', $this->configuration->get('references.namespace'), $namespace), '\\');
 
         return sprintf('%s\\%s', $namespace, $file->getBasename('.'.$file->getExtension()));
     }

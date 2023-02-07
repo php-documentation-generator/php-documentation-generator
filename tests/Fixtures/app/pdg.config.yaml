@@ -1,6 +1,6 @@
 api_platform_pdg:
   autoload: '../../../vendor/autoload.php'
-  reference:
+  references:
     src: '../src'
     namespace: 'ApiPlatform'
     patterns:
@@ -8,8 +8,8 @@ api_platform_pdg:
       names: ["*Interface.php", "*Trait.php", "Configuration.php"]]
       exclude: ['*Factory.php']
       class_tags_to_ignore: ['@experimental', '@internal']
-    base_url: 'pages/references'
-  target:
-    directories:
-      guide_path: 'pages/guide'
-      reference_path: 'pages/reference'
+    output: 'pages/references'
+    base_url: '/pages/references'
+  guides:
+    output: 'pages/guides'
+    base_url: '/pages/guides'

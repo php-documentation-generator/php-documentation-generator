@@ -90,7 +90,7 @@ final class ConfigurationHandler
 
     public function isExcluded(Reflector|ParserInterface $reflection): bool
     {
-        foreach ($this->get('reference.patterns.exclude') as $rule) {
+        foreach ($this->get('references.patterns.exclude') as $rule) {
             if (preg_match(sprintf('/%s/', preg_quote($rule)), $reflection->getFileName())) {
                 return true;
             }

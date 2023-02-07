@@ -23,7 +23,7 @@ final class ConfigurationHandlerTest extends TestCase
      */
     public function testItGetsAConfigurationValueFromTheConfigFile(string $key, mixed $expected): void
     {
-        putenv(sprintf('PDG_CONFIG_FILE=%s/pdg.config.yaml', __DIR__));
+        putenv('PDG_CONFIG_FILE=tests/Services/pdg.config.yaml');
 
         $this->assertEquals($expected, (new ConfigurationHandler())->get($key));
     }
@@ -31,14 +31,15 @@ final class ConfigurationHandlerTest extends TestCase
     public function getConfigs(): iterable
     {
         yield ['autoload', 'vendor/autoload.php'];
-        yield ['reference.src', 'src'];
-        yield ['reference.namespace', 'App'];
-        yield ['reference.patterns.directories', ['Controller', 'Validator']];
-        yield ['reference.patterns.names', ['*.php']];
-        yield ['reference.patterns.exclude', ['*Interface.php']];
-        yield ['reference.patterns.class_tags_to_ignore', ['@internal', '@experimental']];
-        yield ['reference.base_url', '/pages/references'];
-        yield ['target.directories.guide_path', 'pages/guides'];
-        yield ['target.directories.reference_path', 'pages/references'];
+        yield ['references.src', 'tests/Command/src'];
+        yield ['references.namespace', 'PhpDocumentGenerator\Tests\Command\App'];
+        yield ['references.patterns.directories', ['Controller', 'Validator']];
+        yield ['references.patterns.names', ['*.php']];
+        yield ['references.patterns.exclude', ['*Interface.php']];
+        yield ['references.patterns.class_tags_to_ignore', ['@internal', '@experimental']];
+        yield ['references.output', 'tests/Command/pages/references'];
+        yield ['references.base_url', '/pages/references'];
+        yield ['guides.output', 'tests/Command/pages/guides'];
+        yield ['guides.base_url', '/pages/guides'];
     }
 }

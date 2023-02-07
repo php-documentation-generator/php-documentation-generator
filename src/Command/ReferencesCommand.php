@@ -65,9 +65,9 @@ final class ReferencesCommand extends AbstractReferencesCommand
         $style->progressStart();
 
         foreach ($this->getFiles() as $file) {
-            $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('reference.src'));
+            $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('references.src'));
 
-            if (!@mkdir($concurrentDirectory = $this->configuration->get('target.directories.reference_path').\DIRECTORY_SEPARATOR.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
+            if (!@mkdir($concurrentDirectory = $this->configuration->get('references.output').\DIRECTORY_SEPARATOR.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
                 $style->getErrorStyle()->error(sprintf('Cannot create directory "%s".', $concurrentDirectory));
 
                 return self::FAILURE;
@@ -97,7 +97,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
     private function findFiles(array $directories, array $names, array $exclude): Finder
     {
         return (new Finder())->files()
-            ->in(array_map(fn (string $directory) => $this->configuration->get('reference.src').\DIRECTORY_SEPARATOR.$directory, $directories))
+            ->in(array_map(fn (string $directory) => $this->configuration->get('references.src').\DIRECTORY_SEPARATOR.$directory, $directories))
             ->name($names)
             ->notName($exclude);
     }

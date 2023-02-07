@@ -30,7 +30,7 @@ final class GuideCommandTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/guide.config.yaml');
+        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
 
         $kernel = self::bootKernel();
         /** @var Application $application */

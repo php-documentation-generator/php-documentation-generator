@@ -3,7 +3,7 @@ api_platform_pdg:
     src: 'tests/Command/src'
     namespace: 'PhpDocumentGenerator\Tests\Command\App'
     patterns:
-      directories: [ 'Controller', 'Validator' ]
+      directories: [ '*' ]
       names: [ '*.php' ]
       exclude: [ '*Interface.php' ]
       class_tags_to_ignore: [ '@internal', '@experimental' ]
