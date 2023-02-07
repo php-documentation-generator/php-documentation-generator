@@ -14,12 +14,13 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Tests\Command\App\Serializer;
 
 use DateTimeInterface;
+use PhpDocumentGenerator\Tests\Command\App\Services\IgnoredInterface;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
-final class DateTimeDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface
+final class DateTimeDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface, IgnoredInterface
 {
     use DenormalizerAwareTrait;
 

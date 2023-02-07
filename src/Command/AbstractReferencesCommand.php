@@ -36,7 +36,6 @@ abstract class AbstractReferencesCommand extends Command
     protected function getFiles(): iterable
     {
         $patterns = $this->configuration->get('references.patterns');
-        $tagsToIgnore = $patterns['class_tags_to_ignore'] ?? ['@internal', '@experimental'];
         $files = $this->findFiles($patterns['directories'] ?? [], $patterns['names'] ?? ['*.php'], $patterns['exclude'] ?? []);
 
         foreach ($files as $file) {
@@ -50,19 +49,9 @@ abstract class AbstractReferencesCommand extends Command
                 throw new RuntimeException(sprintf('File "%s" does not seem to be a valid PHP class.', $file->getPathname()));
             }
 
-            foreach ($tagsToIgnore as $tagToIgnore) {
-                if ($reflectionClass->hasTag($tagToIgnore)) {
-                    continue 2;
-                }
-            }
-
-            // class is not an interface nor a trait, and has no protected/public methods nor properties
-            if (
-                !$reflectionClass->isTrait()
-                && !$reflectionClass->isInterface()
-                && !\count($reflectionClass->getMethods())
-                && !\count($reflectionClass->getProperties())
-            ) {
+            // Class has tags to ignore or should be excluded
+            // Exclude interfaces, traits, and classes without protected/public methods and properties
+            if ($this->configuration->isExcluded($reflectionClass)) {
                 continue;
             }
 
@@ -72,6 +61,10 @@ abstract class AbstractReferencesCommand extends Command
 
     private function findFiles(array $directories, array $names, array $exclude): Finder
     {
+        if (!$directories) {
+            $directories = [''];
+        }
+
         return (new Finder())->files()
             ->in(array_map(fn (string $directory) => $this->configuration->get('references.src').\DIRECTORY_SEPARATOR.$directory, $directories))
             ->name($names)

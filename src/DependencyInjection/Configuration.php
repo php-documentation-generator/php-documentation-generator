@@ -48,7 +48,7 @@ class Configuration implements ConfigurationInterface
                                 ->arrayNode('directories')
                                     ->info('Directories to parse (supports pattern syntax)')
                                     ->scalarPrototype()->end()
-                                    ->defaultValue(['*'])
+                                    ->defaultValue([''])
                                 ->end()
                                 ->arrayNode('names')
                                     ->info('File names to parse (supports pattern syntax)')

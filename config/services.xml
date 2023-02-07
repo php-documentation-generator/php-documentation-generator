@@ -42,7 +42,6 @@
 
         <service id="pdg.command.references" class="PhpDocumentGenerator\Command\ReferencesCommand">
             <argument type="service" id="pdg.configuration_handler"/>
-            <argument type="service" id="pdg.twig"/>
             <argument>%kernel.project_dir%/template/references/reference.md.twig</argument>
             <tag>console.command</tag>
         </service>

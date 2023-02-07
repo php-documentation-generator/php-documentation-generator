@@ -22,15 +22,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
-use Twig\Environment;
 
 final class ReferencesCommand extends AbstractReferencesCommand
 {
-    use CommandTrait;
-
     public function __construct(
         private readonly ConfigurationHandler $configuration,
-        private readonly Environment $environment,
         private readonly string $defaultTemplate
     ) {
         parent::__construct($configuration, name: 'references');
