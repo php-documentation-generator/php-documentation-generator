@@ -1,3 +1,9 @@
+---
+name: Use Doctrine
+executable: true
+tags: state
+---
+
 <a href="#section-1" id="section-1">§</a>
 
 Should be a real guide

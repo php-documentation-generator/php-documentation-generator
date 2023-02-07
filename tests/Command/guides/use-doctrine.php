@@ -1,4 +1,9 @@
 <?php
+// ---
+// name: Use Doctrine
+// executable: true
+// tags: state
+// ---
 
 // Should be a real guide
 
