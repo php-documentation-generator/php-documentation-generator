@@ -29,7 +29,7 @@ final class ReferencesIndexCommandTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        putenv(sprintf('PDG_CONFIG_FILE=%s/reference.config.yaml', __DIR__));
+        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
 
         $kernel = self::bootKernel();
         /** @var Application $application */
@@ -60,7 +60,7 @@ final class ReferencesIndexCommandTest extends KernelTestCase
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $this->assertFileExists($output);
         $this->assertFileEquals(
-            sprintf('%s/expected/references/index.md', __DIR__),
+            'tests/Command/expected/references/index.md',
             $output
         );
     }

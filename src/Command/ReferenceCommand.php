@@ -16,7 +16,6 @@ namespace PhpDocumentGenerator\Command;
 use PhpDocumentGenerator\Parser\ClassParser;
 use PhpDocumentGenerator\Services\ConfigurationHandler;
 use ReflectionClass;
-use RuntimeException;
 use SplFileInfo;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
@@ -60,14 +59,16 @@ final class ReferenceCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $style = new SymfonyStyle($input, $output);
+
         $file = new SplFileInfo($input->getArgument('filename'));
         if (!$file->isFile()) {
-            throw new RuntimeException(sprintf('File "%s" does not exist.', $file->getPathname()));
+            $style->getErrorStyle()->error(sprintf('File "%s" does not exist.', $file->getPathname()));
+
+            return self::INVALID;
         }
 
         $reflectionClass = new ReflectionClass($this->getNamespace($file));
-
-        $style = new SymfonyStyle($input, $output);
 
         $templateContext = ['class' => new ClassParser($reflectionClass)];
 
@@ -76,7 +77,7 @@ final class ReferenceCommand extends Command
             if (!$yaml) {
                 $style->getErrorStyle()->error(sprintf('No configuration available in "%s".', $file->getPathname()));
 
-                return self::FAILURE;
+                return self::INVALID;
             }
 
             $templateContext['configuration'] = $yaml;

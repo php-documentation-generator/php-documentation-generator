@@ -61,7 +61,7 @@
         <service id="pdg.command.guide" class="PhpDocumentGenerator\Command\GuideCommand">
             <argument type="service" id="pdg.configuration_handler"/>
             <argument type="service" id="pdg.twig"/>
-            <argument>%kernel.project_dir%/template/guides</argument>
+            <argument>%kernel.project_dir%/template/guides/guide.md.twig</argument>
             <tag>console.command</tag>
         </service>
 

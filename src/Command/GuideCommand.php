@@ -33,7 +33,7 @@ final class GuideCommand extends Command
     public function __construct(
         private readonly ConfigurationHandler $configuration,
         private readonly Environment $environment,
-        private readonly string $templatePath
+        private readonly string $defaultTemplate
     ) {
         parent::__construct(name: 'guide');
     }
@@ -41,7 +41,7 @@ final class GuideCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription(description: 'Creates a markdown guide based on a PHP code')
+            ->setDescription(description: 'Creates a guide based on a PHP code')
             ->addArgument(name: 'filename', mode: InputArgument::REQUIRED)
             ->addArgument(
                 name: 'output',
@@ -49,18 +49,23 @@ final class GuideCommand extends Command
                 description: 'The path to the file where the guide will be printed. Leave empty for screen printing'
             )
             ->addOption(
-                name: 'template-path',
+                name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
                 description: 'The path to the template files to use to generate the output file',
-                default: $this->templatePath
+                default: $this->defaultTemplate
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $file = new SplFileInfo($input->getArgument('filename'));
-
         $style = new SymfonyStyle($input, $output);
+
+        $file = new SplFileInfo($input->getArgument('filename'));
+        if (!$file->isFile()) {
+            $style->getErrorStyle()->error(sprintf('File "%s" does not exist.', $file->getPathname()));
+
+            return self::INVALID;
+        }
 
         $handle = fopen($file->getPathName(), 'r');
         if (!$handle) {
@@ -71,7 +76,7 @@ final class GuideCommand extends Command
 
         // Let's split the code between an array of code and an array of text
         $sections = [];
-        $linesOfCode = $linesOfText = $currentSection = 0;
+        $currentSection = 0;
         $sections[$currentSection] = ['text' => [], 'code' => []];
         // splits namespaces if found
         $namespaceOpen = false;
@@ -85,16 +90,16 @@ final class GuideCommand extends Command
         $style->info(sprintf('Creating guide "%s".', $file->getPathName()));
 
         while (($line = fgets($handle)) !== false) {
-            if (!isset($sections[$currentSection]['text'])) {
-                $sections[$currentSection] = ['text' => [], 'code' => []];
-            }
-
             if (!trim($line)) {
                 continue;
             }
 
             if ('<?php' === trim($line)) {
                 continue;
+            }
+
+            if (!isset($sections[$currentSection]['text'])) {
+                $sections[$currentSection] = ['text' => [], 'code' => []];
             }
 
             // This is a line of text
@@ -139,8 +144,19 @@ final class GuideCommand extends Command
             }
 
             if ($matches) {
-                // todo "src" should be from configuration?
-                $sections[$currentSection]['code'][] = '// src'.\DIRECTORY_SEPARATOR.str_replace('\\', \DIRECTORY_SEPARATOR, $matches[1]).'.php'.\PHP_EOL;
+                if ($sections[$currentSection]['code']) {
+                    $sections[$currentSection]['code'][] = \PHP_EOL;
+                }
+                $sections[$currentSection]['code'][] = sprintf(
+                    '// src%s%s.php%s',
+                    \DIRECTORY_SEPARATOR,
+                    str_replace('\\', \DIRECTORY_SEPARATOR, $matches[1]),
+                    \PHP_EOL
+                );
+            }
+
+            if (!trim($line)) {
+                continue;
             }
 
             $sections[$currentSection]['code'][] = $line;

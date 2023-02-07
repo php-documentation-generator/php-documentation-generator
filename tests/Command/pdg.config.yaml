@@ -9,6 +9,12 @@ api_platform_pdg:
             names: [ '*.php' ]
             exclude: [ '*Interface.php' ]
             class_tags_to_ignore: [ '@internal', '@experimental' ]
+#    guide:
+#        src: 'tests/Command/guides'
+#        patterns:
+#            directories: [ '*' ]
+#            names: [ '*.php' ]
+#            exclude: [ '*Interface.php' ]
     target:
         directories:
             guide_path: 'tests/Command/pages/guides'
