@@ -19,6 +19,7 @@ jobs:
         with:
           php-version: 8.2
           tools: composer:v2
+          coverage: none
       - name: Get Composer Cache Directory
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
