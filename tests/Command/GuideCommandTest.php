@@ -53,6 +53,26 @@ EOT
             , $this->tester->getDisplay(true));
     }
 
+    public function testItOutputsAGuideInAFile(): void
+    {
+        $output = 'tests/Command/pages/guides/use-doctrine.md';
+        $filename = 'tests/Command/guides/use-doctrine.php';
+        $this->tester->run([
+            'command' => 'guide',
+            'filename' => $filename,
+            '--output' => $output,
+        ]);
+
+        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
+        $this->assertStringContainsString('[INFO] Creating guide', $this->tester->getDisplay(true));
+        $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
+        $this->assertFileExists($output);
+        $this->assertFileEquals(
+            'tests/Command/expected/guides/use-doctrine.md',
+            $output
+        );
+    }
+
     public function testItOutputsAGuideInCommandOutput(): void
     {
         $filename = 'tests/Command/guides/use-doctrine.php';
@@ -85,25 +105,5 @@ use Doctrine\ORM\Mapping as ORM;
 class Book
 EOT
             , $display);
-    }
-
-    public function testItOutputsAGuideInAFile(): void
-    {
-        $output = 'tests/Command/pages/guides/use-doctrine.md';
-        $filename = 'tests/Command/guides/use-doctrine.php';
-        $this->tester->run([
-            'command' => 'guide',
-            'filename' => $filename,
-            'output' => $output,
-        ]);
-
-        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating guide', $this->tester->getDisplay(true));
-        $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
-        $this->assertFileExists($output);
-        $this->assertFileEquals(
-            'tests/Command/expected/guides/use-doctrine.md',
-            $output
-        );
     }
 }

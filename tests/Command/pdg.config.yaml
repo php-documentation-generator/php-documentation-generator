@@ -1,23 +1,14 @@
-# Example file for tests
 api_platform_pdg:
-    autoload: 'vendor/autoload.php'
-    reference:
-        src: 'tests/Command/src'
-        namespace: 'PhpDocumentGenerator\Tests\Command\App'
-        patterns:
-            directories: [ '*' ]
-            names: [ '*.php' ]
-            exclude: [ '*Interface.php' ]
-            class_tags_to_ignore: [ '@internal', '@experimental' ]
-#    guide:
-#        src: 'tests/Command/guides'
-#        patterns:
-#            directories: [ '*' ]
-#            names: [ '*.php' ]
-#            exclude: [ '*Interface.php' ]
-    target:
-        directories:
-            guide_path: 'tests/Command/pages/guides'
-            reference_path: 'tests/Command/pages/references'
-        # For URLs
-        base_url: '/pages'
+  references:
+    src: 'tests/Command/src'
+    namespace: 'PhpDocumentGenerator\Tests\Command\App'
+    patterns:
+      directories: [ '*' ]
+      names: [ '*.php' ]
+      exclude: [ '*Interface.php' ]
+      class_tags_to_ignore: [ '@internal', '@experimental' ]
+    output: 'tests/Command/pages/references'
+    base_url: '/pages/references'
+  guides:
+    output: 'tests/Command/pages/guides'
+    base_url: '/pages/guides'

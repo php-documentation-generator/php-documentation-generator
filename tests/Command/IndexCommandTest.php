@@ -16,10 +16,9 @@ namespace PhpDocumentGenerator\Tests\Command;
 use PhpDocumentGenerator\Kernel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
-final class ReferenceCommandTest extends KernelTestCase
+final class IndexCommandTest extends KernelTestCase
 {
     private ApplicationTester $tester;
 
@@ -30,7 +29,7 @@ final class ReferenceCommandTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
+        putenv('PDG_CONFIG_FILE=tests/Command/index.config.yaml');
 
         $kernel = self::bootKernel();
         /** @var Application $application */
@@ -39,53 +38,31 @@ final class ReferenceCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    public function testItThrowsAnErrorIfFileDoesNotExist(): void
+    public function testItOutputsIndexInAFile(): void
     {
+        $output = 'tests/Command/pages/index.md';
         $this->tester->run([
-            'command' => 'reference',
-            'filename' => 'tests/Command/src/Invalid/Invalid.php',
-        ]);
-
-        $this->assertEquals(Command::INVALID, $this->tester->getStatusCode());
-        $this->assertStringContainsString('File "tests/Command/src/Invalid/Invalid.php" does not exist.', $this->tester->getDisplay(true));
-    }
-
-    /**
-     * @dataProvider getReferences
-     */
-    public function testItOutputsAReferenceInAFile(string $name): void
-    {
-        $output = sprintf('tests/Command/pages/references/%s.md', $name);
-        $this->tester->run([
-            'command' => 'reference',
-            'filename' => sprintf('tests/Command/src/%s.php', $name),
+            'command' => 'index',
             '--output' => $output,
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $this->assertFileExists($output);
         $this->assertFileEquals(
-            sprintf('tests/Command/expected/references/%s.md', $name),
+            'tests/Command/expected/index.md',
             $output
         );
     }
 
-    public function getReferences(): iterable
-    {
-        yield ['Controller/IndexController'];
-        yield ['DependencyInjection/Configuration'];
-        yield ['Serializer/DateTimeDenormalizer'];
-    }
-
-    public function testItOutputsAReferenceInCommandOutput(): void
+    public function testItOutputsIndexInCommandOutput(): void
     {
         $this->tester->run([
-            'command' => 'reference',
-            'filename' => 'tests/Command/src/Controller/IndexController.php',
+            'command' => 'index',
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController', $display);
+        $this->assertStringContainsString('## Guides', $display);
+        $this->assertStringContainsString('## References', $display);
     }
 }

@@ -47,7 +47,7 @@ final class ReferenceCommand extends Command
             ->addOption(
                 name: 'output',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the file where the reference will be printed'
+                description: 'The path to the file where the reference will be printed. Leave empty for screen printing'
             )
             ->addOption(
                 name: 'template',

@@ -21,6 +21,7 @@ use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser;
 use ReflectionClass;
 use SplFileInfo;
+use Symfony\Component\Filesystem\Path;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -57,6 +58,11 @@ class MarkdownExtension extends AbstractExtension
 
         $url = $this->getUrl($data, $referenceExtension);
 
+        // Reference or guide
+        if (\is_string($data) && file_exists($data)) {
+            $name = pathinfo($data, \PATHINFO_FILENAME);
+        }
+
         return $url ? sprintf('[`%s`](%s)', $name, $url) : sprintf('`%s`', $name);
     }
 
@@ -79,7 +85,7 @@ class MarkdownExtension extends AbstractExtension
             $name = $data->getName();
 
             // Internal
-            if (str_starts_with($name, $this->configuration->get('reference.namespace').'\\')) {
+            if (str_starts_with($name, $this->configuration->get('references.namespace').'\\')) {
                 // calling ConfigurationHandler::isExcluded to ensure the target class is not ignored
                 // from references generation because the target reference file may not exist yet
                 if (!$this->configuration->isExcluded($data)) {
@@ -87,12 +93,18 @@ class MarkdownExtension extends AbstractExtension
                     $rootPath = getcwd();
 
                     // get relative file path without extension (e.g.: Entity/Book)
-                    $fileName = trim(sprintf('%s/%s', str_replace(sprintf('%s/%s', $rootPath, $this->configuration->get('reference.src')), '', $file->getPath()), $file->getBasename('.'.$file->getExtension())), '/');
+                    $fileName = trim(sprintf('%s/%s', str_replace(sprintf('%s/%s', $rootPath, $this->configuration->get('references.src')), '', $file->getPath()), $file->getBasename('.'.$file->getExtension())), '/');
 
                     // get reference file path (e.g.: pages/references/Entity/Book.md)
-                    $filePath = sprintf('%s/%s.%s', $this->configuration->get('target.directories.reference_path'), $fileName, $referenceExtension);
+                    $filePath = sprintf('%s/%s.%s', $this->configuration->get('references.output'), $fileName, $referenceExtension);
 
-                    return sprintf('%s/%s', $this->configuration->get('target.base_url'), $filePath);
+                    return str_replace([
+                        $this->configuration->get('references.output'),
+                        $this->configuration->get('guides.output'),
+                    ], [
+                        $this->configuration->get('references.base_url'),
+                        $this->configuration->get('guides.base_url'),
+                    ], $filePath);
                 }
             }
 
@@ -107,6 +119,17 @@ class MarkdownExtension extends AbstractExtension
         // Symfony
         if (str_starts_with($data, 'Symfony\\')) {
             return 'https://symfony.com/doc/current/index.html';
+        }
+
+        // Reference or guide
+        if (file_exists($data)) {
+            return str_replace([
+                $this->configuration->get('references.output'),
+                $this->configuration->get('guides.output'),
+            ], [
+                $this->configuration->get('references.base_url'),
+                $this->configuration->get('guides.base_url'),
+            ], $data);
         }
 
         return null;

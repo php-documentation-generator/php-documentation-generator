@@ -38,20 +38,9 @@ final class ReferencesIndexCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    public function testItOutputsIndexInCommandOutput(): void
-    {
-        $this->tester->run([
-            'command' => 'references:index',
-        ]);
-
-        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('## PhpDocumentGenerator\Tests\Command\App\Controller', $display);
-    }
-
     public function testItOutputsIndexInAFile(): void
     {
-        $output = 'tests/Command/pages/references/index.md.twig';
+        $output = 'tests/Command/pages/references/index.md';
         $this->tester->run([
             'command' => 'references:index',
             '--output' => $output,
@@ -63,5 +52,16 @@ final class ReferencesIndexCommandTest extends KernelTestCase
             'tests/Command/expected/references/index.md',
             $output
         );
+    }
+
+    public function testItOutputsIndexInCommandOutput(): void
+    {
+        $this->tester->run([
+            'command' => 'references:index',
+        ]);
+
+        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
+        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
+        $this->assertStringContainsString('## PhpDocumentGenerator\Tests\Command\App\Controller', $display);
     }
 }

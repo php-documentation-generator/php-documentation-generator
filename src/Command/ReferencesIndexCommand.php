@@ -41,7 +41,7 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
             ->addOption(
                 name: 'output',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the file where the index will be printed'
+                description: 'The path to the file where the index will be printed. Leave empty for screen printing'
             )
             ->addOption(
                 name: 'template',
