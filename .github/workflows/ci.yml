@@ -40,6 +40,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: composer:v2, php-cs-fixer, phpstan, phpdoc
+          coverage: none
       - name: Get Composer Cache Directory
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT

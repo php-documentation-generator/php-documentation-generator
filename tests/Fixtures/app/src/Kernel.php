@@ -38,7 +38,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 
 use function App\DependencyInjection\configure; // @phpstan-ignore-line
-use function App\Playground\request; // @phpstan-ignore-line
+use function App\Playground\request;
 
 class Kernel extends BaseKernel
 {

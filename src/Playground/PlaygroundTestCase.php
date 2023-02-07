@@ -16,7 +16,7 @@ namespace PhpDocumentGenerator\Playground;
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use LogicException;
 
-use function App\Playground\request; // @phpstan-ignore-line
+use function App\Playground\request;
 
 class PlaygroundTestCase extends ApiTestCase
 {
