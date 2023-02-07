@@ -38,27 +38,6 @@ final class ReferencesCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    public function testItOutputsEachReferenceInCommandOutput(): void
-    {
-        $this->tester->run([
-            'command' => 'references',
-        ]);
-
-        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating reference', $this->tester->getDisplay(true));
-        $this->assertStringContainsString('"tests/Command/src/Controller/IndexController.php"', $this->tester->getDisplay(true));
-        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        // cannot test full output cause the output size differs locally or on GitHub
-        $this->assertStringContainsString(<<<EOT
-import Head from "next/head";
-
-<Head><title>IndexController</title></Head>
-
-# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
-EOT
-            , $display);
-    }
-
     public function testItOutputsEachReferenceInAFile(): void
     {
         $output = 'tests/Command/pages/references';
@@ -68,11 +47,9 @@ EOT
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating reference "tests/Command/src/Controller/IndexController.php".', $this->tester->getDisplay(true));
-        $this->assertFileExists(sprintf('%s/Controller/IndexController.mdx', $output));
         $this->assertFileEquals(
-            sprintf('%s/expected/references/Controller/IndexController.mdx', __DIR__),
-            sprintf('%s/Controller/IndexController.mdx', $output)
+            sprintf('%s/expected/references/Controller/IndexController.md', __DIR__),
+            sprintf('%s/Controller/IndexController.md', $output)
         );
     }
 }

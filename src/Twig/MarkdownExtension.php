@@ -57,7 +57,7 @@ class MarkdownExtension extends AbstractExtension
 
         $url = $this->getUrl($data, $referenceExtension);
 
-        return $url ? sprintf('[`\%s`](%s)', ltrim($name, '\\'), $url) : sprintf('`%s`', $name);
+        return $url ? sprintf('[`%s`](%s)', $name, $url) : sprintf('`%s`', $name);
     }
 
     public function getUrl(ParserInterface|PhpDocTagValueNode|string $data, string $referenceExtension = 'md'): ?string

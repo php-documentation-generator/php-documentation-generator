@@ -1,9 +1,0 @@
-{% block constant %}
-### <span className="token keyword">{{ constant.name|upper }}</span> = `{{ constant.value|md_value }}`
-
-{% if constant.summary|mdx_sanitize|raw|length > 0 %}
-
-{{ constant.summary|mdx_sanitize|raw }}
-
-{% endif %}
-{% endblock %}

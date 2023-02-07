@@ -41,31 +41,27 @@ final class ReferencesIndexCommandTest extends KernelTestCase
     public function testItOutputsIndexInCommandOutput(): void
     {
         $this->tester->run([
-            'command' => 'references-index',
+            'command' => 'references:index',
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString(<<<EOT
-<article className="api-list-container">
-## PhpDocumentGenerator\Tests\Command\App\Controller
-EOT
-            , $display);
+        $this->assertStringContainsString('## PhpDocumentGenerator\Tests\Command\App\Controller', $display);
     }
 
     public function testItOutputsIndexInAFile(): void
     {
-        $output = 'tests/Command/pages/references';
+        $output = 'tests/Command/pages/references/index.md.twig';
         $this->tester->run([
-            'command' => 'references-index',
-            'output' => $output,
+            'command' => 'references:index',
+            '--output' => $output,
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertFileExists(sprintf('%s/index.mdx', $output));
+        $this->assertFileExists($output);
         $this->assertFileEquals(
-            sprintf('%s/expected/references/index.mdx', __DIR__),
-            sprintf('%s/index.mdx', $output)
+            sprintf('%s/expected/references/index.md', __DIR__),
+            $output
         );
     }
 }

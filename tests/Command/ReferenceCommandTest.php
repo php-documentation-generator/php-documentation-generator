@@ -47,32 +47,19 @@ final class ReferenceCommandTest extends KernelTestCase
         ]);
 
         $this->assertEquals(Command::FAILURE, $this->tester->getStatusCode());
-        $this->assertStringContainsString(<<<EOT
-File "tests/Command/src/Invalid/Invalid.php" does not exist.
-EOT
-            , $this->tester->getDisplay(true));
+        $this->assertStringContainsString('File "tests/Command/src/Invalid/Invalid.php" does not exist.', $this->tester->getDisplay(true));
     }
 
     public function testItOutputsAReferenceInCommandOutput(): void
     {
-        $filename = 'tests/Command/src/Controller/IndexController.php';
         $this->tester->run([
             'command' => 'reference',
-            'filename' => $filename,
+            'filename' => 'tests/Command/src/Controller/IndexController.php',
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating reference', $this->tester->getDisplay(true));
-        $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
         $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString(<<<EOT
-import Head from "next/head";
-
-<Head><title>IndexController</title></Head>
-
-# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
-EOT
-            , $display);
+        $this->assertStringContainsString('# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController', $display);
     }
 
     /**
@@ -80,20 +67,17 @@ EOT
      */
     public function testItOutputsAReferenceInAFile(string $name): void
     {
-        $output = sprintf('tests/Command/pages/references/%s.mdx', $name);
-        $filename = sprintf('tests/Command/src/%s.php', $name);
+        $output = sprintf('tests/Command/pages/references/%s.md', $name);
         $this->tester->run([
             'command' => 'reference',
-            'filename' => $filename,
-            'output' => $output,
+            'filename' => sprintf('tests/Command/src/%s.php', $name),
+            '--output' => $output,
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating reference', $this->tester->getDisplay(true));
-        $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
         $this->assertFileExists($output);
         $this->assertFileEquals(
-            sprintf('%s/expected/references/%s.mdx', __DIR__, $name),
+            sprintf('%s/expected/references/%s.md', __DIR__, $name),
             $output
         );
     }

@@ -14,33 +14,28 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Command;
 
 use RuntimeException;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
+use SplFileInfo;
 
 trait CommandTrait
 {
-    private function getTemplateFile(string $templatePath, string $fileName): SplFileInfo
+    private function loadTemplate(string $template): string
     {
-        // check template path and load it in Twig
-        if (!is_dir($templatePath)) {
-            throw new RuntimeException(sprintf('Template directory "%s" does not exist.', $templatePath));
+        // check template
+        if (!is_file($template)) {
+            throw new RuntimeException(sprintf('Template file "%s" does not exist.', $template));
         }
+
+        // load template dir in Twig
+        $templatePath = pathinfo($template, \PATHINFO_DIRNAME);
         if (!\in_array($templatePath, $this->environment->getLoader()->getPaths(), true)) {
             $this->environment->getLoader()->addPath($templatePath);
         }
 
-        // look for file in the template directory
-        $iterator = (new Finder())->files()->in($templatePath)->name($fileName)->getIterator();
-        $iterator->rewind();
-        $templateFile = $iterator->current();
-        if (!$templateFile) {
-            throw new RuntimeException(sprintf('No "%s" file found in "%s" template directory.', $fileName, $templatePath));
-        }
-
-        return $templateFile;
+        // return the template file name without dir
+        return pathinfo($template, \PATHINFO_BASENAME);
     }
 
-    private function getNamespace(\SplFileInfo $file): string
+    private function getNamespace(SplFileInfo $file): string
     {
         // Remove root path from file path
         $namespace = preg_replace(sprintf('#^%s%s?#i', $this->configuration->get('reference.src'), \DIRECTORY_SEPARATOR), '', $file->getPath());

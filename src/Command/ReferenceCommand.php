@@ -35,7 +35,7 @@ final class ReferenceCommand extends Command
     public function __construct(
         private readonly ConfigurationHandler $configuration,
         private readonly Environment $environment,
-        private readonly string $templatePath
+        private readonly string $defaultTemplate
     ) {
         parent::__construct(name: 'reference');
     }
@@ -45,16 +45,16 @@ final class ReferenceCommand extends Command
         $this
             ->setDescription('Creates a reference documentation for a PHP class')
             ->addArgument(name: 'filename', mode: InputArgument::REQUIRED)
-            ->addArgument(
+            ->addOption(
                 name: 'output',
-                mode: InputArgument::OPTIONAL,
-                description: 'The path to the file where the reference will be printed. Leave empty for screen printing'
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The path to the file where the reference will be printed'
             )
             ->addOption(
-                name: 'template-path',
+                name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the template files to use to generate the output file',
-                default: $this->templatePath
+                description: 'The path to the template file to use to generate the reference',
+                default: $this->defaultTemplate
             );
     }
 
@@ -68,9 +68,7 @@ final class ReferenceCommand extends Command
         $reflectionClass = new ReflectionClass($this->getNamespace($file));
 
         $style = new SymfonyStyle($input, $output);
-        $style->info(sprintf('Creating reference "%s".', $file->getPathname()));
 
-        $templateFileName = 'reference.*.twig';
         $templateContext = ['class' => new ClassParser($reflectionClass)];
 
         if ($reflectionClass->implementsInterface(ConfigurationInterface::class)) {
@@ -81,16 +79,15 @@ final class ReferenceCommand extends Command
                 return self::FAILURE;
             }
 
-            $templateFileName = 'configuration.*.twig';
             $templateContext['configuration'] = $yaml;
         }
 
         $content = $this->environment->render(
-            $this->getTemplateFile($input->getOption('template-path'), $templateFileName)->getFilename(),
+            $this->loadTemplate($input->getOption('template')),
             $templateContext
         );
 
-        $out = $input->getArgument('output');
+        $out = $input->getOption('output');
         if (!$out) {
             $style->block($content);
 
@@ -106,8 +103,6 @@ final class ReferenceCommand extends Command
 
             return self::FAILURE;
         }
-
-        $style->success(sprintf('Reference "%s" successfully created.', $file->getPathname()));
 
         return self::SUCCESS;
     }
