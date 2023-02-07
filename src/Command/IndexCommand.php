@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Command;
 
 use PhpDocumentGenerator\Services\ConfigurationHandler;
-use Spatie\YamlFrontMatter\YamlFrontMatter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -22,7 +21,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Exception\ParseException;
 use Twig\Environment;
 
 final class IndexCommand extends Command
@@ -80,25 +78,6 @@ final class IndexCommand extends Command
                     if (!isset($sections[$section][$subDirectory])) {
                         $sections[$section][$subDirectory] = [];
                     }
-                }
-
-                $basename = basename($path, '.'.$file->getExtension());
-                try {
-                    $object = YamlFrontMatter::parseFile($file->getPathName());
-                    if ($matter = $object->matter()) {
-                        $prettyName = $matter['name'] ?? str_replace('-', ' ', $basename);
-                        $sections[$section][$subDirectory][] = sprintf('- [%s](/%s/%s)', $prettyName, Path::getDirectory($path), $matter['slug'] ?? $basename);
-                        if (isset($matter['slug'])) {
-                            $style->getErrorStyle()->warning(sprintf(
-                                'Guide file "%s" is incorrectly named, it should called "%s.%s".',
-                                $file->getPathname(),
-                                $matter['slug'],
-                                $file->getExtension()
-                            ));
-                        }
-                    }
-                } catch (ParseException) {
-                    // Maybe it's a reference: ignore error
                 }
 
                 $sections[$section][$subDirectory][] = $file->getPathname();
