@@ -1,3 +1,4 @@
+{% if guides|length > 0 %}
 ## Guides
 
 {% for path, files in guides %}
@@ -12,7 +13,9 @@
 {% endfor %}
 {% endif %}
 {% endfor %}
+{% endif %}
 
+{% if references|length > 0 %}
 ## References
 
 {% for path, files in references %}
@@ -27,3 +30,4 @@
 {% endfor %}
 {% endif %}
 {% endfor %}
+{% endif %}
