@@ -8,7 +8,7 @@
 
 ## Properties:
 
-### protected $denormalizer
+### <a href="#property-denormalizer" id="property-denormalizer">§</a> protected $denormalizer
 
 Types:
 
@@ -16,7 +16,7 @@ Types:
 
 ## Methods:
 
-### public function denormalize($data, string $type, ?string $format``, array $context`[]`): `DateTimeInterface`
+### <a href="#method-denormalize" id="method-denormalize">§</a> public function denormalize($data, string $type, ?string $format``, array $context`[]`): `DateTimeInterface`
 
 Denormalizes data back into an object of the given class.
 
@@ -54,7 +54,7 @@ Throws:
 
 ---
 
-### public function supportsDenormalization($data, string $type, ?string $format``, array $context`[]`): `bool`
+### <a href="#method-supportsDenormalization" id="method-supportsDenormalization">§</a> public function supportsDenormalization($data, string $type, ?string $format``, array $context`[]`): `bool`
 
 Checks whether the given class is supported for denormalization by this normalizer.
 
@@ -74,4 +74,4 @@ Returns:
 
 ---
 
-### public function setDenormalizer(Symfony\Component\Serializer\Normalizer\DenormalizerInterface $denormalizer)
+### <a href="#method-setDenormalizer" id="method-setDenormalizer">§</a> public function setDenormalizer(Symfony\Component\Serializer\Normalizer\DenormalizerInterface $denormalizer)

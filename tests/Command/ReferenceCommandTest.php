@@ -67,7 +67,7 @@ final class ReferenceCommandTest extends KernelTestCase
      */
     public function testItOutputsAReferenceInAFile(string $name): void
     {
-        $output = sprintf('tests/Command/pages/references/%s.mdx', $name);
+        $output = sprintf('tests/Command/pages/references/%s.md', $name);
         $this->tester->run([
             'command' => 'reference',
             'filename' => sprintf('tests/Command/src/%s.php', $name),
@@ -77,7 +77,7 @@ final class ReferenceCommandTest extends KernelTestCase
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $this->assertFileExists($output);
         $this->assertFileEquals(
-            sprintf('%s/expected/references/%s.mdx', __DIR__, $name),
+            sprintf('%s/expected/references/%s.md', __DIR__, $name),
             $output
         );
     }

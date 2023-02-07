@@ -51,7 +51,7 @@ final class ReferencesIndexCommandTest extends KernelTestCase
 
     public function testItOutputsIndexInAFile(): void
     {
-        $output = 'tests/Command/pages/references/index.mdx.twig';
+        $output = 'tests/Command/pages/references/index.md.twig';
         $this->tester->run([
             'command' => 'references:index',
             '--output' => $output,
@@ -60,7 +60,7 @@ final class ReferencesIndexCommandTest extends KernelTestCase
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $this->assertFileExists($output);
         $this->assertFileEquals(
-            sprintf('%s/expected/references/index.mdx', __DIR__),
+            sprintf('%s/expected/references/index.md', __DIR__),
             $output
         );
     }

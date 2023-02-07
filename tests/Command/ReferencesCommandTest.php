@@ -48,8 +48,8 @@ final class ReferencesCommandTest extends KernelTestCase
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $this->assertFileEquals(
-            sprintf('%s/expected/references/Controller/IndexController.mdx', __DIR__),
-            sprintf('%s/Controller/IndexController.mdx', $output)
+            sprintf('%s/expected/references/Controller/IndexController.md', __DIR__),
+            sprintf('%s/Controller/IndexController.md', $output)
         );
     }
 }
