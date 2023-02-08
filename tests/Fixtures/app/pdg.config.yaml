@@ -1,4 +1,4 @@
-api_platform_pdg:
+pdg:
   autoload: '../../../vendor/autoload.php'
   references:
     src: '../src'
