@@ -15,7 +15,6 @@ namespace PhpDocumentGenerator\Twig;
 
 use PhpDocumentGenerator\Parser\Ast\Node;
 use PhpDocumentGenerator\Parser\ClassParser;
-use PhpDocumentGenerator\Parser\ParameterParser;
 use PhpDocumentGenerator\Parser\ParserInterface;
 use PhpDocumentGenerator\Parser\TypeParser;
 use PhpDocumentGenerator\Services\ConfigurationHandler;
@@ -77,10 +76,6 @@ class MarkdownExtension extends AbstractExtension
             $name = pathinfo($data, \PATHINFO_FILENAME);
         }
 
-        if (($data instanceof TypeParser || $data instanceof ParameterParser) && $data->allowsNull()) {
-            $name = sprintf('?%s', $name);
-        }
-
         if (!\is_string($data) && !$data instanceof ClassParser && !$data instanceof TypeParser) {
             return sprintf('`%s`', $name);
         }
@@ -112,11 +107,6 @@ class MarkdownExtension extends AbstractExtension
         }
 
         $name = \is_object($data) ? $data->getName() : $data;
-
-        // Symfony
-        if (str_starts_with($name, 'Symfony\\')) {
-            return 'https://symfony.com/doc/current/index.html';
-        }
 
         if ($data instanceof Node) {
             $nodeType = $data->getNode()->type;

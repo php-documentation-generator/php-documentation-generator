@@ -86,6 +86,6 @@ final class ReferenceCommandTest extends KernelTestCase
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController', $display);
+        $this->assertStringContainsString('# PhpDocumentGenerator\Tests\Command\App\Controller\IndexController', $display);
     }
 }
