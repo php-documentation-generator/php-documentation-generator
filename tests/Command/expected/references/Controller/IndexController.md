@@ -1,4 +1,4 @@
-# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
+# PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
 
 ### Extends:
 

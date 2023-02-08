@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Parser;
 
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
+use PhpDocumentGenerator\Parser\Ast\Node;
 use Reflection;
 use ReflectionProperty;
 
@@ -40,14 +40,11 @@ final class PropertyParser extends AbstractParser
         return $reflection->hasType() ? new TypeParser($reflection->getType()) : null;
     }
 
-    public function getAdditionalTypes(): ?PhpDocTagValueNode
+    public function getAdditionalTypes(): ?Node
     {
         // retrieve "@var" tags from property doc
         if ($varTagValues = $this->getPhpDoc()->getVarTagValues()) {
-            foreach ($varTagValues as $varTagValue) {
-                // todo is it possible to detect a class and convert it to ReflectionClass? (/!\ PHPStan does not resolve imports)
-                return $varTagValue;
-            }
+            return new Node($varTagValues[0]);
         }
 
         $reflection = $this->getReflection();
@@ -55,10 +52,9 @@ final class PropertyParser extends AbstractParser
         // retrieve types from constructor doc
         $class = $reflection->getDeclaringClass();
         if ($class->hasMethod('__construct')) {
-            foreach ((new MethodParser($class->getMethod('__construct')))->getPhpDoc()->getParamTagValues() as $paramTagValue) {
-                if ($reflection->getName() === substr($paramTagValue->parameterName, 1)) {
-                    // todo is it possible to detect a class and convert it to ReflectionClass? (/!\ PHPStan does not resolve imports)
-                    return $paramTagValue;
+            foreach ((new MethodParser($class->getMethod('__construct')))->getPhpDoc()->getParamTagValues() as $node) {
+                if ($reflection->getName() === substr($node->parameterName, 1)) {
+                    return new Node($node);
                 }
             }
         }
@@ -107,30 +103,29 @@ final class PropertyParser extends AbstractParser
         return $this->reflection;
     }
 
-    protected function inheritDoc(string $docComment): string
+    protected function getParentDoc(): ?string
     {
         $reflection = $this->getReflection();
 
         // property does not have any docComment: try to retrieve it from constructor
         $class = $reflection->getDeclaringClass();
         if (!$class->hasMethod('__construct')) {
-            return $docComment;
+            return null;
         }
 
         foreach ((new MethodParser($class->getMethod('__construct')))->getPhpDoc()->getParamTagValues() as $param) {
             if ($reflection->getName() === substr($param->parameterName, 1)) {
-                // todo is it possible to detect a class and convert it to ReflectionClass? (/!\ PHPStan does not resolve imports)
                 // docComment MUST be a comment to be parsed by "getPhpDoc"
-                // comment is removed in "getSummary" method
-                return sprintf(<<<EOT
+                // comment is removed in "getDocComment" method
+                return trim($param->description) ? sprintf(<<<EOT
 /**
  * %s
  */
 EOT
-                    , $param->description);
+                    , $param->description) : null;
             }
         }
 
-        return $docComment;
+        return null;
     }
 }

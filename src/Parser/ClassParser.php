@@ -48,6 +48,9 @@ final class ClassParser extends AbstractParser
         return false;
     }
 
+    /**
+     * @return self[]
+     */
     public function getInterfaces(): array
     {
         return array_map(fn (ReflectionClass $class) => new self($class), $this->getReflection()->getInterfaces());
@@ -170,20 +173,25 @@ final class ClassParser extends AbstractParser
         return $this->reflection;
     }
 
+    protected function getClassName(): string
+    {
+        return $this->getReflection()->getName();
+    }
+
     /**
-     * Import docComment from parent class (not from interfaces), and replace "inheritdoc" in docComment.
+     * Import docComment from parent class (not from interfaces).
      */
-    protected function inheritDoc(string $docComment): string
+    protected function getParentDoc(): ?string
     {
         // ignore from traits
         if (
             $this->getReflection()->isTrait()
             || !($parentClass = $this->getParentClass())
-            || !($parentDocComment = $parentClass->getDocComment())
+            || !($parentDocComment = $parentClass->getPhpDoc()->__toString())
         ) {
-            return $docComment;
+            return null;
         }
 
-        return preg_replace('/{?@inheritdoc}?/', $parentDocComment, $docComment);
+        return $parentDocComment;
     }
 }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Parser;
 
+use PhpDocumentGenerator\Parser\Ast\Node;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ReturnTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ThrowsTagValueNode;
 use Reflection;
@@ -49,22 +50,19 @@ final class MethodParser extends AbstractParser
     }
 
     /**
-     * @return ReturnTagValueNode[]
+     * @return Node[]
      */
     public function getAdditionalReturnTypes(): array
     {
-        // retrieve additional return types from doc
-        // todo is it possible to detect a class and convert it to ReflectionClass? (/!\ PHPStan does not resolve imports)
-        return $this->getPhpDoc()->getReturnTagValues();
+        return array_map(fn (ReturnTagValueNode $node) => new Node($node), array_unique($this->getPhpDoc()->getReturnTagValues()));
     }
 
     /**
-     * @return ThrowsTagValueNode[]
+     * @return Node[]
      */
     public function getThrowTags(): array
     {
-        // todo is it possible to detect a class and convert it to ReflectionClass? (/!\ PHPStan does not resolve imports)
-        return $this->getPhpDoc()->getThrowsTagValues();
+        return array_map(fn (ThrowsTagValueNode $node) => new Node($node), array_unique($this->getPhpDoc()->getThrowsTagValues()));
     }
 
     public function getReflection(): ReflectionMethod
@@ -72,7 +70,7 @@ final class MethodParser extends AbstractParser
         return $this->reflection;
     }
 
-    protected function inheritDoc(string $docComment): string
+    protected function getParentDoc(): ?string
     {
         $reflection = $this->getReflection();
 
@@ -84,21 +82,21 @@ final class MethodParser extends AbstractParser
         if (
             false !== ($parentClass = $class->getParentClass())
             && $parentClass->hasMethod($name)
-            && ($parentDocComment = $parentClass->getMethod($name)->getDocComment())
+            && ($parentDoc = $parentClass->getMethod($name)->getPhpDoc()->__toString())
         ) {
-            return preg_replace('/{?@inheritdoc}?/', preg_replace('/(?:\/\*\*(?:\n *\*)? )|(\n? *\*\/)/', '', $parentDocComment), $docComment);
+            return $parentDoc;
         }
 
         // import docComment from interfaces
         foreach ($class->getInterfaces() as $interface) {
             if (
                 $interface->hasMethod($name)
-                && ($interfaceDocComment = $interface->getMethod($name)->getDocComment())
+                && ($interfaceDoc = $interface->getMethod($name)->getPhpDoc()->__toString())
             ) {
-                return preg_replace('/{?@inheritdoc}?/', preg_replace('/(?:\/\*\*(?:\n *\*)? )|(\n? *\*\/)/', '', $interfaceDocComment), $docComment);
+                return $interfaceDoc;
             }
         }
 
-        return $docComment;
+        return null;
     }
 }

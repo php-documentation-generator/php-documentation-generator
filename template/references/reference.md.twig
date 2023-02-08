@@ -1,7 +1,7 @@
 {% extends 'layout.md.twig' %}
 
 {% block title %}
-# {% if configuration is defined %}Configuration Reference{% else %}\{{ class.name }}{% endif %}
+# {% if configuration is defined %}Configuration Reference{% else %}{{ class.name }}{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -21,14 +21,11 @@
 {% endblock %}
 
 {% block class %}
-{# block description #}
-{% if class.summary|md_sanitize|length > 0 %}
+{% if class.docComment|md_sanitize|length > 0 %}
 
-{{ class.summary|md_sanitize|raw }}
+{{ class.docComment|md_sanitize|raw }}
 
 {% endif %}
-{# endblock description #}
-{# block extends #}
 {% if class.parentClass %}
 
 ### Extends:
@@ -36,9 +33,7 @@
 > {{ class.parentClass|md_link -}}
 
 {% endif %}
-{# endblock extends #}
 
-{# block implements #}
 {% if class.interfaces|length > 0 %}
 
 ### Implements:
@@ -50,8 +45,6 @@
 {% endif %}
 {% endfor %}
 {% endif %}
-{# endblock implements #}
-{# block constants #}
 {% if class.constants|length > 0 %}
 
 ## Constants:
@@ -63,8 +56,6 @@
 {% endfor %}
 
 {% endif %}
-{# endblock constants #}
-{# block properties #}
 {% if class.properties|length > 0 %}
 
 ## Properties:
@@ -81,8 +72,6 @@
 {% endif %}
 {% endfor %}
 {% endif %}
-{# endblock properties #}
-{# block methods #}
 {% if class.methods|length > 0 %}
 
 ## Methods:
@@ -99,5 +88,4 @@
 {% endif %}
 {% endfor %}
 {% endif %}
-{# endblock methods #}
 {% endblock %}

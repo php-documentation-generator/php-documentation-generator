@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Parser;
 
-use PHPStan\PhpDocParser\Ast\PhpDoc\ParamTagValueNode;
+use PhpDocumentGenerator\Parser\Ast\Node;
 use ReflectionParameter;
 
 final class ParameterParser extends AbstractParser
@@ -26,22 +26,17 @@ final class ParameterParser extends AbstractParser
     {
         $reflection = $this->getReflection();
 
-        if ($reflection->hasType()) {
-            return new TypeParser($reflection->getType());
-        }
-
-        return null;
+        return $reflection->hasType() ? new TypeParser($reflection->getType()) : null;
     }
 
-    public function getAdditionalTypes(): ?ParamTagValueNode
+    public function getAdditionalTypes(): ?Node
     {
         $reflection = $this->getReflection();
 
         // retrieve additional types from method doc
-        $phpDoc = (new MethodParser($reflection->getDeclaringFunction()))->getPhpDoc();
-        foreach ($phpDoc->getParamTagValues() as $param) {
-            if ($reflection->getName() === substr($param->parameterName, 1)) {
-                return $param;
+        foreach ((new MethodParser($reflection->getDeclaringFunction()))->getPhpDoc()->getParamTagValues() as $node) {
+            if ($reflection->getName() === substr($node->parameterName, 1)) {
+                return new Node($node);
             }
         }
 

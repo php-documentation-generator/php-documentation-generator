@@ -14,8 +14,11 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Tests\Command\App\Serializer;
 
 use DateTimeInterface;
+use LogicException;
 use PhpDocumentGenerator\Tests\Command\App\Services\IgnoredInterface;
-use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use RuntimeException;
+use stdClass;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException as FooBarException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -25,9 +28,18 @@ final class DateTimeDenormalizer implements DenormalizerInterface, DenormalizerA
     use DenormalizerAwareTrait;
 
     /**
+     * This method throws multiple exception and returns multiple types to ensure the types are correctly imported.
+     *
      * {@inheritdoc}
      *
-     * @throws NotNormalizableValueException
+     * Also, the parent documentation should be placed in the middle of this method documentation.
+     *
+     * @throws FooBarException|RuntimeException|string
+     * @throws LogicException
+     *
+     * @return mixed
+     * @return string|stdClass|DateTimeInterface
+     * @return array<int, DateTimeInterface>
      */
     public function denormalize($data, string $type, string $format = null, array $context = []): DateTimeInterface
     {
