@@ -1,4 +1,4 @@
-api_platform_pdg:
+pdg:
   references:
     src: 'tests/Command/src'
     namespace: 'PhpDocumentGenerator\Tests\Command\App'

@@ -8,7 +8,7 @@ and `pdg.config.dist.yml` files.
 Check for the default configuration:
 
 ```yaml
-api_platform_pdg:
+pdg:
     # Project autoload
     autoload: 'vendor/autoload.php'
     # References configuration
