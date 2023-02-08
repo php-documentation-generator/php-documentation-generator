@@ -6,11 +6,8 @@ how to use it but assumes that you have a basic understanding of key concepts.
 ## Generating All References
 
 ```shell
-pdg references docs/references
+pdg references
 ```
-
-> Note: the `docs/references` argument is the path where the references files will be generated. If you omit this argument, the
-> references will just be printed on the command output.
 
 ## Generating a Single Reference
 
@@ -24,11 +21,11 @@ pdg reference src/Controller/IndexController.php --output docs/references/Contro
 ## Generating References Index
 
 ```shell
-pdg references:index docs/references
+pdg references:index --output docs/references
 ```
 
-> Note: the `docs/references` argument is the path where the references index will be generated. If you omit this
-> argument, the index will just be printed on the command output.
+> Note: the `--output` option is the path where the references index will be generated. If you omit this option, the
+> index will just be printed on the command output.
 
 ---
 
