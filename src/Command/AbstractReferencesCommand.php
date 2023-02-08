@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use Generator;
 use PhpDocumentGenerator\Parser\ClassParser;
 use PhpDocumentGenerator\Services\ConfigurationHandler;
 use ReflectionClass;
@@ -31,14 +30,14 @@ abstract class AbstractReferencesCommand extends Command
     }
 
     /**
-     * @return Generator<string, SplFileInfo>
+     * @return array<string, SplFileInfo>
      */
-    protected function getFiles(): iterable
+    protected function getFiles(): array
     {
         $patterns = $this->configuration->get('references.patterns');
-        $files = $this->findFiles($patterns['directories'] ?? [], $patterns['names'] ?? ['*.php'], $patterns['exclude'] ?? []);
+        $files = [];
 
-        foreach ($files as $file) {
+        foreach ($this->findFiles($patterns['directories'] ?? [], $patterns['names'] ?? ['*.php'], $patterns['exclude'] ?? []) as $file) {
             $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('references.src'));
             $namespace = rtrim(sprintf('%s\\%s', $this->configuration->get('references.namespace'), str_replace([\DIRECTORY_SEPARATOR, '.php'], ['\\', ''], $relativeToSrc)), '\\');
             $className = sprintf('%s\\%s', $namespace, $file->getBasename('.php'));
@@ -55,8 +54,10 @@ abstract class AbstractReferencesCommand extends Command
                 continue;
             }
 
-            yield $className => $file;
+            $files[$className] = $file;
         }
+
+        return $files;
     }
 
     private function findFiles(array $directories, array $names, array $exclude): Finder
@@ -68,6 +69,7 @@ abstract class AbstractReferencesCommand extends Command
         return (new Finder())->files()
             ->in(array_map(fn (string $directory) => $this->configuration->get('references.src').\DIRECTORY_SEPARATOR.$directory, $directories))
             ->name($names)
-            ->notName($exclude);
+            ->notName($exclude)
+            ->sortByName();
     }
 }

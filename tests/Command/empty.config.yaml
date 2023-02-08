@@ -1,0 +1,5 @@
+pdg:
+  references:
+    src: '/tmp/pdg/empty'
+  guides:
+    src: '/tmp/pdg/empty'

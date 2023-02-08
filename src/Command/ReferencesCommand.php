@@ -21,7 +21,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Path;
-use Symfony\Component\Finder\Finder;
 
 final class ReferencesCommand extends AbstractReferencesCommand
 {
@@ -38,7 +37,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
             ->setDescription('Creates references documentation for PHP classes')
             ->addArgument(
                 name: 'output',
-                mode: InputArgument::REQUIRED,
+                mode: InputArgument::OPTIONAL,
                 description: 'The path where the references will be printed'
             )
             ->addOption(
@@ -51,16 +50,23 @@ final class ReferencesCommand extends AbstractReferencesCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $files = $this->getFiles();
+        $style = new SymfonyStyle($input, $output);
+
+        if (!\count($files)) {
+            $style->getErrorStyle()->warning(sprintf('No files were found in "%s".', $this->configuration->get('references.src')));
+
+            return self::INVALID;
+        }
+
         $template = $input->getOption('template');
-        $out = $input->getArgument('output');
+        $out = $input->getArgument('output') ?: $this->configuration->get('references.output');
 
         // get the output extension for a reference
         $referenceExtension = pathinfo(preg_replace('/\.twig$/i', '', $template), \PATHINFO_EXTENSION);
 
-        $style = new SymfonyStyle($input, $output);
         $style->progressStart();
-
-        foreach ($this->getFiles() as $file) {
+        foreach ($files as $file) {
             $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('references.src'));
 
             if (!@mkdir($concurrentDirectory = $this->configuration->get('references.output').\DIRECTORY_SEPARATOR.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
@@ -88,13 +94,5 @@ final class ReferencesCommand extends AbstractReferencesCommand
         $style->progressFinish();
 
         return self::SUCCESS;
-    }
-
-    private function findFiles(array $directories, array $names, array $exclude): Finder
-    {
-        return (new Finder())->files()
-            ->in(array_map(fn (string $directory) => $this->configuration->get('references.src').\DIRECTORY_SEPARATOR.$directory, $directories))
-            ->name($names)
-            ->notName($exclude);
     }
 }
