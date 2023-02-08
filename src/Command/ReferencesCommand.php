@@ -13,22 +13,22 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use PhpDocumentGenerator\Services\ConfigurationHandler;
+use PhpDocumentGenerator\Configuration;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Path;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class ReferencesCommand extends AbstractReferencesCommand
 {
     public function __construct(
-        private readonly ConfigurationHandler $configuration,
+        private readonly Configuration $configuration,
         private readonly string $defaultTemplate
     ) {
-        parent::__construct($configuration, name: 'references');
+        parent::__construct(name: 'references');
     }
 
     protected function configure(): void
@@ -37,40 +37,83 @@ final class ReferencesCommand extends AbstractReferencesCommand
             ->setDescription('Creates references documentation for PHP classes')
             ->addArgument(
                 name: 'output',
-                mode: InputArgument::OPTIONAL,
-                description: 'The path where the references will be printed'
+                description: 'The path where the references will be printed.',
+                default: $this->configuration->references->output
+            )
+            ->addArgument(
+                name: 'src',
+                description: 'The source directory',
+                default: $this->configuration->references->src
             )
             ->addOption(
                 name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the template file to use to generate each reference',
+                description: 'The path to the template file to use to generate each reference.',
                 default: $this->defaultTemplate
+            )
+            ->addOption(
+                name: 'exclude',
+                mode: InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                description: 'Glob patterns to exclude.',
+                default: $this->configuration->references->exclude
+            )
+            ->addOption(
+                name: 'exclude-path',
+                mode: InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                description: 'Paths to exclude.',
+                default: $this->configuration->references->excludePath
+            )
+            ->addOption(
+                name: 'tags-to-ignore',
+                mode: InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                description: 'The tags to ignore.',
+                default: $this->configuration->references->tagsToIgnore
+            )
+            ->addOption(
+                name: 'namespace',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The PSR-4 prefix representing your source directory.',
+                default: $this->configuration->references->namespace
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $files = $this->getFiles();
         $style = new SymfonyStyle($input, $output);
+        $stderr = $style->getErrorStyle();
+        $template = $input->getOption('template');
 
-        if (!\count($files)) {
-            $style->getErrorStyle()->warning(sprintf('No files were found in "%s".', $this->configuration->get('references.src')));
+        if (!$input->getArgument('src') || !$input->getArgument('output')) {
+            $stderr->error('Specify "src" and "output" to create references.');
 
             return self::INVALID;
         }
 
-        $template = $input->getOption('template');
-        $out = $input->getArgument('output') ?: $this->configuration->get('references.output');
+        $src = Path::canonicalize($input->getArgument('src'));
+        $out = Path::canonicalize($input->getArgument('output'));
 
         // get the output extension for a reference
-        $referenceExtension = pathinfo(preg_replace('/\.twig$/i', '', $template), \PATHINFO_EXTENSION);
+        $referenceExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
+        /** @var SplFileInfo[] */
+        $files = $this->getFiles($src, $input->getOption('namespace'), (array) $input->getOption('exclude'), (array) $input->getOption('tags-to-ignore'), (array) $input->getOption('exclude-path'));
 
-        $style->progressStart();
+        if (!\count($files)) {
+            $stderr->warning(sprintf('No files were found in "%s".', $src));
+
+            return self::INVALID;
+        }
+
+        $progressBar = $output->isDebug() ? null : $style->createProgressBar(\count($files));
+        $progressBar?->start();
+
         foreach ($files as $file) {
-            $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('references.src'));
+            $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->references->src);
+            $target = Path::changeExtension(Path::join($out, $relativeToSrc, $file->getBaseName()), $referenceExtension);
 
-            if (!@mkdir($concurrentDirectory = $this->configuration->get('references.output').\DIRECTORY_SEPARATOR.$relativeToSrc, 0777, true) && !is_dir($concurrentDirectory)) {
-                $style->getErrorStyle()->error(sprintf('Cannot create directory "%s".', $concurrentDirectory));
+            $stderr->writeln(sprintf('Processing %s => %s', $file, $target), OutputInterface::VERBOSITY_DEBUG);
+
+            if (!@mkdir($concurrentDirectory = $out.\DIRECTORY_SEPARATOR.$relativeToSrc, 0755, true) && !is_dir($concurrentDirectory)) {
+                $stderr->error(sprintf('Cannot create directory "%s".', $concurrentDirectory));
 
                 return self::FAILURE;
             }
@@ -80,18 +123,19 @@ final class ReferencesCommand extends AbstractReferencesCommand
                 self::FAILURE === $this->getApplication()?->find('reference')->run(new ArrayInput([
                     'filename' => $file->getPathName(),
                     '--template' => $template,
-                    '--output' => sprintf('%s%s%s%2$s%s.%s', rtrim($out, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $relativeToSrc, $file->getBaseName('.php'), $referenceExtension),
+                    '--output' => $target,
+                    '--quiet' => true,
                 ]), $output)
             ) {
-                $style->getErrorStyle()->error(sprintf('Failed creating reference "%s".', $file->getPathname()));
+                $stderr->error(sprintf('Failed creating reference "%s".', $file->getPathname()));
 
                 return self::FAILURE;
             }
 
-            $style->progressAdvance();
+            $progressBar?->advance(1);
         }
 
-        $style->progressFinish();
+        $progressBar?->finish();
 
         return self::SUCCESS;
     }

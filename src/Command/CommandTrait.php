@@ -15,9 +15,13 @@ namespace PhpDocumentGenerator\Command;
 
 use RuntimeException;
 use SplFileInfo;
+use Symfony\Component\Filesystem\Path;
+use Twig\Environment;
 
 trait CommandTrait
 {
+    protected Environment $environment;
+
     private function loadTemplate(string $template): string
     {
         // check template
@@ -35,15 +39,15 @@ trait CommandTrait
         return pathinfo($template, \PATHINFO_BASENAME);
     }
 
-    private function getNamespace(SplFileInfo $file): string
+    private function getFQDNFromFile(SplFileInfo $file, string $src, string $namespace): string
     {
+        $relativeToSrc = Path::makeRelative($file->getPath(), $src);
         // Remove root path from file path
-        $namespace = preg_replace(sprintf('#^%s%s?#i', $this->configuration->get('references.src'), \DIRECTORY_SEPARATOR), '', $file->getPath());
         // Convert it to namespace format
-        $namespace = str_replace(\DIRECTORY_SEPARATOR, '\\', $namespace);
+        $ns = str_replace(\DIRECTORY_SEPARATOR, '\\', $relativeToSrc);
         // Prepend main namespace
-        $namespace = rtrim(sprintf('%s\\%s', $this->configuration->get('references.namespace'), $namespace), '\\');
+        $ns = rtrim(sprintf('%s\\%s', $namespace, $ns), '\\');
 
-        return sprintf('%s\\%s', $namespace, $file->getBasename('.'.$file->getExtension()));
+        return sprintf('%s\\%s', $ns, $file->getBasename('.'.$file->getExtension()));
     }
 }

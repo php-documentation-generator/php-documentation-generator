@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use PhpDocumentGenerator\Services\ConfigurationHandler;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -31,10 +30,10 @@ final class GuideCommand extends Command
     private const REGEX = '/^\s*\/\/\s/';
 
     public function __construct(
-        private readonly ConfigurationHandler $configuration,
-        private readonly Environment $environment,
+        Environment $environment,
         private readonly string $defaultTemplate
     ) {
+        $this->environment = $environment;
         parent::__construct(name: 'guide');
     }
 
@@ -46,12 +45,12 @@ final class GuideCommand extends Command
             ->addOption(
                 name: 'output',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the file where the reference will be printed. Leave empty for screen printing'
+                description: 'The path to the file where the reference will be printed. Defaults to stdout.'
             )
             ->addOption(
                 name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the template files to use to generate the output file',
+                description: 'The path to the template files to use to generate the output file.',
                 default: $this->defaultTemplate
             );
     }
@@ -59,17 +58,18 @@ final class GuideCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
+        $stderr = $style->getErrorStyle();
 
         $file = new SplFileInfo($input->getArgument('filename'));
         if (!$file->isFile()) {
-            $style->getErrorStyle()->error(sprintf('File "%s" does not exist.', $file->getPathname()));
+            $stderr->error(sprintf('File "%s" does not exist.', $file->getPathname()));
 
             return self::INVALID;
         }
 
         $handle = fopen($file->getPathName(), 'r');
         if (!$handle) {
-            $style->getErrorStyle()->error(sprintf('Error opening "%s".', $file->getPathName()));
+            $stderr->error(sprintf('Error opening "%s".', $file->getPathName()));
 
             return self::INVALID;
         }
@@ -86,8 +86,6 @@ final class GuideCommand extends Command
         $headers = [];
 
         $previousLine = 'text';
-
-        $style->info(sprintf('Creating guide "%s".', $file->getPathName()));
 
         while (($line = fgets($handle)) !== false) {
             if (!trim($line)) {
@@ -172,7 +170,11 @@ final class GuideCommand extends Command
 
         $out = $input->getOption('output');
         if (!$out) {
-            $style->block($content);
+            $output->write($content);
+
+            if (!$input->getOption('quiet')) {
+                $stderr->success(sprintf('Guide "%s" successfully created.', $file->getPathname()));
+            }
 
             return self::SUCCESS;
         }
@@ -182,12 +184,14 @@ final class GuideCommand extends Command
             mkdir($dirName, 0777, true);
         }
         if (!file_put_contents($out, $content)) {
-            $style->getErrorStyle()->error(sprintf('Cannot write in "%s".', $out));
+            $stderr->error(sprintf('Cannot write in "%s".', $out));
 
             return self::FAILURE;
         }
 
-        $style->success(sprintf('Guide "%s" successfully created.', $file->getPathname()));
+        if (!$input->getOption('quiet')) {
+            $stderr->success(sprintf('Guide "%s" successfully created.', $file->getPathname()));
+        }
 
         return self::SUCCESS;
     }

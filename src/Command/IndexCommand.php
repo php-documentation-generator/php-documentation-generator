@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use PhpDocumentGenerator\Services\ConfigurationHandler;
+use PhpDocumentGenerator\Configuration;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,10 +29,11 @@ final class IndexCommand extends Command
     use CommandTrait;
 
     public function __construct(
-        private readonly ConfigurationHandler $configuration,
-        private readonly Environment $environment,
+        private readonly Configuration $configuration,
+        Environment $environment,
         private readonly string $defaultTemplate
     ) {
+        $this->environment = $environment;
         parent::__construct(name: 'index');
     }
 
@@ -42,26 +44,30 @@ final class IndexCommand extends Command
             ->addOption(
                 name: 'output',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the file where the index will be printed. Leave empty for screen printing'
+                description: 'The path to the file where the index will be printed. Defaults to stdout.',
             )
             ->addOption(
                 name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the template file to use to generate the index',
+                description: 'The path to the template file to use to generate the index.',
                 default: $this->defaultTemplate
+            )
+            ->addArgument(
+                name: 'directories',
+                mode: InputArgument::IS_ARRAY,
+                description: 'The path to the template file to use to generate the index.',
+                default: ['guides' => $this->configuration->guides->output, 'references' => $this->configuration->references->output]
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
+        $stderr = $style->getErrorStyle();
         $out = $input->getOption('output');
-
+        $directories = $input->getArgument('directories');
         $sections = [];
-        $directories = [
-            'guides' => $this->configuration->get('guides.output'),
-            'references' => $this->configuration->get('references.output'),
-        ];
+
         foreach ($directories as $section => $directory) {
             foreach ((new Finder())->files()->in($directory)->sortByName() as $file) {
                 // Ignore indexes
@@ -87,7 +93,7 @@ final class IndexCommand extends Command
         $content = $this->environment->render($this->loadTemplate($input->getOption('template')), $sections);
 
         if (!$out) {
-            $style->block($content);
+            $output->write($content);
 
             return self::SUCCESS;
         }
@@ -97,7 +103,7 @@ final class IndexCommand extends Command
             mkdir($dirName, 0777, true);
         }
         if (!file_put_contents($out, $content)) {
-            $style->getErrorStyle()->error(sprintf('Cannot write in "%s".', $out));
+            $stderr->error(sprintf('Cannot write in "%s".', $out));
 
             return self::FAILURE;
         }

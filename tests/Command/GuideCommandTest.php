@@ -64,7 +64,7 @@ EOT
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating guide', $this->tester->getDisplay(true));
+        $this->assertStringContainsString('[OK] Guide "tests/Command/guides/use-doctrine.php" successfully created.', $this->tester->getDisplay(true));
         $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
         $this->assertFileExists($output);
         $this->assertFileEquals(
@@ -82,9 +82,8 @@ EOT
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[INFO] Creating guide', $this->tester->getDisplay(true));
+        $this->assertStringContainsString('[OK] Guide "tests/Command/guides/use-doctrine.php" successfully created.', $this->tester->getDisplay(true));
         $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
-        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
         $this->assertStringContainsString(<<<EOT
 <a href="#section-1" id="section-1">§</a>
 
@@ -104,6 +103,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 class Book
 EOT
-            , $display);
+            , $this->tester->getDisplay(true));
     }
 }

@@ -2,11 +2,8 @@ pdg:
   references:
     src: 'tests/Command/src'
     namespace: 'PhpDocumentGenerator\Tests\Command\App'
-    patterns:
-      directories: [ '' ]
-      names: [ '*.php' ]
-      exclude: [ '*Interface.php' ]
-      class_tags_to_ignore: [ '@internal', '@experimental' ]
+    exclude: ['*Interface.php']
+    tags_to_ignore: ['@experimental', '@internal', '@ignore']
     output: 'tests/Command/expected/references'
     base_url: '/pages/references'
   guides:

@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
+use PhpDocumentGenerator\Configuration;
 use PhpDocumentGenerator\Parser\ClassParser;
-use PhpDocumentGenerator\Services\ConfigurationHandler;
 use ReflectionClass;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Path;
 use Twig\Environment;
 
 final class ReferencesIndexCommand extends AbstractReferencesCommand
@@ -27,11 +28,12 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
     use CommandTrait;
 
     public function __construct(
-        private readonly ConfigurationHandler $configuration,
-        private readonly Environment $environment,
+        private readonly Configuration $configuration,
+        Environment $environment,
         private readonly string $defaultTemplate
     ) {
-        parent::__construct($configuration, name: 'references:index');
+        $this->environment = $environment;
+        parent::__construct(name: 'references:index');
     }
 
     protected function configure(): void
@@ -41,13 +43,42 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
             ->addOption(
                 name: 'output',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the file where the index will be printed. Leave empty for screen printing'
+                description: 'The path to the file where the index will be printed. Defaults to stdout.'
             )
             ->addOption(
                 name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the template file to use to generate the index',
+                description: 'The path to the template file to use to generate the index.',
                 default: $this->defaultTemplate
+            )
+            ->addOption(
+                name: 'exclude',
+                mode: InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                description: 'Glob patterns to exclude.',
+                default: $this->configuration->references->exclude
+            )
+            ->addOption(
+                name: 'exclude-path',
+                mode: InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                description: 'Paths to exclude.',
+                default: $this->configuration->references->excludePath
+            )
+            ->addOption(
+                name: 'tags-to-ignore',
+                mode: InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                description: 'The tags to ignore.',
+                default: $this->configuration->references->tagsToIgnore
+            )
+            ->addOption(
+                name: 'namespace',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The PSR-4 prefix representing your source directory.',
+                default: $this->configuration->references->namespace
+            )
+            ->addArgument(
+                name: 'src',
+                description: 'The source directory',
+                default: $this->configuration->references->src
             );
     }
 
@@ -55,8 +86,9 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
     {
         $namespaces = [];
         $style = new SymfonyStyle($input, $output);
+        $src = Path::canonicalize($input->getArgument('src'));
 
-        foreach ($this->getFiles() as $class => $file) {
+        foreach ($this->getFiles($src, $input->getOption('namespace'), (array) $input->getOption('exclude'), (array) $input->getOption('tags-to-ignore'), (array) $input->getOption('exclude-path')) as $class => $file) {
             $class = new ClassParser(new ReflectionClass($class));
             $namespaces[$class->getNamespaceName()][] = $class;
         }

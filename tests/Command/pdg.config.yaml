@@ -1,14 +1,11 @@
 pdg:
   references:
-    src: 'tests/Command/src'
-    namespace: 'PhpDocumentGenerator\Tests\Command\App'
-    patterns:
-      directories: [ '' ]
-      names: [ '*.php' ]
-      exclude: [ '*Interface.php' ]
-      class_tags_to_ignore: [ '@internal', '@experimental' ]
-    output: 'tests/Command/pages/references'
     base_url: '/pages/references'
+    tags_to_ignore: [ '@internal', '@experimental', '@ignore' ]
+    exclude: [ '*Interface.php' ]
+    output: 'tests/Command/pages/references'
+    namespace: 'PhpDocumentGenerator\Tests\Command\App'
+    src: 'tests/Command/src'
   guides:
     src: 'tests/Command/guides'
     output: 'tests/Command/pages/guides'
