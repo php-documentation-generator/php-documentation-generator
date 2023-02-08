@@ -1,9 +1,9 @@
 {% block method %}
-### <a href="#method-{{ method.name }}" id="method-{{ method.name }}">§</a> {{ method.modifier }} function {{ method.name }}({% for parameter in method.parameters %}{% if parameter.hasType %}{{ parameter.type }} {% endif %}{% if parameter.isPassedByReference %}&{% endif %}${{ parameter.name }}{% if parameter.isDefaultValueAvailable %}`{{ parameter.defaultValue|md_value }}`{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}){% if method.hasReturnType %}: {% if method.returnType.isUnion or method.returnType.isIntersection %}{{ method.returnType.types|map(type => type|md_link)|join(method.returnType.isUnion ? '|' : '&') }}{% else %}{{ method.returnType|md_link }}{% endif %}{% endif %}
+### <a href="#method-{{ method.name }}" id="method-{{ method.name }}">§</a> {{ method.modifier }} function {{ method.name }}({% for parameter in method.parameters %}{% if parameter.hasType %}{{ parameter.type|md_link|raw }} {% endif %}{% if parameter.isPassedByReference %}&{% endif %}${{ parameter.name }}{% if parameter.isDefaultValueAvailable and parameter.defaultValue|md_value|length %} = `{{ parameter.defaultValue|md_value }}`{% endif %}{% if not loop.last %}, {% endif %}{% endfor %}){% if method.hasReturnType %}: {{ method.returnType|md_link }}{% endif %}
 
-{% if method.summary|md_sanitize|raw|length > 0 %}
+{% if method.docComment|md_sanitize|raw|length > 0 %}
 
-{{ method.summary|md_sanitize|raw }}
+{{ method.docComment|md_sanitize|raw }}
 {% endif %}
 
 {% if method.parameters|length > 0 %}
@@ -13,7 +13,7 @@
 Additional info:
 
 {% endif %}
-> {{ parameter.additionalTypes|md_link }} ${{ parameter.name }}{% if parameter.additionalTypes.description|length > 0 %} {{ parameter.additionalTypes.description|raw }}{% endif %}
+> {{ parameter.additionalTypes|md_link|raw }} ${{ parameter.name }}{% if parameter.additionalTypes.description|length > 0 %} {{ parameter.additionalTypes.description|raw }}{% endif %}
 
 {% if not loop.last %}
 >
@@ -26,7 +26,7 @@ Additional info:
 Returns:
 
 {% for returnTag in method.additionalReturnTypes %}
-> {{ returnTag|md_link }}{% if returnTag.description|length > 0 %} {{ returnTag.description|raw }}{% endif %}
+> {{ returnTag|md_link|raw }}{% if returnTag.description|length > 0 %} {{ returnTag.description|raw }}{% endif %}
 
 {% if not loop.last %}
 >

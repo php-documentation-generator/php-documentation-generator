@@ -13,15 +13,20 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Twig;
 
+use PhpDocumentGenerator\Parser\Ast\Node;
 use PhpDocumentGenerator\Parser\ClassParser;
 use PhpDocumentGenerator\Parser\ParserInterface;
+use PhpDocumentGenerator\Parser\TypeParser;
 use PhpDocumentGenerator\Services\ConfigurationHandler;
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
+use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser;
 use ReflectionClass;
+use ReflectionException;
+use RuntimeException;
 use SplFileInfo;
-use Symfony\Component\Filesystem\Path;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -46,83 +51,44 @@ class MarkdownExtension extends AbstractExtension
         ];
     }
 
-    public function getLink(ParserInterface|PhpDocTagValueNode|string $data, string $referenceExtension = 'md'): string
+    public function getLink(ParserInterface|Node|string $data, string $extension = 'md'): string
     {
+        if ($data instanceof Node) {
+            $nodeType = $data->getNode()->type;
+
+            if ($nodeType instanceof UnionTypeNode || $nodeType instanceof IntersectionTypeNode) {
+                return implode(
+                    $nodeType instanceof UnionTypeNode ? '|' : '&',
+                    array_map(fn (TypeNode $node) => $this->getLink($node->__toString()), $nodeType->types)
+                );
+            }
+
+            return $this->getLink($nodeType->__toString());
+        }
+
         $name = $data;
 
-        if ($data instanceof PhpDocTagValueNode) {
-            $name = $data->type->__toString();
-        } elseif ($data instanceof ParserInterface) {
+        if (\is_object($data)) {
+            // class name
             $name = $data->getName();
-        }
-
-        $url = $this->getUrl($data, $referenceExtension);
-
-        // Reference or guide
-        if (\is_string($data) && file_exists($data)) {
+        } elseif (file_exists($data)) {
+            // reference or guide
             $name = pathinfo($data, \PATHINFO_FILENAME);
         }
+
+        if (!\is_string($data) && !$data instanceof ClassParser && !$data instanceof TypeParser) {
+            return sprintf('`%s`', $name);
+        }
+
+        $url = $this->getUrl($data, $extension);
 
         return $url ? sprintf('[`%s`](%s)', $name, $url) : sprintf('`%s`', $name);
     }
 
-    public function getUrl(ParserInterface|PhpDocTagValueNode|string $data, string $referenceExtension = 'md'): ?string
+    public function getUrl(ClassParser|TypeParser|Node|string $data, string $extension = 'md'): ?string
     {
-        if ($data instanceof PhpDocTagValueNode) {
-            // todo is it possible to detect a class and convert it to ReflectionClass? (/!\ PHPStan does not resolve imports)
-            $data = $data->type->__toString();
-        }
-
-        // try to convert $data to \ReflectionClass
-        if (\is_string($data)) {
-            try {
-                $data = new ClassParser(new ReflectionClass($data));
-            } catch (\ReflectionException) {
-            }
-        }
-
-        if ($data instanceof ParserInterface) {
-            $name = $data->getName();
-
-            // Internal
-            if (str_starts_with($name, $this->configuration->get('references.namespace').'\\')) {
-                // calling ConfigurationHandler::isExcluded to ensure the target class is not ignored
-                // from references generation because the target reference file may not exist yet
-                if (!$this->configuration->isExcluded($data)) {
-                    $file = new SplFileInfo($data->getFileName());
-                    $rootPath = getcwd();
-
-                    // get relative file path without extension (e.g.: Entity/Book)
-                    $fileName = trim(sprintf('%s/%s', str_replace(sprintf('%s/%s', $rootPath, $this->configuration->get('references.src')), '', $file->getPath()), $file->getBasename('.'.$file->getExtension())), '/');
-
-                    // get reference file path (e.g.: pages/references/Entity/Book.md)
-                    $filePath = sprintf('%s/%s.%s', $this->configuration->get('references.output'), $fileName, $referenceExtension);
-
-                    return str_replace([
-                        $this->configuration->get('references.output'),
-                        $this->configuration->get('guides.output'),
-                    ], [
-                        $this->configuration->get('references.base_url'),
-                        $this->configuration->get('guides.base_url'),
-                    ], $filePath);
-                }
-            }
-
-            // PHP
-            if ($data instanceof ClassParser && !$data->isUserDefined()) {
-                return sprintf('https://php.net/class.%s', strtolower($name));
-            }
-
-            $data = $name;
-        }
-
-        // Symfony
-        if (str_starts_with($data, 'Symfony\\')) {
-            return 'https://symfony.com/doc/current/index.html';
-        }
-
-        // Reference or guide
-        if (file_exists($data)) {
+        // reference or guide
+        if (\is_string($data) && file_exists($data)) {
             return str_replace([
                 $this->configuration->get('references.output'),
                 $this->configuration->get('guides.output'),
@@ -130,6 +96,54 @@ class MarkdownExtension extends AbstractExtension
                 $this->configuration->get('references.base_url'),
                 $this->configuration->get('guides.base_url'),
             ], $data);
+        }
+
+        // try to convert $data to ClassParser
+        if (\is_string($data)) {
+            try {
+                $data = new ClassParser(new ReflectionClass($data));
+            } catch (ReflectionException) {
+            }
+        }
+
+        $name = \is_object($data) ? $data->getName() : $data;
+
+        if ($data instanceof Node) {
+            $nodeType = $data->getNode()->type;
+
+            if ($nodeType instanceof UnionTypeNode || $nodeType instanceof IntersectionTypeNode) {
+                throw new RuntimeException(sprintf('Unable to get a single url of multiple types for type "%s".', $data::class));
+            }
+
+            return $this->getUrl($nodeType->__toString(), $extension);
+        }
+
+        if ($data instanceof TypeParser && $data->isClass()) {
+            $data = $data->getClass();
+        }
+
+        if ($data instanceof ClassParser) {
+            // PHP
+            if (!$data->isUserDefined()) {
+                return sprintf('https://php.net/class.%s', strtolower($name));
+            }
+
+            // internal
+            if (str_starts_with($name, $this->configuration->get('references.namespace').'\\')) {
+                // calling ConfigurationHandler::isExcluded to ensure the target class is not ignored
+                // from references generation because the target reference file may not exist yet
+                if (!$this->configuration->isExcluded($data)) {
+                    $file = new SplFileInfo($data->getFileName());
+
+                    // get relative file path without extension (e.g.: Entity/Book)
+                    $fileName = trim(sprintf('%s/%s', str_replace(sprintf('%s/%s', getcwd(), $this->configuration->get('references.src')), '', $file->getPath()), $file->getBasename('.'.$file->getExtension())), '/');
+
+                    // get reference file path (e.g.: pages/references/Entity/Book.md)
+                    $filePath = sprintf('%s/%s.%s', $this->configuration->get('references.output'), $fileName, $extension);
+
+                    return $this->getUrl($filePath, $extension);
+                }
+            }
         }
 
         return null;

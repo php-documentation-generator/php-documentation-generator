@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Parser;
 
+use LogicException;
 use ReflectionClass;
 use ReflectionIntersectionType;
 use ReflectionNamedType;
@@ -49,7 +50,12 @@ final class TypeParser extends AbstractParser
     {
         $reflection = $this->getReflection();
 
-        return $this->isNamed() && !$reflection->isBuiltin() && class_exists($reflection->getName());
+        return $this->isNamed() && !$reflection->isBuiltin() && (class_exists($reflection->getName()) || interface_exists($reflection->getName()));
+    }
+
+    public function getName()
+    {
+        return $this->getReflection()->__toString();
     }
 
     public function getClass(): ?ClassParser
@@ -76,5 +82,10 @@ final class TypeParser extends AbstractParser
     public function getReflection(): ReflectionType
     {
         return $this->reflection;
+    }
+
+    protected function getClassName(): string
+    {
+        throw new LogicException(sprintf('Method "%s" should not be called.', __METHOD__));
     }
 }

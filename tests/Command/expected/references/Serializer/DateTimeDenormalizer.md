@@ -1,10 +1,10 @@
-# \PhpDocumentGenerator\Tests\Command\App\Serializer\DateTimeDenormalizer
+# PhpDocumentGenerator\Tests\Command\App\Serializer\DateTimeDenormalizer
 
 ### Implements:
 
-> [`Symfony\Component\Serializer\Normalizer\DenormalizerInterface`](https://symfony.com/doc/current/index.html)
+> `Symfony\Component\Serializer\Normalizer\DenormalizerInterface`
 >
-> [`Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface`](https://symfony.com/doc/current/index.html)
+> `Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface`
 >
 > `PhpDocumentGenerator\Tests\Command\App\Services\IgnoredInterface`
 
@@ -14,13 +14,17 @@
 
 Types:
 
-> `DenormalizerInterface`
+> `Symfony\Component\Serializer\Normalizer\DenormalizerInterface`
 
 ## Methods:
 
-### <a href="#method-denormalize" id="method-denormalize">§</a> public function denormalize($data, string $type, ?string $format``, array $context`[]`): `DateTimeInterface`
+### <a href="#method-denormalize" id="method-denormalize">§</a> public function denormalize($data, `string` $type, `?string` $format, `array` $context = `[]`): [`DateTimeInterface`](https://php.net/class.datetimeinterface)
+
+This method throws multiple exception and returns multiple types to ensure the types are correctly imported.
 
 Denormalizes data back into an object of the given class.
+
+Also, the parent documentation should be placed in the middle of this method documentation.
 
 Additional info:
 
@@ -35,28 +39,34 @@ Additional info:
 Returns:
 
 > `mixed`
+>
+> `string`|[`stdClass`](https://php.net/class.stdclass)|[`DateTimeInterface`](https://php.net/class.datetimeinterface)
+>
+> `array<int, DateTimeInterface>`
 
 Throws:
 
-> [`BadMethodCallException`](https://php.net/class.badmethodcallexception) Occurs when the normalizer is not called in an expected context
+> `Symfony\Component\Serializer\Exception\BadMethodCallException` Occurs when the normalizer is not called in an expected context
 >
-> [`InvalidArgumentException`](https://php.net/class.invalidargumentexception) Occurs when the arguments are not coherent or not supported
+> `Symfony\Component\Serializer\Exception\InvalidArgumentException` Occurs when the arguments are not coherent or not supported
 >
-> [`UnexpectedValueException`](https://php.net/class.unexpectedvalueexception) Occurs when the item cannot be hydrated with the given data
+> `Symfony\Component\Serializer\Exception\UnexpectedValueException` Occurs when the item cannot be hydrated with the given data
 >
-> `ExtraAttributesException` Occurs when the item doesn't have attribute to receive given data
+> `Symfony\Component\Serializer\Exception\ExtraAttributesException` Occurs when the item doesn't have attribute to receive given data
 >
-> [`LogicException`](https://php.net/class.logicexception) Occurs when the normalizer is not supposed to denormalize
+> `Symfony\Component\Serializer\Exception\LogicException` Occurs when the normalizer is not supposed to denormalize
 >
-> [`RuntimeException`](https://php.net/class.runtimeexception) Occurs if the class cannot be instantiated
+> `Symfony\Component\Serializer\Exception\RuntimeException` Occurs if the class cannot be instantiated
 >
-> `ExceptionInterface` Occurs for all the other cases of errors
+> `Symfony\Component\Serializer\Exception\ExceptionInterface` Occurs for all the other cases of errors
 >
-> `NotNormalizableValueException`
+> `Symfony\Component\Serializer\Exception\NotNormalizableValueException`|[`RuntimeException`](https://php.net/class.runtimeexception)|`string`
+>
+> [`LogicException`](https://php.net/class.logicexception)
 
 ---
 
-### <a href="#method-supportsDenormalization" id="method-supportsDenormalization">§</a> public function supportsDenormalization($data, string $type, ?string $format``, array $context`[]`): `bool`
+### <a href="#method-supportsDenormalization" id="method-supportsDenormalization">§</a> public function supportsDenormalization($data, `string` $type, `?string` $format, `array` $context = `[]`): `bool`
 
 Checks whether the given class is supported for denormalization by this normalizer.
 
@@ -76,4 +86,4 @@ Returns:
 
 ---
 
-### <a href="#method-setDenormalizer" id="method-setDenormalizer">§</a> public function setDenormalizer(Symfony\Component\Serializer\Normalizer\DenormalizerInterface $denormalizer)
+### <a href="#method-setDenormalizer" id="method-setDenormalizer">§</a> public function setDenormalizer(`Symfony\Component\Serializer\Normalizer\DenormalizerInterface` $denormalizer)

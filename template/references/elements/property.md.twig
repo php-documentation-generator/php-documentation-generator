@@ -1,16 +1,16 @@
 {% block property %}
-### <a href="#property-{{ property.name }}" id="property-{{ property.name }}">§</a> {{ property.modifier }}{% if property.hasType %} {{ property.type }}{% endif %} ${{ property.name }}{% if property.hasDefaultValue and property.defaultValue|length > 0 %} = `{{ property.defaultValue|md_value }}`{% endif %}
+### <a href="#property-{{ property.name }}" id="property-{{ property.name }}">§</a> {{ property.modifier }}{% if property.hasType %} {{ property.type|md_link|raw }}{% endif %} ${{ property.name }}{% if property.hasDefaultValue and property.defaultValue|length > 0 %} = `{{ property.defaultValue|md_value }}`{% endif %}
 
-{% if property.summary|md_sanitize|raw|length > 0 %}
+{% if property.docComment|md_sanitize|raw|length > 0 %}
 
-{{ property.summary|md_sanitize|raw }}
+{{ property.docComment|md_sanitize|raw }}
 
 {% endif %}
-{% if property.additionalTypes|length > 0 %}
+{% if property.additionalTypes %}
 
 Types:
 
-> {{ property.additionalTypes|md_link }}
+> {{ property.additionalTypes|md_link|raw }}
 {% endif %}
 {% if property.accessors|length > 0 %}
 

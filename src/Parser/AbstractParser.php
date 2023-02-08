@@ -14,9 +14,15 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Parser;
 
 use LogicException;
+use PhpDocumentGenerator\Services\PhpStanTypeHelper;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
+use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
+use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser;
+use Symfony\Component\PropertyInfo\PhpStan\NameScopeFactory;
+use Symfony\Component\PropertyInfo\Type;
 
 abstract class AbstractParser implements ParserInterface
 {
@@ -51,37 +57,15 @@ abstract class AbstractParser implements ParserInterface
 
     public function getDocComment(): string|false
     {
-        $reflection = $this->getReflection();
-
-        if (!\is_callable([$reflection, 'getDocComment'])) {
-            throw new LogicException(sprintf('Method "%s::getDocComment" is not callable.', $reflection::class));
-        }
-
-        if (false === ($docComment = $reflection->getDocComment())) {
+        if (!$docComment = $this->getPhpDoc()->__toString()) {
             return false;
         }
-
-        // inheritdoc
-        if ($docComment && str_contains($docComment, '@inheritdoc')) {
-            $docComment = $this->inheritDoc($docComment);
-        }
-
-        // todo check "@see" tags to import absolute namespace if available (/!\ PHPStan does not resolve imports)
-
-        return $docComment;
-    }
-
-    public function getSummary(): string|false
-    {
-        if (!$docComment = $this->getDocComment()) {
-            return false;
-        }
-
-        // remove tags (including "@SuppressWarnings(...)")
-        $docComment = preg_replace('/@[a-zA-Z]+(?:(?:\s+.+)|(?:\(".+"\)))/', '', $docComment);
 
         // remove PHP comment syntax
-        return trim(preg_replace('#[\/ ]{0,}\*{1,2} ?\/?#i', '', $docComment));
+        $docComment = trim(preg_replace('#[\/ ]{0,}\*{1,2} ?\/?#', '', $docComment));
+
+        // remove tags (including "@SuppressWarnings(...)")
+        return trim(preg_replace('/@[a-zA-Z]+(?:(?:\s+.+)|(?:\(".+"\)))(?:\n+)?/', '', $docComment));
     }
 
     public function getPhpDoc(): PhpDocNode
@@ -94,11 +78,30 @@ abstract class AbstractParser implements ParserInterface
             $this->parser = new Parser\PhpDocParser(new Parser\TypeParser(new Parser\ConstExprParser()), new Parser\ConstExprParser());
         }
 
-        $docComment = $this->getDocComment();
-        if (!$docComment) {
+        $reflection = $this->getReflection();
+        if (!$docComment = $reflection->getDocComment()) {
             return new PhpDocNode([]);
         }
 
+        $tokens = new Parser\TokenIterator($this->lexer->tokenize($docComment));
+        $phpDoc = $this->parser->parse($tokens);
+        $tokens->consumeTokenType(Lexer::TOKEN_END);
+        $docComment = $phpDoc->__toString();
+
+        // replace tags
+        $docComment = $this->replaceTag($phpDoc->getThrowsTagValues(), '@throws', $docComment);
+        $docComment = $this->replaceTag($phpDoc->getReturnTagValues(), '@return', $docComment);
+        $docComment = $this->replaceTag($phpDoc->getVarTagValues(), '@var', $docComment);
+        $docComment = $this->replaceTag($phpDoc->getParamTagValues(), '@param', $docComment);
+        $docComment = $this->replaceTag($phpDoc->getExtendsTagValues(), '@extends', $docComment);
+        $docComment = $this->replaceTag($phpDoc->getImplementsTagValues(), '@implements', $docComment);
+
+        // inheritdoc
+        if (str_contains($docComment, '@inheritdoc') && ($inheritdoc = $this->getParentDoc())) {
+            $docComment = preg_replace('/{?@inheritdoc}?/', preg_replace('/(?:\/\*\*(?:\n *\*)? )|(\n? *\*\/)/', '', $inheritdoc), $docComment);
+        }
+
+        // Parse docComment after its modifications
         $tokens = new Parser\TokenIterator($this->lexer->tokenize($docComment));
         $phpDoc = $this->parser->parse($tokens);
         $tokens->consumeTokenType(Lexer::TOKEN_END);
@@ -106,8 +109,56 @@ abstract class AbstractParser implements ParserInterface
         return $phpDoc;
     }
 
-    protected function inheritDoc(string $docComment): string
+    protected function getParentDoc(): ?string
     {
+        return null;
+    }
+
+    protected function getClassName(): string
+    {
+        return $this->getReflection()->getDeclaringClass()->getName();
+    }
+
+    /**
+     * @param PhpDocTagValueNode[] $nodes
+     */
+    private function replaceTag(array $nodes, string $tag, string $docComment): string
+    {
+        $helper = new PhpStanTypeHelper();
+        $namedFactory = new NameScopeFactory();
+        $class = $this->getClassName();
+
+        foreach ($nodes as $node) {
+            $types = $helper->getTypes($node, $namedFactory->create($class));
+
+            // no valid types found
+            // node is not typed
+            // node is generic
+            if (!$types || !isset($node->type) || $node->type instanceof GenericTypeNode) {
+                continue;
+            }
+
+            $nodeType = $node->type;
+
+            if (1 === \count($types)) {
+                $type = $types[0];
+                $docComment = preg_replace(
+                    sprintf('/%s %s/', $tag, preg_quote($nodeType->__toString())),
+                    sprintf('%s %s', $tag, $type->getClassName() ?: $type->getBuiltinType()),
+                    $docComment
+                );
+                continue;
+            }
+
+            // Foo|Bar => App\Foo|App\Bar
+            // Foo&Bar => App\Foo&App\Bar
+            $docComment = preg_replace(
+                sprintf('/%s %s/', $tag, preg_quote($nodeType->__toString())),
+                sprintf('%s %s', $tag, implode($nodeType instanceof UnionTypeNode ? '|' : '&', array_map(fn (Type $node) => $node->getClassName() ?: $node->getBuiltinType(), $types))),
+                $docComment
+            );
+        }
+
         return $docComment;
     }
 }

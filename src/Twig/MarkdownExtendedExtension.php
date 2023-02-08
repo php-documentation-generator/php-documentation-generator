@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Twig;
 
+use PhpDocumentGenerator\Parser\Ast\Node;
+use PhpDocumentGenerator\Parser\ClassParser;
 use PhpDocumentGenerator\Parser\ParserInterface;
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
+use PhpDocumentGenerator\Parser\TypeParser;
 use Twig\TwigFilter;
 
 class MarkdownExtendedExtension extends MarkdownExtension
@@ -28,14 +30,14 @@ class MarkdownExtendedExtension extends MarkdownExtension
         ];
     }
 
-    public function getLink(ParserInterface|PhpDocTagValueNode|string $data, string $referenceExtension = 'mdx'): string
+    public function getLink(ParserInterface|Node|string $data, string $extension = 'mdx'): string
     {
-        return parent::getLink($data, $referenceExtension);
+        return parent::getLink($data, $extension);
     }
 
-    public function getUrl(ParserInterface|PhpDocTagValueNode|string $data, string $referenceExtension = 'mdx'): ?string
+    public function getUrl(ClassParser|TypeParser|Node|string $data, string $extension = 'mdx'): ?string
     {
-        return parent::getUrl($data, $referenceExtension);
+        return parent::getUrl($data, $extension);
     }
 
     public function sanitize(string $string): string

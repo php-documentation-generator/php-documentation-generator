@@ -1,15 +1,15 @@
-# \PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
+# PhpDocumentGenerator\Tests\Command\App\Controller\IndexController
 
 ### Extends:
 
-> [`Symfony\Bundle\FrameworkBundle\Controller\AbstractController`](https://symfony.com/doc/current/index.html)
+> `Symfony\Bundle\FrameworkBundle\Controller\AbstractController`
 
 ### Implements:
 
-> [`Symfony\Contracts\Service\ServiceSubscriberInterface`](https://symfony.com/doc/current/index.html)
+> `Symfony\Contracts\Service\ServiceSubscriberInterface`
 
 ## Methods:
 
-### <a href="#method-__invoke" id="method-__invoke">§</a> public function __invoke(): [`Symfony\Component\HttpFoundation\Response`](https://symfony.com/doc/current/index.html)
+### <a href="#method-__invoke" id="method-__invoke">§</a> public function __invoke(): `Symfony\Component\HttpFoundation\Response`
 
 Renders an index.
