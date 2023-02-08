@@ -1,11 +1,11 @@
-## PhpDocumentGenerator\Tests\Command\App\Serializer
+## PhpDocumentGenerator\Tests\Command\App\Controller
 
-* [`DateTimeDenormalizer`](/pages/references/Serializer/DateTimeDenormalizer.md)
+* [`IndexController`](/pages/references/Controller/IndexController.md)
 
 ## PhpDocumentGenerator\Tests\Command\App\DependencyInjection
 
 * [`Configuration`](/pages/references/DependencyInjection/Configuration.md)
 
-## PhpDocumentGenerator\Tests\Command\App\Controller
+## PhpDocumentGenerator\Tests\Command\App\Serializer
 
-* [`IndexController`](/pages/references/Controller/IndexController.md)
+* [`DateTimeDenormalizer`](/pages/references/Serializer/DateTimeDenormalizer.md)

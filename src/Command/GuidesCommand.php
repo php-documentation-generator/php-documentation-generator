@@ -57,15 +57,22 @@ final class GuidesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $guideDir = $input->getOption('directory') ?? $this->configuration->get('guides.src');
+        $files = (new Finder())->files()->in($guideDir)->sortByName();
         $style = new SymfonyStyle($input, $output);
 
-        $guideDir = $input->getOption('directory') ?? $this->configuration->get('guides.src');
+        if (!\count($files)) {
+            $style->getErrorStyle()->warning(sprintf('No files were found in "%s".', $guideDir));
+
+            return self::INVALID;
+        }
+
         $template = $input->getOption('template');
         $out = $input->getArgument('output') ?: $this->configuration->get('guides.output');
 
         $guideExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
 
-        foreach ((new Finder())->files()->in($guideDir) as $file) {
+        foreach ($files as $file) {
             $input = new ArrayInput([
                 'filename' => $file->getPathName(),
                 '--output' => Path::changeExtension(sprintf('%s%s%s', rtrim($out, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $file->getBaseName()), $guideExtension),

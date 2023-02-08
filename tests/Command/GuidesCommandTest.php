@@ -16,18 +16,36 @@ namespace PhpDocumentGenerator\Tests\Command;
 use PhpDocumentGenerator\Kernel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
 class GuidesCommandTest extends KernelTestCase
 {
-    private ApplicationTester $tester;
-
     protected static function getKernelClass(): string
     {
         return Kernel::class;
     }
 
-    protected function setUp(): void
+    public function testItReturnsAWarningIfNoFilesWereFound(): void
+    {
+        putenv('PDG_CONFIG_FILE=tests/Command/empty.config.yaml');
+
+        $kernel = self::bootKernel();
+        /** @var Application $application */
+        $application = $kernel->getContainer()->get(Application::class);
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+        @mkdir('/tmp/pdg/empty', 0777, true);
+
+        $tester->run([
+            'command' => 'guides',
+        ]);
+
+        $this->assertEquals(Command::INVALID, $tester->getStatusCode());
+        $this->assertStringContainsString('No files were found in "/tmp/pdg/empty".', $tester->getDisplay(true));
+    }
+
+    public function testItOutputsEachReferenceInAFile(): void
     {
         putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
 
@@ -35,19 +53,16 @@ class GuidesCommandTest extends KernelTestCase
         /** @var Application $application */
         $application = $kernel->getContainer()->get(Application::class);
         $application->setAutoExit(false);
-        $this->tester = new ApplicationTester($application);
-    }
+        $tester = new ApplicationTester($application);
 
-    public function testItOutputsEachReferenceInAFile(): void
-    {
         $output = '/tmp/pdg/guides';
-        $this->tester->run([
+        $tester->run([
             'command' => 'guides',
             'output' => $output,
             '--directory' => 'tests/Command/guides',
         ]);
 
-        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
+        $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));
         $this->assertFileEquals(
             'tests/Command/expected/guides/use-doctrine.md',
             sprintf('%s/use-doctrine.md', $output)
@@ -56,11 +71,19 @@ class GuidesCommandTest extends KernelTestCase
 
     public function testItOutputsEachReferenceInAFileUsingConfiguration(): void
     {
-        $this->tester->run([
+        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
+
+        $kernel = self::bootKernel();
+        /** @var Application $application */
+        $application = $kernel->getContainer()->get(Application::class);
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+
+        $tester->run([
             'command' => 'guides',
         ]);
 
-        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
+        $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));
         $this->assertFileEquals(
             'tests/Command/expected/guides/use-doctrine.md',
             'tests/Command/pages/guides/use-doctrine.md'
