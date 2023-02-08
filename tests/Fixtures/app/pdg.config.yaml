@@ -11,5 +11,6 @@ pdg:
     output: 'pages/references'
     base_url: '/pages/references'
   guides:
+    src: 'guides'
     output: 'pages/guides'
     base_url: '/pages/guides'
