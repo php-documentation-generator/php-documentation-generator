@@ -38,7 +38,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
             ->setDescription('Creates references documentation for PHP classes')
             ->addArgument(
                 name: 'output',
-                mode: InputArgument::REQUIRED,
+                mode: InputArgument::OPTIONAL,
                 description: 'The path where the references will be printed'
             )
             ->addOption(
@@ -52,7 +52,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $template = $input->getOption('template');
-        $out = $input->getArgument('output');
+        $out = $input->getArgument('output') ?: $this->configuration->get('references.output');
 
         // get the output extension for a reference
         $referenceExtension = pathinfo(preg_replace('/\.twig$/i', '', $template), \PATHINFO_EXTENSION);

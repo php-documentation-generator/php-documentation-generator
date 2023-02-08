@@ -39,7 +39,7 @@ final class GuidesCommand extends Command
             ->setDescription('Creates Guides based on PHP code')
             ->addArgument(
                 name: 'output',
-                mode: InputArgument::REQUIRED,
+                mode: InputArgument::OPTIONAL,
                 description: 'The path where the guides will be printed'
             )
             ->addOption(
@@ -61,7 +61,7 @@ final class GuidesCommand extends Command
 
         $guideDir = $input->getOption('directory') ?? $this->configuration->get('guides.src');
         $template = $input->getOption('template');
-        $out = $input->getArgument('output');
+        $out = $input->getArgument('output') ?: $this->configuration->get('guides.output');
 
         $guideExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
 

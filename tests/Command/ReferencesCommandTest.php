@@ -40,7 +40,7 @@ final class ReferencesCommandTest extends KernelTestCase
 
     public function testItOutputsEachReferenceInAFile(): void
     {
-        $output = 'tests/Command/pages/references';
+        $output = '/tmp/pdg/references';
         $this->tester->run([
             'command' => 'references',
             'output' => $output,
@@ -50,6 +50,19 @@ final class ReferencesCommandTest extends KernelTestCase
         $this->assertFileEquals(
             'tests/Command/expected/references/Controller/IndexController.md',
             sprintf('%s/Controller/IndexController.md', $output)
+        );
+    }
+
+    public function testItOutputsEachReferenceInAFileUsingConfiguration(): void
+    {
+        $this->tester->run([
+            'command' => 'references',
+        ]);
+
+        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
+        $this->assertFileEquals(
+            'tests/Command/expected/references/Controller/IndexController.md',
+            'tests/Command/pages/references/Controller/IndexController.md'
         );
     }
 }

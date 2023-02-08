@@ -40,7 +40,7 @@ class GuidesCommandTest extends KernelTestCase
 
     public function testItOutputsEachReferenceInAFile(): void
     {
-        $output = 'tests/Command/pages/guides';
+        $output = '/tmp/pdg/guides';
         $this->tester->run([
             'command' => 'guides',
             'output' => $output,
@@ -51,6 +51,19 @@ class GuidesCommandTest extends KernelTestCase
         $this->assertFileEquals(
             'tests/Command/expected/guides/use-doctrine.md',
             sprintf('%s/use-doctrine.md', $output)
+        );
+    }
+
+    public function testItOutputsEachReferenceInAFileUsingConfiguration(): void
+    {
+        $this->tester->run([
+            'command' => 'guides',
+        ]);
+
+        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
+        $this->assertFileEquals(
+            'tests/Command/expected/guides/use-doctrine.md',
+            'tests/Command/pages/guides/use-doctrine.md'
         );
     }
 }
