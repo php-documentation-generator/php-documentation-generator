@@ -75,6 +75,12 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
                 description: 'The PSR-4 prefix representing your source directory.',
                 default: $this->configuration->references->namespace
             )
+            ->addOption(
+                name: 'base-url',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The base URL for references.',
+                default: $this->configuration->references->baseUrl
+            )
             ->addArgument(
                 name: 'src',
                 description: 'The source directory',
@@ -89,7 +95,11 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
         $src = Path::canonicalize($input->getArgument('src'));
 
         foreach ($this->getFiles($src, $input->getOption('namespace'), (array) $input->getOption('exclude'), (array) $input->getOption('tags-to-ignore'), (array) $input->getOption('exclude-path')) as $class => $file) {
-            $class = new ClassParser(new ReflectionClass($class));
+            $class = new ClassParser(
+                reflection: new ReflectionClass($class),
+                url: str_replace($src, $input->getOption('base-url'), $file->getPathname())
+            );
+
             $namespaces[$class->getNamespaceName()][] = $class;
         }
 
