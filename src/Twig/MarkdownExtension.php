@@ -46,7 +46,6 @@ class MarkdownExtension extends AbstractExtension
         return [
             new TwigFilter('md_sanitize', [$this, 'sanitize']),
             new TwigFilter('md_link', [$this, 'getLink']),
-            new TwigFilter('md_url', [$this, 'getUrl']),
             new TwigFilter('md_value', [$this, 'formatValue']),
         ];
     }

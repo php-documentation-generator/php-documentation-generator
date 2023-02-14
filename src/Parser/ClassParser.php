@@ -19,8 +19,9 @@ use ReflectionMethod;
 
 final class ClassParser extends AbstractParser
 {
-    public function __construct(private readonly ReflectionClass $reflection)
+    public function __construct(private readonly ReflectionClass $reflection, public readonly ?string $url = null, public ?string $type = null)
     {
+        $this->type = $type ?: $this->getClassType($reflection);
     }
 
     public function hasTag(string $searchedTag): bool
@@ -193,5 +194,22 @@ final class ClassParser extends AbstractParser
         }
 
         return $parentDocComment;
+    }
+
+    private function getClassType(ReflectionClass $refl): string
+    {
+        if ($refl->isInterface()) {
+            return 'I';
+        }
+
+        if (\count($refl->getAttributes('Attribute'))) {
+            return 'A';
+        }
+
+        if ($refl->isTrait()) {
+            return 'T';
+        }
+
+        return 'C';
     }
 }
