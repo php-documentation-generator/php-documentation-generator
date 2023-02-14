@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Command;
 
 use PhpDocumentGenerator\Parser\ClassParser;
-use PhpDocumentGenerator\Services\ConfigurationHandler;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 abstract class AbstractReferencesCommand extends Command
 {
-    public function __construct(private readonly ConfigurationHandler $configuration, ?string $name = null)
+    use CommandTrait;
+
+    public function __construct(?string $name = null)
     {
         parent::__construct($name);
     }
@@ -32,26 +32,24 @@ abstract class AbstractReferencesCommand extends Command
     /**
      * @return array<string, SplFileInfo>
      */
-    protected function getFiles(): array
+    protected function getFiles(string $src, string $namespace, array $exclude = [], array $tagsToIgnore = [], array $excludePath = []): iterable
     {
-        $patterns = $this->configuration->get('references.patterns');
         $files = [];
-
-        foreach ($this->findFiles($patterns['directories'] ?? [], $patterns['names'] ?? ['*.php'], $patterns['exclude'] ?? []) as $file) {
-            $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->get('references.src'));
-            $namespace = rtrim(sprintf('%s\\%s', $this->configuration->get('references.namespace'), str_replace([\DIRECTORY_SEPARATOR, '.php'], ['\\', ''], $relativeToSrc)), '\\');
-            $className = sprintf('%s\\%s', $namespace, $file->getBasename('.php'));
+        foreach ($this->findFiles($src, $exclude, $excludePath) as $file) {
+            $className = $this->getFQDNFromFile($file, $src, $namespace);
 
             try {
-                $reflectionClass = new ClassParser(new ReflectionClass($className));
+                $reflectionClass = new ReflectionClass($className);
+                $classParser = new ClassParser($reflectionClass);
             } catch (\ReflectionException) {
                 throw new RuntimeException(sprintf('File "%s" does not seem to be a valid PHP class.', $file->getPathname()));
             }
 
             // Class has tags to ignore or should be excluded
-            // Exclude interfaces, traits, and classes without protected/public methods and properties
-            if ($this->configuration->isExcluded($reflectionClass)) {
-                continue;
+            foreach ($tagsToIgnore as $tagToIgnore) {
+                if ($classParser->hasTag($tagToIgnore)) {
+                    continue 2;
+                }
             }
 
             $files[$className] = $file;
@@ -60,15 +58,12 @@ abstract class AbstractReferencesCommand extends Command
         return $files;
     }
 
-    private function findFiles(array $directories, array $names, array $exclude): Finder
+    private function findFiles(string $src, array $exclude = [], array $excludePath = []): Finder
     {
-        if (!$directories) {
-            $directories = [''];
-        }
-
         return (new Finder())->files()
-            ->in(array_map(fn (string $directory) => $this->configuration->get('references.src').\DIRECTORY_SEPARATOR.$directory, $directories))
-            ->name($names)
+            ->in($src)
+            ->name('*.php')
+            ->notPath($excludePath)
             ->notName($exclude)
             ->sortByName();
     }

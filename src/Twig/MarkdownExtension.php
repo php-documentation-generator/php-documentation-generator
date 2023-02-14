@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Twig;
 
+use PhpDocumentGenerator\Configuration;
 use PhpDocumentGenerator\Parser\Ast\Node;
 use PhpDocumentGenerator\Parser\ClassParser;
 use PhpDocumentGenerator\Parser\ParserInterface;
 use PhpDocumentGenerator\Parser\TypeParser;
-use PhpDocumentGenerator\Services\ConfigurationHandler;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
@@ -35,7 +35,7 @@ class MarkdownExtension extends AbstractExtension
     protected readonly Lexer $lexer;
     protected readonly Parser\PhpDocParser $parser;
 
-    public function __construct(protected readonly ConfigurationHandler $configuration)
+    public function __construct(protected readonly Configuration $configuration)
     {
         $this->lexer = new Lexer();
         $this->parser = new Parser\PhpDocParser(new Parser\TypeParser(new Parser\ConstExprParser()), new Parser\ConstExprParser());
@@ -90,11 +90,11 @@ class MarkdownExtension extends AbstractExtension
         // reference or guide
         if (\is_string($data) && file_exists($data)) {
             return str_replace([
-                $this->configuration->get('references.output'),
-                $this->configuration->get('guides.output'),
+                $this->configuration->references->output,
+                $this->configuration->guides->output,
             ], [
-                $this->configuration->get('references.base_url'),
-                $this->configuration->get('guides.base_url'),
+                $this->configuration->references->baseUrl,
+                $this->configuration->guides->baseUrl,
             ], $data);
         }
 
@@ -129,17 +129,20 @@ class MarkdownExtension extends AbstractExtension
             }
 
             // internal
-            if (str_starts_with($name, $this->configuration->get('references.namespace').'\\')) {
-                // calling ConfigurationHandler::isExcluded to ensure the target class is not ignored
+            if (str_starts_with($name, $this->configuration->references->namespace.'\\')) {
+                // calling isExcluded to ensure the target class is not ignored
                 // from references generation because the target reference file may not exist yet
-                if (!$this->configuration->isExcluded($data)) {
+
+                if (!$this->isExcluded($data, $this->configuration->references->tagsToIgnore, $this->configuration->references->exclude)) {
                     $file = new SplFileInfo($data->getFileName());
 
+                    // TODO: should use Path::makeRelative
                     // get relative file path without extension (e.g.: Entity/Book)
-                    $fileName = trim(sprintf('%s/%s', str_replace(sprintf('%s/%s', getcwd(), $this->configuration->get('references.src')), '', $file->getPath()), $file->getBasename('.'.$file->getExtension())), '/');
+                    $fileName = trim(sprintf('%s/%s', str_replace(sprintf('%s/%s', getcwd(), $this->configuration->references->src), '', $file->getPath()), $file->getBasename('.'.$file->getExtension())), '/');
 
+                    // TODO: should use Path::makeAbsolute or Path::join
                     // get reference file path (e.g.: pages/references/Entity/Book.md)
-                    $filePath = sprintf('%s/%s.%s', $this->configuration->get('references.output'), $fileName, $extension);
+                    $filePath = sprintf('%s/%s.%s', $this->configuration->references->output, $fileName, $extension);
 
                     return $this->getUrl($filePath, $extension);
                 }
@@ -170,8 +173,27 @@ class MarkdownExtension extends AbstractExtension
         return $string;
     }
 
-    public function formatValue($value)
+    public function formatValue($value): mixed
     {
         return \is_array($value) ? json_encode($value) : $value;
+    }
+
+    private function isExcluded(ClassParser $classParser, array $tagsToIgnore = [], array $excluded = []): bool
+    {
+        foreach ($tagsToIgnore as $tagToIgnore) {
+            if ($classParser->hasTag($tagToIgnore)) {
+                return true;
+            }
+        }
+
+        if (\function_exists('fnmatch')) {
+            foreach ($excluded as $excludePattern) {
+                if (fnmatch($excludePattern, $classParser->getFileName())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

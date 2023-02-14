@@ -59,7 +59,7 @@ class GuidesCommandTest extends KernelTestCase
         $tester->run([
             'command' => 'guides',
             'output' => $output,
-            '--directory' => 'tests/Command/guides',
+            'directory' => 'tests/Command/guides',
         ]);
 
         $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));

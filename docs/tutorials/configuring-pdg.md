@@ -5,35 +5,33 @@ and `pdg.config.dist.yml` files.
 
 > Note: the configuration file name can be overridden using the `PDG_CONFIG_FILE` environment variable.
 
-Check for the default configuration:
+The configuration may look like this:
 
 ```yaml
 pdg:
-    # Project autoload
+    # Project autoload for tests
     autoload: 'vendor/autoload.php'
-    # References configuration
-    reference:
-        # Root path for code parsing
+    references:
+        # Root of the source code, used for resolving a namespace based on the file path
         src: 'src'
         # Root namespace
         namespace: 'App'
-        patterns:
-            # Directories to parse (supports pattern syntax)
-            directories: [ '' ]
-            # File names to parse (supports pattern syntax)
-            names: [ '*.php' ]
-            # Files or directories to ignore (supports pattern syntax)
-            exclude: [ ]
-            # PHP tags to ignore
-            class_tags_to_ignore: [ '@internal', '@experimental' ]
-    target:
-        directories:
-            # Path to output generated reference files
-            reference_path: 'docs/reference'
-            # Path to output generated guide files
-            guide_path: 'docs/guide'
-        # Base url for link generation (e.g.: `/docs`, `docs`, `https://github.com/foo/bar/blob/main/docs/docs/`)
-        base_url: '/docs'
+        # Exclude glob pattern on file names
+        exclude: ['*Factory.php']
+        # Exclude paths, relative to src/
+        exclude_paths: ['Model']
+        tags_to_ignore: ['@experimental', '@internal', '@ignore']
+        # Output for the "references" command
+        output: 'docs/references'
+        # Base URL for references linking
+        base_url: '/docs/references'
+    guides:
+        # Source for the "guides" command
+        src: 'guides'
+        # Output for the "guides" command
+        output: 'docs/guides'
+        # Base URL for guides linking
+        base_url: '/docs/guides'
 ```
 
 ---

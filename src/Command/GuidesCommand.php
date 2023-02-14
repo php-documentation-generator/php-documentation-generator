@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use PhpDocumentGenerator\Services\ConfigurationHandler;
+use PhpDocumentGenerator\Configuration;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -27,7 +28,7 @@ use Symfony\Component\Finder\Finder;
 final class GuidesCommand extends Command
 {
     public function __construct(
-        private readonly ConfigurationHandler $configuration,
+        private readonly Configuration $configuration,
         private readonly string $defaultTemplate
     ) {
         parent::__construct(name: 'guides');
@@ -36,54 +37,81 @@ final class GuidesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Creates Guides based on PHP code')
+            ->setDescription('Creates Guides based on PHP code.')
             ->addArgument(
                 name: 'output',
                 mode: InputArgument::OPTIONAL,
-                description: 'The path where the guides will be printed'
+                description: 'The path where the guides will be printed.',
+                default: $this->configuration->guides->output
+            )
+            ->addArgument(
+                name: 'directory',
+                mode: InputArgument::OPTIONAL,
+                description: 'The path to the directory that contains the guides.',
+                default: $this->configuration->guides->src
             )
             ->addOption(
                 name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the template file to use to generate each guide',
+                description: 'The path to the template file to use to generate each guide.',
                 default: $this->defaultTemplate
-            )
-            ->addOption(
-                name: 'directory',
-                mode: InputOption::VALUE_OPTIONAL,
-                description: 'The path to the directory that contains the guides',
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $guideDir = $input->getOption('directory') ?? $this->configuration->get('guides.src');
-        $files = (new Finder())->files()->in($guideDir)->sortByName();
         $style = new SymfonyStyle($input, $output);
+        $stderr = $style->getErrorStyle();
+        $guideDir = $input->getArgument('directory');
 
-        if (!\count($files)) {
-            $style->getErrorStyle()->warning(sprintf('No files were found in "%s".', $guideDir));
+        if (!$guideDir) {
+            $stderr->error('No guides directory.');
 
             return self::INVALID;
         }
 
-        $template = $input->getOption('template');
-        $out = $input->getArgument('output') ?: $this->configuration->get('guides.output');
+        $files = (new Finder())->files()->in($guideDir)->sortByName();
 
+        if (!\count($files)) {
+            $stderr->warning(sprintf('No files were found in "%s".', $guideDir));
+
+            return self::INVALID;
+        }
+
+        $progressBar = $output->isDebug() ? null : $style->createProgressBar(\count($files));
+        $progressBar?->start();
+
+        $template = $input->getOption('template');
+        $out = $input->getArgument('output');
+
+        if (!($application = $this->getApplication())) {
+            throw new RuntimeException('No Application.');
+        }
+
+        $guideCommand = $application->find('guide');
         $guideExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
 
         foreach ($files as $file) {
+            $target = Path::changeExtension(Path::join($out, $file->getBaseName()), $guideExtension);
             $input = new ArrayInput([
                 'filename' => $file->getPathName(),
-                '--output' => Path::changeExtension(sprintf('%s%s%s', rtrim($out, \DIRECTORY_SEPARATOR), \DIRECTORY_SEPARATOR, $file->getBaseName()), $guideExtension),
+                '--output' => $target,
                 '--template' => $template,
+                '--quiet' => true,
             ]);
-            if (self::FAILURE === $this->getApplication()?->find('guide')->run($input, $output)) {
-                $style->getErrorStyle()->error(sprintf('Failed creating guide "%s".', $file->getPathname()));
+
+            $stderr->writeln(sprintf('Processing %s => %s', $file->getBaseName(), $target), OutputInterface::VERBOSITY_DEBUG);
+
+            if (self::FAILURE === $guideCommand->run($input, $output)) {
+                $stderr->error(sprintf('Failed creating guide "%s".', $file->getPathname()));
 
                 return self::FAILURE;
             }
+
+            $progressBar?->advance(1);
         }
+
+        $progressBar?->finish();
 
         return self::SUCCESS;
     }

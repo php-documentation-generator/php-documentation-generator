@@ -3,11 +3,8 @@ pdg:
   references:
     src: '../src'
     namespace: 'ApiPlatform'
-    patterns:
-      directories: ['Metadata', 'OpenApi/Model']
-      names: ["*Interface.php", "*Trait.php", "Configuration.php"]]
-      exclude: ['*Factory.php']
-      class_tags_to_ignore: ['@experimental', '@internal']
+    exclude: ['*Factory.php']
+    class_tags_to_ignore: ['@experimental', '@internal', '@ignore']
     output: 'pages/references'
     base_url: '/pages/references'
   guides:

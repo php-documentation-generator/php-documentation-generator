@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
+use PhpDocumentGenerator\Configuration;
 use PhpDocumentGenerator\Parser\ClassParser;
-use PhpDocumentGenerator\Services\ConfigurationHandler;
 use ReflectionClass;
 use SplFileInfo;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -32,10 +32,11 @@ final class ReferenceCommand extends Command
     use CommandTrait;
 
     public function __construct(
-        private readonly ConfigurationHandler $configuration,
-        private readonly Environment $environment,
+        private readonly Configuration $configuration,
+        Environment $environment,
         private readonly string $defaultTemplate
     ) {
+        $this->environment = $environment;
         parent::__construct(name: 'reference');
     }
 
@@ -47,13 +48,24 @@ final class ReferenceCommand extends Command
             ->addOption(
                 name: 'output',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the file where the reference will be printed. Leave empty for screen printing'
+                description: 'The path to the file where the reference will be printed. Defaults to stdout.'
             )
             ->addOption(
                 name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
-                description: 'The path to the template file to use to generate the reference',
+                description: 'The path to the template file to use to generate the reference.',
                 default: $this->defaultTemplate
+            )->addOption(
+                name: 'namespace',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The PSR-4 prefix representing your source directory.',
+                default: $this->configuration->references->namespace
+            )
+            ->addOption(
+                name: 'src',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The source directory.',
+                default: $this->configuration->references->src
             );
     }
 
@@ -68,7 +80,7 @@ final class ReferenceCommand extends Command
             return self::INVALID;
         }
 
-        $reflectionClass = new ReflectionClass($this->getNamespace($file));
+        $reflectionClass = new ReflectionClass($this->getFQDNFromFile($file, $input->getOption('src'), $input->getOption('namespace')));
 
         $templateContext = ['class' => new ClassParser($reflectionClass)];
 

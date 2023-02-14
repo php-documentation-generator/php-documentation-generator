@@ -88,4 +88,24 @@ final class ReferencesCommandTest extends KernelTestCase
             'tests/Command/pages/references/Controller/IndexController.md'
         );
     }
+
+    public function testSkipPaths(): void
+    {
+        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
+
+        $kernel = self::bootKernel();
+        /** @var Application $application */
+        $application = $kernel->getContainer()->get(Application::class);
+        $application->setAutoExit(false);
+        $tester = new ApplicationTester($application);
+
+        $tester->run([
+            'command' => 'references',
+            '--exclude-path' => 'Serializer/',
+            '-vvv',
+        ]);
+
+        $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));
+        $this->assertStringNotContainsString('Processing tests/Command/src/Serializer/DateTimeDenormalizer.php => tests/Command/pages/references/Serializer/DateTimeDenormalizer.md', $tester->getDisplay(true));
+    }
 }
