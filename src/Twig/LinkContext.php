@@ -11,8 +11,11 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Parser;
+namespace PhpDocumentGenerator\Twig;
 
-interface ParserInterface
+class LinkContext
 {
+    public function __construct(public readonly string $namespace, public readonly string $root, public readonly string $baseUrl)
+    {
+    }
 }

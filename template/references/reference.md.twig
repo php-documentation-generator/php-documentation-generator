@@ -1,7 +1,16 @@
 {% extends 'layout.md.twig' %}
 
+{% block link %}
+{% if class.link %}[{{ class.name }}]({{ class.link }}){% else %}{{ class.name }}
+{% endif %}
+{% endblock %}
+
+{% block types %}
+{% for type in types %}{% if not loop.first %}{{ type.type }}{% endif %}{% with {'class': type} %}{{ block('link') }}{% endwith %}{% endfor %}
+{% endblock %}
+
 {% block title %}
-# {% if configuration is defined %}Configuration Reference{% else %}{{ class.name }}{% endif %}
+# {% if configuration is defined %}Configuration Reference{% else %}{% with {'class': class} %}{{ block('link') }}{% endwith %}{% endif %}{% if class.parentClass %} extends {% with {'class': class.parentClass} %}{{ block('link') }}{% endwith %}{% endif %}{% if class.interfaces|length > 0 %}{% for interface in class.interfaces %}{% if loop.first %} implements {% else %}, {% endif %}{% with {'class': interface} %}{{ block('link') }}{% endwith %}{% endfor %}{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -21,29 +30,10 @@
 {% endblock %}
 
 {% block class %}
-{% if class.docComment|md_sanitize|length > 0 %}
+{% if class.description %}
 
-{{ class.docComment|md_sanitize|raw }}
+{{ class.description|raw }}
 
-{% endif %}
-{% if class.parentClass %}
-
-### Extends:
-
-> {{ class.parentClass|md_link -}}
-
-{% endif %}
-
-{% if class.interfaces|length > 0 %}
-
-### Implements:
-
-{% for interface in class.interfaces %}
-> {{ interface|md_link }}
-{% if not loop.last %}
->
-{% endif %}
-{% endfor %}
 {% endif %}
 {% if class.constants|length > 0 %}
 

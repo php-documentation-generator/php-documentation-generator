@@ -29,7 +29,7 @@ final class ParameterParser extends AbstractParser
         return $reflection->hasType() ? new TypeParser($reflection->getType()) : null;
     }
 
-    public function getAdditionalTypes(): ?Node
+    public function getDocTypes(): ?Node
     {
         $reflection = $this->getReflection();
 

@@ -74,6 +74,12 @@ final class ReferencesCommand extends AbstractReferencesCommand
                 mode: InputOption::VALUE_REQUIRED,
                 description: 'The PSR-4 prefix representing your source directory.',
                 default: $this->configuration->references->namespace
+            )
+            ->addOption(
+                name: 'base-url',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The base URL for references.',
+                default: $this->configuration->references->baseUrl
             );
     }
 
@@ -82,6 +88,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
         $style = new SymfonyStyle($input, $output);
         $stderr = $style->getErrorStyle();
         $template = $input->getOption('template');
+        $baseUrl = $input->getOption('base-url');
 
         if (!$input->getArgument('src') || !$input->getArgument('output')) {
             $stderr->error('Specify "src" and "output" to create references.');
@@ -124,6 +131,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
                     'filename' => $file->getPathName(),
                     '--template' => $template,
                     '--output' => $target,
+                    '--base-url' => $baseUrl,
                     '--quiet' => true,
                 ]), $output)
             ) {

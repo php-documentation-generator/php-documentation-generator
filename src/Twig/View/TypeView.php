@@ -11,8 +11,11 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Parser;
+namespace PhpDocumentGenerator\Twig\View;
 
-interface ParserInterface
+class TypeView
 {
+    public function __construct(public readonly string $name, public readonly ?string $link, public readonly ?string $type = '', public readonly ?string $description = '')
+    {
+    }
 }

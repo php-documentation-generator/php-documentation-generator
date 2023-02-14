@@ -9,25 +9,17 @@
         <!-- Twig -->
         <service id="pdg.twig.loader.filesystem" class="Twig\Loader\FilesystemLoader"/>
 
-        <service id="pdg.twig.extension.markdown" class="PhpDocumentGenerator\Twig\MarkdownExtension">
-            <argument type="service" id="pdg.configuration"/>
+        <service id="pdg.twig.class_view_factory" class="PhpDocumentGenerator\Twig\ClassViewFactory">
+            <argument type="service" id="pdg.services.link_factory" />
         </service>
 
-        <service id="pdg.twig.extension.markdown_extended" class="PhpDocumentGenerator\Twig\MarkdownExtendedExtension">
-            <argument type="service" id="pdg.configuration"/>
-        </service>
+        <service id="pdg.services.link_factory" class="PhpDocumentGenerator\Twig\LinkFactory" />
 
         <service id="pdg.twig" class="Twig\Environment">
             <argument type="service" id="pdg.twig.loader.filesystem"/>
             <argument type="collection">
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
-            <call method="addExtension">
-                <argument type="service" id="pdg.twig.extension.markdown"/>
-            </call>
-            <call method="addExtension">
-                <argument type="service" id="pdg.twig.extension.markdown_extended"/>
-            </call>
         </service>
 
         <!-- Commands -->
@@ -35,6 +27,7 @@
             <argument type="service" id="pdg.configuration"/>
             <argument type="service" id="pdg.twig"/>
             <argument>%kernel.project_dir%/template/references/reference.md.twig</argument>
+            <argument type="service" id="pdg.twig.class_view_factory"/>
             <tag>console.command</tag>
         </service>
 

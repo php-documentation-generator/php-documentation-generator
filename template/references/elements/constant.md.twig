@@ -1,9 +1,14 @@
 {% block constant %}
-### <a href="#constant-{{ constant.name }}" id="constant-{{ constant.name }}">§</a> {{ constant.name|upper }} = `{{ constant.value|md_value }}`
+### <a href="#constant-{{ constant.name }}" id="constant-{{ constant.name }}">§</a> {{ constant.name|upper }} = `{{ constant.value }}`
 
-{% if constant.docComment|md_sanitize|raw|length > 0 %}
+{% if constant.description %}
 
-{{ constant.docComment|md_sanitize|raw }}
+{{ constant.description|raw }}
 
 {% endif %}
+
+{% for link in constant.link %}
+- {{ link }}
+{% endfor %}
+
 {% endblock %}
