@@ -35,7 +35,7 @@ final class ReferencesCommandTest extends KernelTestCase
         $application = $kernel->getContainer()->get(Application::class);
         $application->setAutoExit(false);
         $tester = new ApplicationTester($application);
-        @mkdir('/tmp/pdg/empty', 0777, true);
+        @mkdir('/tmp/pdg/empty', 0755, true);
 
         $tester->run([
             'command' => 'references',

@@ -108,7 +108,7 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
 
         $dirName = pathinfo($out, \PATHINFO_DIRNAME);
         if (!is_dir($dirName)) {
-            mkdir($dirName, 0777, true);
+            mkdir($dirName, 0755, true);
         }
         if (!file_put_contents($out, $content)) {
             $style->getErrorStyle()->error(sprintf('Cannot write in "%s".', $out));
