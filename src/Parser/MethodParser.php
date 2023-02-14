@@ -42,7 +42,7 @@ final class MethodParser extends AbstractParser
         );
     }
 
-    public function getReturnType(): ?TypeParser
+    public function getType(): ?TypeParser
     {
         $reflection = $this->getReflection();
 
@@ -52,9 +52,9 @@ final class MethodParser extends AbstractParser
     /**
      * @return Node[]
      */
-    public function getAdditionalReturnTypes(): array
+    public function getDocReturnTypes(): array
     {
-        return array_map(fn (ReturnTagValueNode $node) => new Node($node), array_unique($this->getPhpDoc()->getReturnTagValues()));
+        return array_map(fn (ReturnTagValueNode $node) => $node, array_unique($this->getPhpDoc()->getReturnTagValues()));
     }
 
     /**
@@ -62,7 +62,7 @@ final class MethodParser extends AbstractParser
      */
     public function getThrowTags(): array
     {
-        return array_map(fn (ThrowsTagValueNode $node) => new Node($node), array_unique($this->getPhpDoc()->getThrowsTagValues()));
+        return array_map(fn (ThrowsTagValueNode $node) => $node, array_unique($this->getPhpDoc()->getThrowsTagValues()));
     }
 
     public function getReflection(): ReflectionMethod
@@ -81,7 +81,7 @@ final class MethodParser extends AbstractParser
         // import docComment from parent class first
         if (
             false !== ($parentClass = $class->getParentClass())
-            && $parentClass->hasMethod($name)
+            && $parentClass->getReflection()->hasMethod($name)
             && ($parentDoc = $parentClass->getMethod($name)->getPhpDoc()->__toString())
         ) {
             return $parentDoc;
@@ -90,7 +90,7 @@ final class MethodParser extends AbstractParser
         // import docComment from interfaces
         foreach ($class->getInterfaces() as $interface) {
             if (
-                $interface->hasMethod($name)
+                $interface->getReflection()->hasMethod($name)
                 && ($interfaceDoc = $interface->getMethod($name)->getPhpDoc()->__toString())
             ) {
                 return $interfaceDoc;

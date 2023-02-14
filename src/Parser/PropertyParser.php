@@ -40,7 +40,7 @@ final class PropertyParser extends AbstractParser
         return $reflection->hasType() ? new TypeParser($reflection->getType()) : null;
     }
 
-    public function getAdditionalTypes(): ?Node
+    public function getDocTypes(): ?Node
     {
         // retrieve "@var" tags from property doc
         if ($varTagValues = $this->getPhpDoc()->getVarTagValues()) {

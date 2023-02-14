@@ -11,8 +11,11 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Parser;
+namespace PhpDocumentGenerator\Twig\View;
 
-interface ParserInterface
+class ConstantView
 {
+    public function __construct(public readonly string $name, public readonly string $value, public readonly string $description, public readonly array $links = [])
+    {
+    }
 }

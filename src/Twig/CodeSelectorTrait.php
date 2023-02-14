@@ -13,40 +13,13 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Twig;
 
-use PhpDocumentGenerator\Parser\Ast\Node;
-use PhpDocumentGenerator\Parser\ClassParser;
-use PhpDocumentGenerator\Parser\ParserInterface;
-use PhpDocumentGenerator\Parser\TypeParser;
-use Twig\TwigFilter;
-
-class MarkdownExtendedExtension extends MarkdownExtension
+// TODO: we could actually do this in twig using a CodeExampleView
+trait CodeSelectorTrait
 {
-    public function getFilters(): array
+    public function handleCodeSelector(string $phpDoc): string
     {
-        return [
-            new TwigFilter('mdx_sanitize', [$this, 'sanitize']),
-            new TwigFilter('mdx_url', [$this, 'getUrl']),
-            new TwigFilter('mdx_link', [$this, 'getLink']),
-        ];
-    }
-
-    public function getLink(ParserInterface|Node|string $data, string $extension = 'mdx'): string
-    {
-        return parent::getLink($data, $extension);
-    }
-
-    public function getUrl(ClassParser|TypeParser|Node|string $data, string $extension = 'mdx'): ?string
-    {
-        return parent::getUrl($data, $extension);
-    }
-
-    public function sanitize(string $string): string
-    {
-        // {@see} breaks mdx as it thinks that it's a React component
-        $string = parent::sanitize($string);
-
         // Handle codeSelector
-        $blocks = preg_split('/(\[codeSelector\][\s\S\w\n]*?\[\/codeSelector\])/', $string, 0, \PREG_SPLIT_DELIM_CAPTURE);
+        $blocks = preg_split('/(\[codeSelector\][\s\S\w\n]*?\[\/codeSelector\])/', $phpDoc, 0, \PREG_SPLIT_DELIM_CAPTURE);
         $string = '';
         foreach ($blocks as $block) {
             if (str_contains($block, 'codeSelector')) {
