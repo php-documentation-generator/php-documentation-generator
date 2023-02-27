@@ -19,7 +19,7 @@ pdg:
         # Exclude glob pattern on file names
         exclude: ['*Factory.php']
         # Exclude paths, relative to src/
-        exclude_paths: ['Model']
+        exclude_path: ['Model']
         tags_to_ignore: ['@experimental', '@internal', '@ignore']
         # Output for the "references" command
         output: 'docs/references'

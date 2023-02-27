@@ -141,7 +141,7 @@ final class ClassParser extends AbstractParser
             // ignore from external class (e.g.: parent class)
             // if it is from a trait, ignore if it is imported in an external class (e.g.: parent class)
             if (
-                '__construct' === $method->getName()
+                $method->isConstructor()
                 || (
                     $reflection->getName() !== ($class = $method->getDeclaringClass())->getName()
                     && !\in_array($class->getName(), $traitsName, true)
@@ -181,17 +181,34 @@ final class ClassParser extends AbstractParser
     /**
      * Import docComment from parent class (not from interfaces).
      */
-    protected function getParentDoc(): ?string
+    protected function getParentDocComment(): ?string
     {
         // ignore from traits
         if (
             $this->getReflection()->isTrait()
             || !($parentClass = $this->getParentClass())
-            || !($parentDocComment = $parentClass->getPhpDoc()->__toString())
+            || !($parentDocComment = $parentClass->getDocComment())
         ) {
             return null;
         }
 
         return $parentDocComment;
+    }
+
+    /**
+     * Import phpDoc from parent class (not from interfaces).
+     */
+    protected function getParentPhpDoc(): ?string
+    {
+        // ignore from traits
+        if (
+            $this->getReflection()->isTrait()
+            || !($parentClass = $this->getParentClass())
+            || !($parentPhpDoc = $parentClass->getPhpDoc()->__toString())
+        ) {
+            return null;
+        }
+
+        return $parentPhpDoc;
     }
 }
