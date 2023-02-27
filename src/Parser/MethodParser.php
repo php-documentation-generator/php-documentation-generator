@@ -70,7 +70,7 @@ final class MethodParser extends AbstractParser
         return $this->reflection;
     }
 
-    protected function getParentDoc(): ?string
+    protected function getParentDoc(bool $withTags = false): ?string
     {
         $reflection = $this->getReflection();
 
@@ -82,18 +82,24 @@ final class MethodParser extends AbstractParser
         if (
             false !== ($parentClass = $class->getParentClass())
             && $parentClass->hasMethod($name)
-            && ($parentDoc = $parentClass->getMethod($name)->getPhpDoc()->__toString())
+            && (
+                ($withTags && ($parentPhpDoc = $parentClass->getMethod($name)->getPhpDoc()->__toString()))
+                || (!$withTags && ($parentDocComment = $parentClass->getMethod($name)->getDocComment()))
+            )
         ) {
-            return $parentDoc;
+            return $parentPhpDoc ?? $parentDocComment ?? null;
         }
 
         // import docComment from interfaces
         foreach ($class->getInterfaces() as $interface) {
             if (
                 $interface->hasMethod($name)
-                && ($interfaceDoc = $interface->getMethod($name)->getPhpDoc()->__toString())
+                && (
+                    ($withTags && ($interfacePhpDoc = $interface->getMethod($name)->getPhpDoc()->__toString()))
+                    || (!$withTags && ($interfaceDocComment = $interface->getMethod($name)->getDocComment()))
+                )
             ) {
-                return $interfaceDoc;
+                return $interfacePhpDoc ?? $interfaceDocComment ?? null;
             }
         }
 

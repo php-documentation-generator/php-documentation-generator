@@ -57,14 +57,20 @@ abstract class AbstractParser implements ParserInterface
 
     public function getDocComment(): string|false
     {
-        if (!$docComment = $this->getPhpDoc()->__toString()) {
+        // cannot retrieve docComment from getPhpDoc because indent will be removed
+        if (!$docComment = $this->getReflection()->getDocComment()) {
             return false;
         }
 
         // remove PHP comment syntax
         $docComment = trim(preg_replace('#[\/ ]{0,}\*{1,2} ?\/?#', '', $docComment));
 
-        // remove tags (including "@SuppressWarnings(...)")
+        // inheritdoc
+        if (str_contains($docComment, '@inheritdoc') && ($inheritdoc = $this->getParentDoc())) {
+            $docComment = preg_replace('/{?@inheritdoc}?/', preg_replace('/(?:\/\*\*(?:\n *\*)? )|(\n? *\*\/)/', '', $inheritdoc), $docComment);
+        }
+
+        // remove tags (including non-formal tags like "@SuppressWarnings(...)")
         return trim(preg_replace('/@[a-zA-Z]+(?:(?:\s+.+)|(?:\(".+"\)))(?:\n+)?/', '', $docComment));
     }
 
@@ -96,8 +102,8 @@ abstract class AbstractParser implements ParserInterface
         $docComment = $this->replaceTag($phpDoc->getExtendsTagValues(), '@extends', $docComment);
         $docComment = $this->replaceTag($phpDoc->getImplementsTagValues(), '@implements', $docComment);
 
-        // inheritdoc
-        if (str_contains($docComment, '@inheritdoc') && ($inheritdoc = $this->getParentDoc())) {
+        // duplicate from getDocComment, but must inheritdoc here to inherit tags
+        if (str_contains($docComment, '@inheritdoc') && ($inheritdoc = $this->getParentDoc(true))) {
             $docComment = preg_replace('/{?@inheritdoc}?/', preg_replace('/(?:\/\*\*(?:\n *\*)? )|(\n? *\*\/)/', '', $inheritdoc), $docComment);
         }
 
@@ -109,7 +115,7 @@ abstract class AbstractParser implements ParserInterface
         return $phpDoc;
     }
 
-    protected function getParentDoc(): ?string
+    protected function getParentDoc(bool $withTags = false): ?string
     {
         return null;
     }

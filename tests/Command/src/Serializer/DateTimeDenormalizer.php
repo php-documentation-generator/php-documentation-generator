@@ -23,9 +23,27 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
+/**
+ * This is an example of code to test the indentation is kept.
+ *
+ * <code>
+ * ```php
+ * $denormalizer->denormalize(new \DateTimeImmutable(), [
+ *     'foo' => 'bar',
+ * ]);
+ * ```
+ * </code>
+ */
 final class DateTimeDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface, IgnoredInterface
 {
     use DenormalizerAwareTrait;
+
+    /**
+     * This variable is just here for documentation.
+     *
+     * @var array<string>,null
+     */
+    public ?array $foo = null;
 
     /**
      * This method throws multiple exception and returns multiple types to ensure the types are correctly imported.

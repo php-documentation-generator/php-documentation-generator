@@ -23,8 +23,7 @@
 {% block class %}
 {% if class.docComment|md_sanitize|length > 0 %}
 
-{{ class.docComment|md_sanitize|raw }}
-
+{{ class.docComment|md_sanitize|raw -}}
 {% endif %}
 {% if class.parentClass %}
 

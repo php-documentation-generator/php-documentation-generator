@@ -1,5 +1,15 @@
 # PhpDocumentGenerator\Tests\Command\App\Serializer\DateTimeDenormalizer
 
+This is an example of code to test the indentation is kept.
+
+<code>
+```php
+$denormalizer->denormalize(new \DateTimeImmutable(), [
+    'foo' => 'bar',
+]);
+```
+</code>
+
 ### Implements:
 
 > `Symfony\Component\Serializer\Normalizer\DenormalizerInterface`
@@ -9,6 +19,16 @@
 > `PhpDocumentGenerator\Tests\Command\App\Services\IgnoredInterface`
 
 ## Properties:
+
+### <a href="#property-foo" id="property-foo">§</a> public `?array` $foo
+
+This variable is just here for documentation.
+
+Types:
+
+> `array<string>`
+
+---
 
 ### <a href="#property-denormalizer" id="property-denormalizer">§</a> protected $denormalizer
 
