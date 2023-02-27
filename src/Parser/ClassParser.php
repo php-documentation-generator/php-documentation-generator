@@ -179,20 +179,36 @@ final class ClassParser extends AbstractParser
     }
 
     /**
-     * Import doc from parent class (not from interfaces).
+     * Import docComment from parent class (not from interfaces).
      */
-    protected function getParentDoc(bool $withTags = false): ?string
+    protected function getParentDocComment(): ?string
     {
         // ignore from traits
         if (
             $this->getReflection()->isTrait()
             || !($parentClass = $this->getParentClass())
-            || ($withTags && !($parentPhpDoc = $parentClass->getPhpDoc()->__toString()))
-            || (!$withTags && !($parentDocComment = $parentClass->getDocComment()))
+            || !($parentDocComment = $parentClass->getDocComment())
         ) {
             return null;
         }
 
-        return $parentPhpDoc ?? $parentDocComment ?? null;
+        return $parentDocComment;
+    }
+
+    /**
+     * Import phpDoc from parent class (not from interfaces).
+     */
+    protected function getParentPhpDoc(): ?string
+    {
+        // ignore from traits
+        if (
+            $this->getReflection()->isTrait()
+            || !($parentClass = $this->getParentClass())
+            || !($parentPhpDoc = $parentClass->getPhpDoc()->__toString())
+        ) {
+            return null;
+        }
+
+        return $parentPhpDoc;
     }
 }

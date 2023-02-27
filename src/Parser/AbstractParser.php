@@ -66,7 +66,7 @@ abstract class AbstractParser implements ParserInterface
         $docComment = $this->uncomment($docComment);
 
         // inheritdoc
-        if (str_contains($docComment, '@inheritdoc') && ($inheritdoc = $this->getParentDoc())) {
+        if (str_contains($docComment, '@inheritdoc') && ($inheritdoc = $this->getParentDocComment())) {
             $docComment = preg_replace('/{?@inheritdoc}?/', $this->uncomment($inheritdoc), $docComment);
         }
 
@@ -103,12 +103,14 @@ abstract class AbstractParser implements ParserInterface
         $docComment = $this->replaceTag($phpDoc->getExtendsTagValues(), '@extends', $docComment);
         $docComment = $this->replaceTag($phpDoc->getImplementsTagValues(), '@implements', $docComment);
 
-        // duplicate from getDocComment, but must inheritdoc here to inherit tags
-        if (str_contains($docComment, '@inheritdoc') && ($inheritdoc = $this->getParentDoc(true))) {
+        // seems duplicate from getDocComment, but it's not.
+        // "getDocComment" calls "$this->getParentDocComment" to get the docComment only,
+        // here "$this->getParentPhpDoc" is called to get a phpDoc string with inherited tags
+        if (str_contains($docComment, '@inheritdoc') && ($inheritdoc = $this->getParentPhpDoc())) {
             $docComment = preg_replace('/{?@inheritdoc}?/', $this->uncomment($inheritdoc), $docComment);
         }
 
-        // Parse docComment after its modifications
+        // parse the updated docComment after its modifications to get the phpDoc object
         $tokens = new Parser\TokenIterator($this->lexer->tokenize($docComment));
         $phpDoc = $this->parser->parse($tokens);
         $tokens->consumeTokenType(Lexer::TOKEN_END);
@@ -116,7 +118,12 @@ abstract class AbstractParser implements ParserInterface
         return $phpDoc;
     }
 
-    protected function getParentDoc(bool $withTags = false): ?string
+    protected function getParentPhpDoc(): ?string
+    {
+        return null;
+    }
+
+    protected function getParentDocComment(): ?string
     {
         return null;
     }

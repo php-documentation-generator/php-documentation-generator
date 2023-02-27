@@ -70,7 +70,7 @@ final class MethodParser extends AbstractParser
         return $this->reflection;
     }
 
-    protected function getParentDoc(bool $withTags = false): ?string
+    protected function getParentPhpDoc(): ?string
     {
         $reflection = $this->getReflection();
 
@@ -82,24 +82,48 @@ final class MethodParser extends AbstractParser
         if (
             false !== ($parentClass = $class->getParentClass())
             && $parentClass->hasMethod($name)
-            && (
-                ($withTags && ($parentPhpDoc = $parentClass->getMethod($name)->getPhpDoc()->__toString()))
-                || (!$withTags && ($parentDocComment = $parentClass->getMethod($name)->getDocComment()))
-            )
+            && ($parentPhpDoc = $parentClass->getMethod($name)->getPhpDoc()->__toString())
         ) {
-            return $parentPhpDoc ?? $parentDocComment ?? null;
+            return $parentPhpDoc;
         }
 
         // import docComment from interfaces
         foreach ($class->getInterfaces() as $interface) {
             if (
                 $interface->hasMethod($name)
-                && (
-                    ($withTags && ($interfacePhpDoc = $interface->getMethod($name)->getPhpDoc()->__toString()))
-                    || (!$withTags && ($interfaceDocComment = $interface->getMethod($name)->getDocComment()))
-                )
+                && ($interfacePhpDoc = $interface->getMethod($name)->getPhpDoc()->__toString())
             ) {
-                return $interfacePhpDoc ?? $interfaceDocComment ?? null;
+                return $interfacePhpDoc;
+            }
+        }
+
+        return null;
+    }
+
+    protected function getParentDocComment(): ?string
+    {
+        $reflection = $this->getReflection();
+
+        // import and replace "inheritdoc"
+        $name = $reflection->getName();
+        $class = new ClassParser($reflection->getDeclaringClass());
+
+        // import docComment from parent class first
+        if (
+            false !== ($parentClass = $class->getParentClass())
+            && $parentClass->hasMethod($name)
+            && ($parentDocComment = $parentClass->getMethod($name)->getDocComment())
+        ) {
+            return $parentDocComment;
+        }
+
+        // import docComment from interfaces
+        foreach ($class->getInterfaces() as $interface) {
+            if (
+                $interface->hasMethod($name)
+                && ($interfaceDocComment = $interface->getMethod($name)->getDocComment())
+            ) {
+                return $interfaceDocComment;
             }
         }
 

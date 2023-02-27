@@ -103,7 +103,20 @@ final class PropertyParser extends AbstractParser
         return $this->reflection;
     }
 
-    protected function getParentDoc(bool $withTags = false): ?string
+    protected function getParentPhpDoc(): ?string
+    {
+        if (!$parentDocComment = $this->getParentDocComment()) {
+            return null;
+        }
+
+        return <<<EOT
+/**
+ * $parentDocComment
+ */
+EOT;
+    }
+
+    protected function getParentDocComment(): ?string
     {
         $reflection = $this->getReflection();
 
@@ -115,14 +128,7 @@ final class PropertyParser extends AbstractParser
 
         foreach ((new MethodParser($class->getMethod('__construct')))->getPhpDoc()->getParamTagValues() as $param) {
             if ($reflection->getName() === substr($param->parameterName, 1)) {
-                // docComment MUST be a PHP comment to be parsed by "getPhpDoc"
-                // comment is removed in "getDocComment" method
-                return trim($param->description) ? sprintf(<<<EOT
-/**
- * %s
- */
-EOT
-                    , $param->description) : null;
+                return trim($param->description) ?: null;
             }
         }
 
