@@ -14,18 +14,14 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Parser;
 
 use LogicException;
-use PhpDocumentGenerator\Services\PhpStanTypeHelper;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
-use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
-use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser;
-use Symfony\Component\PropertyInfo\PhpStan\NameScopeFactory;
-use Symfony\Component\PropertyInfo\Type;
 
 abstract class AbstractParser implements ParserInterface
 {
+    use ParserUtilsTrait;
+
     protected ?Parser\PhpDocParser $parser = null;
     protected ?Lexer $lexer = null;
 
@@ -96,12 +92,12 @@ abstract class AbstractParser implements ParserInterface
         $docComment = $phpDoc->__toString();
 
         // replace tags
-        $docComment = $this->replaceTag($phpDoc->getThrowsTagValues(), '@throws', $docComment);
-        $docComment = $this->replaceTag($phpDoc->getReturnTagValues(), '@return', $docComment);
-        $docComment = $this->replaceTag($phpDoc->getVarTagValues(), '@var', $docComment);
-        $docComment = $this->replaceTag($phpDoc->getParamTagValues(), '@param', $docComment);
-        $docComment = $this->replaceTag($phpDoc->getExtendsTagValues(), '@extends', $docComment);
-        $docComment = $this->replaceTag($phpDoc->getImplementsTagValues(), '@implements', $docComment);
+        $docComment = $this->replaceTag($this->getClassName(), $phpDoc->getThrowsTagValues(), '@throws', $docComment);
+        $docComment = $this->replaceTag($this->getClassName(), $phpDoc->getReturnTagValues(), '@return', $docComment);
+        $docComment = $this->replaceTag($this->getClassName(), $phpDoc->getVarTagValues(), '@var', $docComment);
+        $docComment = $this->replaceTag($this->getClassName(), $phpDoc->getParamTagValues(), '@param', $docComment);
+        $docComment = $this->replaceTag($this->getClassName(), $phpDoc->getExtendsTagValues(), '@extends', $docComment);
+        $docComment = $this->replaceTag($this->getClassName(), $phpDoc->getImplementsTagValues(), '@implements', $docComment);
 
         // seems duplicate from getDocComment, but it's not.
         // "getDocComment" calls "$this->getParentDocComment" to get the docComment only,
@@ -131,58 +127,5 @@ abstract class AbstractParser implements ParserInterface
     protected function getClassName(): string
     {
         return $this->getReflection()->getDeclaringClass()->getName();
-    }
-
-    /**
-     * @param PhpDocTagValueNode[] $nodes
-     */
-    private function replaceTag(array $nodes, string $tag, string $docComment): string
-    {
-        $helper = new PhpStanTypeHelper();
-        $namedFactory = new NameScopeFactory();
-        $class = $this->getClassName();
-
-        foreach ($nodes as $node) {
-            $types = $helper->getTypes($node, $namedFactory->create($class));
-
-            // no valid types found
-            // node is not typed
-            // node is generic
-            if (!$types || !isset($node->type) || $node->type instanceof GenericTypeNode) {
-                continue;
-            }
-
-            $nodeType = $node->type;
-
-            if (1 === \count($types)) {
-                $type = $types[0];
-                $docComment = preg_replace(
-                    sprintf('/%s %s/', $tag, preg_quote($nodeType->__toString(), '/')),
-                    sprintf('%s %s', $tag, $type->getClassName() ?: $type->getBuiltinType()),
-                    $docComment
-                );
-                continue;
-            }
-
-            // Foo|Bar => App\Foo|App\Bar
-            // Foo&Bar => App\Foo&App\Bar
-            $docComment = preg_replace(
-                sprintf('/%s %s/', $tag, preg_quote($nodeType->__toString(), '/')),
-                sprintf('%s %s', $tag, implode($nodeType instanceof UnionTypeNode ? '|' : '&', array_map(fn (Type $node) => $node->getClassName() ?: $node->getBuiltinType(), $types))),
-                $docComment
-            );
-        }
-
-        return $docComment;
-    }
-
-    /**
-     * Uncomment a PHP comment string.
-     *
-     * @example https://rubular.com/r/CvFxBNzudoTZAl
-     */
-    protected function uncomment(string $string): string
-    {
-        return trim(preg_replace('/^ *\/\*\*| *\*[ \/]?/m', '', $string));
     }
 }
