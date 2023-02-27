@@ -33,6 +33,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
  * ]);
  * ```
  * </code>
+ *
+ * @foo
  */
 final class DateTimeDenormalizer implements DenormalizerInterface, DenormalizerAwareInterface, IgnoredInterface
 {

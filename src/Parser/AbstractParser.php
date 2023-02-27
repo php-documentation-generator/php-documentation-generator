@@ -70,8 +70,9 @@ abstract class AbstractParser implements ParserInterface
             $docComment = preg_replace('/{?@inheritdoc}?/', preg_replace('/(?:\/\*\*(?:\n *\*)? )|(\n? *\*\/)/', '', $inheritdoc), $docComment);
         }
 
-        // remove tags (including non-formal tags like "@SuppressWarnings(...)")
-        return trim(preg_replace('/@[a-zA-Z]+(?:(?:\s+.+)|(?:\(".+"\)))(?:\n+)?/', '', $docComment));
+        // remove tags => https://rubular.com/r/Fx0PuZ5d3DCLjU
+        // note: do not remove inline tags as they should be replaced in view
+        return trim(preg_replace('/^@[a-zA-Z\-]+(?:\(".+"\)| .+)?$/m', '', $docComment));
     }
 
     public function getPhpDoc(): PhpDocNode
