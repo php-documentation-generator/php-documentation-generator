@@ -143,7 +143,7 @@ abstract class AbstractParser implements ParserInterface
             if (1 === \count($types)) {
                 $type = $types[0];
                 $docComment = preg_replace(
-                    sprintf('/%s %s/', $tag, preg_quote($nodeType->__toString())),
+                    sprintf('/%s %s/', $tag, preg_quote($nodeType->__toString(), '/')),
                     sprintf('%s %s', $tag, $type->getClassName() ?: $type->getBuiltinType()),
                     $docComment
                 );
@@ -153,7 +153,7 @@ abstract class AbstractParser implements ParserInterface
             // Foo|Bar => App\Foo|App\Bar
             // Foo&Bar => App\Foo&App\Bar
             $docComment = preg_replace(
-                sprintf('/%s %s/', $tag, preg_quote($nodeType->__toString())),
+                sprintf('/%s %s/', $tag, preg_quote($nodeType->__toString(), '/')),
                 sprintf('%s %s', $tag, implode($nodeType instanceof UnionTypeNode ? '|' : '&', array_map(fn (Type $node) => $node->getClassName() ?: $node->getBuiltinType(), $types))),
                 $docComment
             );
