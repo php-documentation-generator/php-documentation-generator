@@ -63,14 +63,14 @@ abstract class AbstractParser implements ParserInterface
         }
 
         // remove PHP comment syntax
-        $docComment = trim(preg_replace('#[\/ ]{0,}\*{1,2} ?\/?#', '', $docComment));
+        $docComment = $this->uncomment($docComment);
 
         // inheritdoc
         if (str_contains($docComment, '@inheritdoc') && ($inheritdoc = $this->getParentDoc())) {
-            $docComment = preg_replace('/{?@inheritdoc}?/', preg_replace('/(?:\/\*\*(?:\n *\*)? )|(\n? *\*\/)/', '', $inheritdoc), $docComment);
+            $docComment = preg_replace('/{?@inheritdoc}?/', $this->uncomment($inheritdoc), $docComment);
         }
 
-        // remove tags => https://rubular.com/r/Fx0PuZ5d3DCLjU
+        // remove tags (https://rubular.com/r/Fx0PuZ5d3DCLjU)
         // note: do not remove inline tags as they should be replaced in view
         return trim(preg_replace('/^@[a-zA-Z\-]+(?:\(".+"\)| .+)?$/m', '', $docComment));
     }
@@ -105,7 +105,7 @@ abstract class AbstractParser implements ParserInterface
 
         // duplicate from getDocComment, but must inheritdoc here to inherit tags
         if (str_contains($docComment, '@inheritdoc') && ($inheritdoc = $this->getParentDoc(true))) {
-            $docComment = preg_replace('/{?@inheritdoc}?/', preg_replace('/(?:\/\*\*(?:\n *\*)? )|(\n? *\*\/)/', '', $inheritdoc), $docComment);
+            $docComment = preg_replace('/{?@inheritdoc}?/', $this->uncomment($inheritdoc), $docComment);
         }
 
         // Parse docComment after its modifications
@@ -167,5 +167,15 @@ abstract class AbstractParser implements ParserInterface
         }
 
         return $docComment;
+    }
+
+    /**
+     * Uncomment a PHP comment string.
+     *
+     * @example https://rubular.com/r/CvFxBNzudoTZAl
+     */
+    protected function uncomment(string $string): string
+    {
+        return trim(preg_replace('/^ *\/\*\*| *\*[ \/]?/m', '', $string));
     }
 }
