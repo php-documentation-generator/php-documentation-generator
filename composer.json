@@ -53,7 +53,7 @@
     "autoload-dev": {
         "psr-4": {
             "PhpDocumentGenerator\\Tests\\": "tests/",
-            "PhpDocumentGenerator\\Tests\\Command\\App\\": "tests/Command/src/"
+            "PhpDocumentGenerator\\Tests\\Fixtures\\": "tests/Fixtures/src/"
         }
     },
     "bin": ["bin/pdg"],

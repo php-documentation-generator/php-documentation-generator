@@ -26,6 +26,7 @@ use PhpDocumentGenerator\Twig\View\TypeView;
 use PHPStan\PhpDocParser\Ast\Type\IntersectionTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
 use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
+use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
@@ -56,10 +57,14 @@ final class ClassViewFactory
         foreach ($classParser->getMethods() as $methodParser) {
             $refl = $methodParser->getReflection();
 
+            [$methodPhpDoc, $methodLinks] = $this->linkFactory->getLinksFromPHPDoc($methodParser->getDocComment());
+            $methodDescription = $this->handleCodeSelector($methodPhpDoc);
+
             $parameters = [];
-            foreach ($methodParser->getParameters() as $parameter) {
-                $parameterRefl = $parameter->getReflection();
-                $parameters[] = new MethodParameterView(name: $parameterRefl->getName(), types: $this->getTypes($parameter, $linkContext), isReference: $parameterRefl->isPassedByReference(), defaultValue: $parameterRefl->isDefaultValueAvailable() ? $this->valueToString($parameterRefl->getDefaultValue()) : null);
+            foreach ($methodParser->getParameters() as $parameterParser) {
+                $parameterRefl = $parameterParser->getReflection();
+                $types = $this->getTypes($parameterParser, $linkContext);
+                $parameters[] = new MethodParameterView(name: $parameterRefl->getName(), types: $types, isReference: $parameterRefl->isPassedByReference(), defaultValue: $parameterRefl->isDefaultValueAvailable() ? $this->valueToString($parameterRefl->getDefaultValue()) : null, description: array_values($types)[0]->description ?? null);
             }
 
             $throws = [];
@@ -68,10 +73,10 @@ final class ClassViewFactory
                 $throws[$name] = new TypeView(name: $name, link: $this->linkFactory->createNodeLink($node->type, $linkContext), description: $node->description);
             }
 
-            $methods[] = new MethodView(name: $refl->getName(), modifier: $methodParser->getModifier(), parameters: $parameters, returnTypes: $this->getTypes($methodParser, $linkContext), throws: $throws);
+            $methods[] = new MethodView(name: $refl->getName(), modifier: $methodParser->getModifier(), parameters: $parameters, returnTypes: $this->getTypes($methodParser, $linkContext), throws: $throws, description: $methodDescription);
         }
 
-        return new ClassView(name: $classRefl->getName(), description: $description, link: $link, links: $links, parentClass: $parentClass, interfaces: $interfaces, constants: $this->getConstants($classParser), methods: $methods, properties: $this->getProperties($classParser, $linkContext));
+        return new ClassView(name: $classRefl->getName(), description: $description, link: $link, links: $links, parentClass: $parentClass, interfaces: $interfaces, constants: $this->getConstants($classParser), methods: $methods, properties: $this->getProperties($classParser, $linkContext), type: $this->getClassType($classRefl));
     }
 
     private function valueToString(mixed $v): string
@@ -95,10 +100,10 @@ final class ClassViewFactory
 
                 if ($nodeType instanceof UnionTypeNode || $nodeType instanceof IntersectionTypeNode) {
                     /** @var TypeNode $node */
-                    foreach ($nodeType->types as $node) {
-                        $name = trim((string) $node);
+                    foreach ($nodeType->types as $n) {
+                        $name = trim((string) $n);
                         if (!isset($types[$name])) {
-                            $types[$name] = new TypeView(name: $name, link: $this->linkFactory->createNodeLink($node, $linkContext), type: $nodeType instanceof UnionTypeNode ? '|' : '&');
+                            $types[$name] = new TypeView(name: $name, link: $this->linkFactory->createNodeLink($n, $linkContext), type: $nodeType instanceof UnionTypeNode ? '|' : '&', description: $node->description);
                         }
                     }
 
@@ -106,7 +111,7 @@ final class ClassViewFactory
                 }
 
                 $name = trim((string) $nodeType);
-                $types[$name] = new TypeView(name: $name, link: $this->linkFactory->createNodeLink($nodeType, $linkContext));
+                $types[$name] = new TypeView(name: $name, link: $this->linkFactory->createNodeLink($nodeType, $linkContext), description: $node->description);
             }
 
             return $types;
@@ -176,5 +181,22 @@ final class ClassViewFactory
         }
 
         return $properties;
+    }
+
+    private function getClassType(ReflectionClass $refl): string
+    {
+        if ($refl->isInterface()) {
+            return 'I';
+        }
+
+        if (\count($refl->getAttributes('Attribute'))) {
+            return 'A';
+        }
+
+        if ($refl->isTrait()) {
+            return 'T';
+        }
+
+        return 'C';
     }
 }

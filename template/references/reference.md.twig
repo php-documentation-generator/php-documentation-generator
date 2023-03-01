@@ -1,8 +1,7 @@
 {% extends 'layout.md.twig' %}
 
 {% block link %}
-{% if class.link %}[{{ class.name }}]({{ class.link }}){% else %}{{ class.name }}
-{% endif %}
+{% if class.link %}[{{ class.name }}]({{ class.link }}){% else %}{{ class.name }}{% endif %}
 {% endblock %}
 
 {% block types %}
@@ -10,7 +9,8 @@
 {% endblock %}
 
 {% block title %}
-# {% if configuration is defined %}Configuration Reference{% else %}{% with {'class': class} %}{{ block('link') }}{% endwith %}{% endif %}{% if class.parentClass %} extends {% with {'class': class.parentClass} %}{{ block('link') }}{% endwith %}{% endif %}{% if class.interfaces|length > 0 %}{% for interface in class.interfaces %}{% if loop.first %} implements {% else %}, {% endif %}{% with {'class': interface} %}{{ block('link') }}{% endwith %}{% endfor %}{% endif %}
+# {% if configuration is defined %}Configuration Reference{% else %}{% with {'class': class} %}{{ block('link') }}{% endwith %}{% if class.parentClass %} extends {% with {'class': class.parentClass} %}{{ block('link') }}{% endwith %}{% endif %}{% if class.interfaces|length > 0 %}{% for interface in class.interfaces %}{% if loop.first %} implements {% else %}, {% endif %}{% with {'class': interface} %}{{ block('link') }}{% endwith %}{% endfor %}{% endif %}{% endif %}
+
 {% endblock %}
 
 {% block content %}
@@ -31,9 +31,7 @@
 
 {% block class %}
 {% if class.description %}
-
 {{ class.description|raw }}
-
 {% endif %}
 {% if class.constants|length > 0 %}
 

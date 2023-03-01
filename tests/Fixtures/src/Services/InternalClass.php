@@ -11,8 +11,13 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Tests\Command\App\Services;
+namespace PhpDocumentGenerator\Tests\Fixtures\Services;
 
-interface IgnoredInterface
+/**
+ * This class should be ignored because or the following tag:.
+ *
+ * @internal
+ */
+final class InternalClass
 {
 }

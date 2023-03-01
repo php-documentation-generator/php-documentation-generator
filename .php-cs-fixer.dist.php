@@ -15,8 +15,7 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude([
         'tests/Fixtures/app/var',
-        'tests/Fixtures/app/guides',
-        'tests/Command/guides',
+        'tests/Fixtures/guides',
         'src/DependencyInjection/Configuration.php',
     ])
     ;

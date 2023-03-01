@@ -3,9 +3,8 @@
 ## {{ namespace }}
 
 {% for class in classes %}
-* [`{{ class.shortName }}`]({{ class.url }})
+  * <a href="{{ class.link }}"><span class="symbol {{ class.type }}">{{ class.type }}</span>{{ class.name }}</a>
 
 {% endfor %}
 {% endfor %}
 {% endapply %}
-

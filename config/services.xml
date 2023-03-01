@@ -41,6 +41,7 @@
             <argument type="service" id="pdg.configuration"/>
             <argument type="service" id="pdg.twig"/>
             <argument>%kernel.project_dir%/template/references/index.md.twig</argument>
+            <argument type="service" id="pdg.twig.class_view_factory"/>
             <tag>console.command</tag>
         </service>
 

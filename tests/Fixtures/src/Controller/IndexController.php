@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Tests\Command\App\Controller;
+namespace PhpDocumentGenerator\Tests\Fixtures\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

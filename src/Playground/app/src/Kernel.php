@@ -11,6 +11,8 @@
 
 declare(strict_types=1);
 
+// TODO: move this to Playground\Kernel
+
 namespace App;
 
 use ApiPlatform\Metadata\ApiResource;

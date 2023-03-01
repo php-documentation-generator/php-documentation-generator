@@ -163,7 +163,7 @@ final class GuideCommand extends Command
 
         fclose($handle);
 
-        // TODO: fix the removed mdx_sanitize to handle code blocks on text sections 
+        // TODO: fix the removed mdx_sanitize to handle code blocks on text sections
         $content = $this->environment->render(
             $this->loadTemplate($input->getOption('template')),
             ['headers' => $headers, 'sections' => $sections]

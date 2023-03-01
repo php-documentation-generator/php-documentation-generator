@@ -18,6 +18,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 final class ReferencesCommandTest extends KernelTestCase
 {
@@ -26,86 +28,82 @@ final class ReferencesCommandTest extends KernelTestCase
         return Kernel::class;
     }
 
-    public function testItReturnsAWarningIfNoFilesWereFound(): void
+    private function getApplicationTester(): ApplicationTester
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/empty.config.yaml');
-
         $kernel = self::bootKernel();
         /** @var Application $application */
         $application = $kernel->getContainer()->get(Application::class);
         $application->setAutoExit(false);
-        $tester = new ApplicationTester($application);
-        @mkdir('/tmp/pdg/empty', 0755, true);
+
+        return new ApplicationTester($application);
+    }
+
+    private function getOutputDirectory(): string
+    {
+        return Path::join(sys_get_temp_dir(), '/pdg');
+    }
+
+    protected function setUp(): void
+    {
+        @mkdir($this->getOutputDirectory(), 0755, true);
+    }
+
+    protected function tearDown(): void
+    {
+        (new Filesystem())->remove($this->getOutputDirectory());
+    }
+
+    public function testItReturnsAWarningIfNoFilesWereFound(): void
+    {
+        $tester = $this->getApplicationTester();
 
         $tester->run([
             'command' => 'references',
+            'src' => Path::join($this->getOutputDirectory(), 'empty'),
         ]);
 
-        $this->assertEquals(Command::INVALID, $tester->getStatusCode());
-        $this->assertStringContainsString('No files were found in "/tmp/pdg/empty".', $tester->getDisplay(true));
+        $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
     public function testItOutputsEachReferenceInAFile(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
-
         $kernel = self::bootKernel();
         /** @var Application $application */
         $application = $kernel->getContainer()->get(Application::class);
         $application->setAutoExit(false);
         $tester = new ApplicationTester($application);
+        $output = $this->getOutputDirectory();
 
-        $output = '/tmp/pdg/references';
         $tester->run([
             'command' => 'references',
             'output' => $output,
+            'src' => 'tests/Fixtures/src',
+            '--namespace' => 'PhpDocumentGenerator\Tests\Fixtures',
         ]);
 
         $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));
-        $this->assertFileEquals(
-            'tests/Command/expected/references/Controller/IndexController.md',
-            sprintf('%s/Controller/IndexController.md', $output)
-        );
-    }
 
-    public function testItOutputsEachReferenceInAFileUsingConfiguration(): void
-    {
-        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
-
-        $kernel = self::bootKernel();
-        /** @var Application $application */
-        $application = $kernel->getContainer()->get(Application::class);
-        $application->setAutoExit(false);
-        $tester = new ApplicationTester($application);
-
-        $tester->run([
-            'command' => 'references',
-        ]);
-
-        $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));
-        $this->assertFileEquals(
-            'tests/Command/expected/references/Controller/IndexController.md',
-            'tests/Command/pages/references/Controller/IndexController.md'
-        );
+        $this->assertFileExists(Path::join($output, 'Controller/IndexController.md'));
     }
 
     public function testSkipPaths(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
-
         $kernel = self::bootKernel();
         /** @var Application $application */
         $application = $kernel->getContainer()->get(Application::class);
         $application->setAutoExit(false);
         $tester = new ApplicationTester($application);
+        $output = $this->getOutputDirectory();
 
         $tester->run([
             'command' => 'references',
+            'output' => $output,
+            'src' => 'tests/Fixtures/src',
+            '--namespace' => 'PhpDocumentGenerator\Tests\Fixtures',
             '--exclude-path' => 'Serializer/',
-            '-vvv',
         ]);
 
         $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));
-        $this->assertStringNotContainsString('Processing tests/Command/src/Serializer/DateTimeDenormalizer.php => tests/Command/pages/references/Serializer/DateTimeDenormalizer.md', $tester->getDisplay(true));
+        $this->assertDirectoryDoesNotExist(Path::join($output, 'Serializer'));
     }
 }

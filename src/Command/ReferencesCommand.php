@@ -89,6 +89,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
         $stderr = $style->getErrorStyle();
         $template = $input->getOption('template');
         $baseUrl = $input->getOption('base-url');
+        $namespace = $input->getOption('namespace');
 
         if (!$input->getArgument('src') || !$input->getArgument('output')) {
             $stderr->error('Specify "src" and "output" to create references.');
@@ -102,7 +103,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
         // get the output extension for a reference
         $referenceExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
         /** @var SplFileInfo[] */
-        $files = $this->getFiles($src, $input->getOption('namespace'), (array) $input->getOption('exclude'), (array) $input->getOption('tags-to-ignore'), (array) $input->getOption('exclude-path'));
+        $files = $this->getFiles($src, $namespace, (array) $input->getOption('exclude'), (array) $input->getOption('tags-to-ignore'), (array) $input->getOption('exclude-path'));
 
         if (!\count($files)) {
             $stderr->warning(sprintf('No files were found in "%s".', $src));
@@ -114,7 +115,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
         $progressBar?->start();
 
         foreach ($files as $file) {
-            $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->references->src);
+            $relativeToSrc = Path::makeRelative($file->getPath(), $src);
             $target = Path::changeExtension(Path::join($out, $relativeToSrc, $file->getBaseName()), $referenceExtension);
 
             $stderr->writeln(sprintf('Processing %s => %s', $file, $target), OutputInterface::VERBOSITY_DEBUG);
@@ -129,9 +130,11 @@ final class ReferencesCommand extends AbstractReferencesCommand
             if (
                 self::FAILURE === $this->getApplication()?->find('reference')->run(new ArrayInput([
                     'filename' => $file->getPathName(),
+                    '--namespace' => $namespace,
                     '--template' => $template,
                     '--output' => $target,
                     '--base-url' => $baseUrl,
+                    '--src' => $src,
                     '--quiet' => true,
                 ]), $output)
             ) {

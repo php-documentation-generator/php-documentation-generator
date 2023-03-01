@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Tests\Command\App\DependencyInjection;
+namespace PhpDocumentGenerator\Tests\Fixtures\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

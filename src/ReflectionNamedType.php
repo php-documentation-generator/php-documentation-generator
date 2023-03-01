@@ -16,10 +16,12 @@ namespace PhpDocumentGenerator;
 class ReflectionNamedType extends \ReflectionNamedType
 {
     private string $_name;
+    private bool $isBuiltin;
 
-    public function __construct(string $name)
+    public function __construct(string $name, bool $isBuiltin = true)
     {
         $this->_name = $name;
+        $this->isBuiltin = $isBuiltin;
     }
 
     public function getName(): string
@@ -29,7 +31,7 @@ class ReflectionNamedType extends \ReflectionNamedType
 
     public function isBuiltin(): bool
     {
-        return true;
+        return $this->isBuiltin;
     }
 
     public function __toString()

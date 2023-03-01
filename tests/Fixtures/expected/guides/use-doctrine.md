@@ -8,6 +8,7 @@ tags: state
 
 Should be a real guide
 
+
 ```php
 // src/App/Entity.php
 namespace App\Entity;

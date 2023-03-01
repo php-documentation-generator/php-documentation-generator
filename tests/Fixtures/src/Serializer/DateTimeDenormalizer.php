@@ -11,11 +11,11 @@
 
 declare(strict_types=1);
 
-namespace PhpDocumentGenerator\Tests\Command\App\Serializer;
+namespace PhpDocumentGenerator\Tests\Fixtures\Serializer;
 
 use DateTimeInterface;
 use LogicException;
-use PhpDocumentGenerator\Tests\Command\App\Services\IgnoredInterface;
+use PhpDocumentGenerator\Tests\Fixtures\Services\IgnoredInterface;
 use RuntimeException;
 use stdClass;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException as FooBarException;
@@ -34,10 +34,10 @@ final class DateTimeDenormalizer implements DenormalizerInterface, DenormalizerA
      *
      * Also, the parent documentation should be placed in the middle of this method documentation.
      *
-     * @throws FooBarException|RuntimeException|string
+     * @throws FooBarException|RuntimeException
      * @throws LogicException
      *
-     * @return mixed
+     * @return mixed                             the data
      * @return string|stdClass|DateTimeInterface
      * @return array<int, DateTimeInterface>
      */

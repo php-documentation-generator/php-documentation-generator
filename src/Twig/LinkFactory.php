@@ -15,6 +15,7 @@ namespace PhpDocumentGenerator\Twig;
 
 use PhpDocumentGenerator\ReflectionNamedType as PDGReflectionNamedType;
 use PHPStan\PhpDocParser\Ast\Type\TypeNode;
+use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionType;
@@ -93,6 +94,6 @@ final class LinkFactory
             return $this->createClassLink(new ReflectionClass($type), $linkContext);
         }
 
-        return $this->createTypeLink(new PDGReflectionNamedType($type), $linkContext);
+        return $this->createTypeLink(new PDGReflectionNamedType($type, isBuiltin: !$node instanceof UnionTypeNode), $linkContext);
     }
 }

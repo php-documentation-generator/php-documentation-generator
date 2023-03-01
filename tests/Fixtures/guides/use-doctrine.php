@@ -4,7 +4,6 @@
 // executable: true
 // tags: state
 // ---
-
 // Should be a real guide
 
 namespace App\Entity {

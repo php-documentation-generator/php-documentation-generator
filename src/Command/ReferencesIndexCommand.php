@@ -15,6 +15,8 @@ namespace PhpDocumentGenerator\Command;
 
 use PhpDocumentGenerator\Configuration;
 use PhpDocumentGenerator\Parser\ClassParser;
+use PhpDocumentGenerator\Twig\ClassViewFactory;
+use PhpDocumentGenerator\Twig\LinkContext;
 use ReflectionClass;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -30,7 +32,8 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
     public function __construct(
         private readonly Configuration $configuration,
         Environment $environment,
-        private readonly string $defaultTemplate
+        private readonly string $defaultTemplate,
+        private readonly ClassViewFactory $classViewFactory
     ) {
         $this->environment = $environment;
         parent::__construct(name: 'references:index');
@@ -92,15 +95,16 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
     {
         $namespaces = [];
         $style = new SymfonyStyle($input, $output);
+        $stderr = $style->getErrorStyle();
         $src = Path::canonicalize($input->getArgument('src'));
+        $root = Path::makeAbsolute($input->getArgument('src'), getcwd());
 
         foreach ($this->getFiles($src, $input->getOption('namespace'), (array) $input->getOption('exclude'), (array) $input->getOption('tags-to-ignore'), (array) $input->getOption('exclude-path')) as $class => $file) {
-            $class = new ClassParser(
-                reflection: new ReflectionClass($class),
-                url: str_replace($src, $input->getOption('base-url'), $file->getPathname())
-            );
+            $linkContext = new LinkContext(namespace: $input->getOption('namespace'), root: $root, baseUrl: $input->getOption('base-url'));
+            $refl = new ReflectionClass($class);
+            $classView = $this->classViewFactory->create(new ClassParser($refl), $linkContext);
 
-            $namespaces[$class->getNamespaceName()][] = $class;
+            $namespaces[$refl->getNamespaceName()][] = $classView;
         }
 
         // Creating an index like https://angular.io/api
@@ -111,7 +115,7 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
 
         $out = $input->getOption('output');
         if (!$out) {
-            $style->block($content);
+            $output->write($content);
 
             return self::SUCCESS;
         }
@@ -120,8 +124,9 @@ final class ReferencesIndexCommand extends AbstractReferencesCommand
         if (!is_dir($dirName)) {
             mkdir($dirName, 0755, true);
         }
+
         if (!file_put_contents($out, $content)) {
-            $style->getErrorStyle()->error(sprintf('Cannot write in "%s".', $out));
+            $stderr->error(sprintf('Cannot write in "%s".', $out));
 
             return self::FAILURE;
         }
