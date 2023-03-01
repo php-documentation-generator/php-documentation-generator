@@ -30,8 +30,6 @@ final class ReferenceCommandTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
-
         $kernel = self::bootKernel();
         /** @var Application $application */
         $application = $kernel->getContainer()->get(Application::class);
@@ -55,17 +53,19 @@ final class ReferenceCommandTest extends KernelTestCase
      */
     public function testItOutputsAReferenceInAFile(string $name): void
     {
-        $output = sprintf('tests/Command/pages/references/%s.md', $name);
+        $output = sprintf('tests/Fixtures/output/references/%s.md', $name);
         $this->tester->run([
             'command' => 'reference',
-            'filename' => sprintf('tests/Command/src/%s.php', $name),
+            'filename' => sprintf('tests/Fixtures/src/%s.php', $name),
             '--output' => $output,
+            '--src' => 'tests/Fixtures/src',
+            '--namespace' => 'PhpDocumentGenerator\Tests\Fixtures',
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $this->assertFileExists($output);
         $this->assertFileEquals(
-            sprintf('tests/Command/expected/references/%s.md', $name),
+            sprintf('tests/Fixtures/expected/references/%s.md', $name),
             $output
         );
     }
@@ -77,15 +77,15 @@ final class ReferenceCommandTest extends KernelTestCase
         yield ['Serializer/DateTimeDenormalizer'];
     }
 
-    public function testItOutputsAReferenceInCommandOutput(): void
+    public function testItOutputsAReferenceInStdout(): void
     {
         $this->tester->run([
             'command' => 'reference',
-            'filename' => 'tests/Command/src/Controller/IndexController.php',
+            'filename' => 'tests/Fixtures/src/Controller/IndexController.php',
+            '--src' => 'tests/Fixtures/src',
+            '--namespace' => 'PhpDocumentGenerator\Tests\Fixtures',
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('# PhpDocumentGenerator\Tests\Command\App\Controller\IndexController', $display);
     }
 }

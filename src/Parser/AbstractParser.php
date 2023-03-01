@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Parser;
 
-use LogicException;
 use PhpDocumentGenerator\Services\PhpStanTypeHelper;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagValueNode;
@@ -30,25 +29,6 @@ abstract class AbstractParser implements ParserInterface
     protected ?Lexer $lexer = null;
 
     abstract public function getReflection();
-
-    public function __call(string $name, array $arguments)
-    {
-        $reflection = $this->getReflection();
-
-        if (!\is_callable([$reflection, $name])) {
-            foreach (['get'.ucfirst($name), 'is'.ucfirst($name), 'has'.ucfirst($name)] as $accessor) {
-                if (\is_callable([$reflection, $accessor])) {
-                    $name = $accessor;
-                }
-            }
-        }
-
-        if (\is_callable([$reflection, $name])) {
-            return $reflection->{$name}(...$arguments);
-        }
-
-        throw new LogicException(sprintf('Method "%s::%s" does not exist.', static::class, $name));
-    }
 
     public function __toString(): string
     {

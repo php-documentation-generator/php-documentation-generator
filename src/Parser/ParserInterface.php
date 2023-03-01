@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Parser;
 
-/**
- * @method getName
- */
 interface ParserInterface
 {
 }

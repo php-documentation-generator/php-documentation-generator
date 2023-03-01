@@ -19,8 +19,9 @@ use ReflectionMethod;
 
 final class ClassParser extends AbstractParser
 {
-    public function __construct(private readonly ReflectionClass $reflection)
+    public function __construct(private readonly ReflectionClass $reflection, public ?string $type = null)
     {
+        $this->type = $type ?: $this->getClassType($reflection);
     }
 
     public function hasTag(string $searchedTag): bool
@@ -73,7 +74,7 @@ final class ClassParser extends AbstractParser
 
         $constants = [];
         foreach ($reflection->getReflectionConstants(ReflectionClassConstant::IS_PUBLIC | ReflectionClassConstant::IS_PROTECTED) as $constant) {
-            $constant = new ConstantParser($constant);
+            $constantParser = new ConstantParser($constant);
 
             // ignore from external class (e.g.: parent class)
             // if it is from a trait, ignore if it is imported in an external class (e.g.: parent class)
@@ -84,7 +85,7 @@ final class ClassParser extends AbstractParser
                 continue;
             }
 
-            $constants[] = $constant;
+            $constants[] = $constantParser;
         }
 
         return $constants;
@@ -102,22 +103,24 @@ final class ClassParser extends AbstractParser
 
         $properties = [];
         foreach ($reflection->getProperties() as $property) {
-            $property = new PropertyParser($property);
+            $propertyParser = new PropertyParser($property);
+            $propertyClassParser = $propertyParser->getDeclaringClass();
+            $propertyClassName = $propertyClassParser->getReflection()->getName();
 
             // ignore private properties without accessors
             // ignore from external class (e.g.: parent class)
             // if it is from a trait, ignore if it is imported in an external class (e.g.: parent class)
             if (
-                $property->isPrivate() && !$property->getAccessors()
+                $property->isPrivate() && !$propertyParser->getAccessors()
                 || (
-                    $reflection->getName() !== ($class = $property->getDeclaringClass())->getName()
-                    && !\in_array($class->getName(), $traitsName, true)
+                    $reflection->getName() !== $propertyClassName
+                    && !\in_array($propertyClassName, $traitsName, true)
                 )
             ) {
                 continue;
             }
 
-            $properties[] = $property;
+            $properties[] = $propertyParser;
         }
 
         return $properties;
@@ -136,23 +139,26 @@ final class ClassParser extends AbstractParser
         $methods = [];
         foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED) as $method) {
             $method = new MethodParser($method);
+            $methodRefl = $method->getReflection();
+            $methodClassRefl = $methodRefl->getDeclaringClass();
+            $methodClassName = $methodClassRefl->getName();
 
             // ignore constructor
             // ignore from external class (e.g.: parent class)
             // if it is from a trait, ignore if it is imported in an external class (e.g.: parent class)
             if (
-                '__construct' === $method->getName()
+                '__construct' === $methodRefl->getName()
                 || (
-                    $reflection->getName() !== ($class = $method->getDeclaringClass())->getName()
-                    && !\in_array($class->getName(), $traitsName, true)
+                    $reflection->getName() !== $methodClassName
+                    && !\in_array($methodClassName, $traitsName, true)
                 )
             ) {
                 continue;
             }
 
             // ignore accessors
-            foreach ($method->getDeclaringClass()->getProperties() as $property) {
-                if (\in_array($method->getName(), (new PropertyParser($property))->getAccessors(), true)) {
+            foreach ($methodClassRefl->getProperties() as $property) {
+                if (\in_array($methodRefl->getName(), (new PropertyParser($property))->getAccessors(), true)) {
                     continue 2;
                 }
             }
@@ -193,5 +199,22 @@ final class ClassParser extends AbstractParser
         }
 
         return $parentDocComment;
+    }
+
+    private function getClassType(ReflectionClass $refl): string
+    {
+        if ($refl->isInterface()) {
+            return 'I';
+        }
+
+        if (\count($refl->getAttributes('Attribute'))) {
+            return 'A';
+        }
+
+        if ($refl->isTrait()) {
+            return 'T';
+        }
+
+        return 'C';
     }
 }

@@ -2,8 +2,9 @@
 {% for section in sections %}
 <a href="#section-{{ loop.index }}" id="section-{{ loop.index }}">§</a>
 
-{% if section.text|join('')|mdx_sanitize|length > 0 %}
-{{ section.text|join('')|mdx_sanitize }}
+{% set text = section.text|join('') %}
+{% if text|length > 0 %}
+{{ text }}
 
 {% endif %}
 ```php

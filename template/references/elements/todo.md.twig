@@ -1,0 +1,28 @@
+
+{% if method.parameters|length > 0 %}
+{% for parameter in method.parameters %}
+{% if parameter.types|length > 0 %}
+{% if loop.first %}
+Additional info:
+
+{% endif %}
+> {{ parameter.types|md_link|raw }} ${{ parameter.name }}{% if parameter.additionalTypes.description|length > 0 %} {{ parameter.additionalTypes.description|raw }}{% endif %}
+
+{% if not loop.last %}
+>
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if method.additionalReturnTypes|length > 0 %}
+Returns:
+
+{% for returnTag in method.additionalReturnTypes %}
+> {{ returnTag|md_link|raw }}{% if returnTag.description|length > 0 %} {{ returnTag.description|raw }}{% endif %}
+
+{% if not loop.last %}
+>
+{% endif %}
+{% endfor %}
+{% endif %}

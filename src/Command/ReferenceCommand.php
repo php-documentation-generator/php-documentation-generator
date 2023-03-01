@@ -15,6 +15,8 @@ namespace PhpDocumentGenerator\Command;
 
 use PhpDocumentGenerator\Configuration;
 use PhpDocumentGenerator\Parser\ClassParser;
+use PhpDocumentGenerator\Twig\ClassViewFactory;
+use PhpDocumentGenerator\Twig\LinkContext;
 use ReflectionClass;
 use SplFileInfo;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -25,6 +27,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Path;
 use Twig\Environment;
 
 final class ReferenceCommand extends Command
@@ -34,7 +37,8 @@ final class ReferenceCommand extends Command
     public function __construct(
         private readonly Configuration $configuration,
         Environment $environment,
-        private readonly string $defaultTemplate
+        private readonly string $defaultTemplate,
+        private readonly ClassViewFactory $classViewFactory
     ) {
         $this->environment = $environment;
         parent::__construct(name: 'reference');
@@ -55,11 +59,18 @@ final class ReferenceCommand extends Command
                 mode: InputOption::VALUE_REQUIRED,
                 description: 'The path to the template file to use to generate the reference.',
                 default: $this->defaultTemplate
-            )->addOption(
+            )
+            ->addOption(
                 name: 'namespace',
                 mode: InputOption::VALUE_REQUIRED,
                 description: 'The PSR-4 prefix representing your source directory.',
                 default: $this->configuration->references->namespace
+            )
+            ->addOption(
+                name: 'base-url',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The base URL for references.',
+                default: $this->configuration->references->baseUrl
             )
             ->addOption(
                 name: 'src',
@@ -82,7 +93,11 @@ final class ReferenceCommand extends Command
 
         $reflectionClass = new ReflectionClass($this->getFQDNFromFile($file, $input->getOption('src'), $input->getOption('namespace')));
 
-        $templateContext = ['class' => new ClassParser($reflectionClass)];
+        $root = Path::makeAbsolute($input->getOption('src'), getcwd());
+        $linkContext = new LinkContext(namespace: $input->getOption('namespace'), root: $root, baseUrl: $input->getOption('base-url'));
+        $templateContext = [
+            'class' => $this->classViewFactory->create(new ClassParser($reflectionClass), $linkContext),
+        ];
 
         if ($reflectionClass->implementsInterface(ConfigurationInterface::class)) {
             $yaml = (new YamlReferenceDumper())->dump($reflectionClass->newInstance());
