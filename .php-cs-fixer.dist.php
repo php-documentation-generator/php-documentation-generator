@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 $header = <<<'HEADER'
-This file is part of the API Platform project.
+This file is part of the PHP Documentation Generator project
 
-(c) Kévin Dunglas <dunglas@gmail.com>
+(c) Antoine Bluchet <soyuka@gmail.com>
 
 For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
@@ -14,20 +14,13 @@ HEADER;
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude([
-        'tests/Fixtures/app/var',
-        'tests/Fixtures/app/guides',
-        'tests/Command/guides',
-        'src/DependencyInjection/Configuration.php',
+        'tests/Fixtures/guides'
     ])
     ;
 
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
-        '@DoctrineAnnotation' => true,
-        '@PHP71Migration' => true,
-        '@PHP71Migration:risky' => true,
-        '@PHPUnit60Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'align_multiline_comment' => [
@@ -35,17 +28,10 @@ return (new PhpCsFixer\Config())
         ],
         'array_indentation' => true,
         'compact_nullable_typehint' => true,
-        'doctrine_annotation_array_assignment' => [
-            'operator' => '=',
-        ],
-        'doctrine_annotation_spaces' => [
-            'after_array_assignments_equals' => false,
-            'before_array_assignments_equals' => false,
-        ],
         'explicit_indirect_variable' => true,
         'fully_qualified_strict_types' => true,
         'global_namespace_import' => [
-            'import_classes' => true,
+            'import_classes' => false,
         ],
         'header_comment' => [
             'header' => $header,

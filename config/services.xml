@@ -6,67 +6,23 @@
     <services>
         <defaults public="false"/>
 
-        <!-- Twig -->
-        <service id="pdg.twig.loader.filesystem" class="Twig\Loader\FilesystemLoader"/>
-
-        <service id="pdg.twig.extension.markdown" class="PhpDocumentGenerator\Twig\MarkdownExtension">
-            <argument type="service" id="pdg.configuration"/>
-        </service>
-
-        <service id="pdg.twig.extension.markdown_extended" class="PhpDocumentGenerator\Twig\MarkdownExtendedExtension">
-            <argument type="service" id="pdg.configuration"/>
-        </service>
-
-        <service id="pdg.twig" class="Twig\Environment">
-            <argument type="service" id="pdg.twig.loader.filesystem"/>
-            <argument type="collection">
-                <argument key="debug">%kernel.debug%</argument>
-            </argument>
-            <call method="addExtension">
-                <argument type="service" id="pdg.twig.extension.markdown"/>
-            </call>
-            <call method="addExtension">
-                <argument type="service" id="pdg.twig.extension.markdown_extended"/>
-            </call>
-        </service>
-
         <!-- Commands -->
         <service id="pdg.command.reference" class="PhpDocumentGenerator\Command\ReferenceCommand">
             <argument type="service" id="pdg.configuration"/>
-            <argument type="service" id="pdg.twig"/>
-            <argument>%kernel.project_dir%/template/references/reference.md.twig</argument>
             <tag>console.command</tag>
         </service>
 
         <service id="pdg.command.references" class="PhpDocumentGenerator\Command\ReferencesCommand">
             <argument type="service" id="pdg.configuration"/>
-            <argument>%kernel.project_dir%/template/references/reference.md.twig</argument>
-            <tag>console.command</tag>
-        </service>
-
-        <service id="pdg.command.references_index" class="PhpDocumentGenerator\Command\ReferencesIndexCommand">
-            <argument type="service" id="pdg.configuration"/>
-            <argument type="service" id="pdg.twig"/>
-            <argument>%kernel.project_dir%/template/references/index.md.twig</argument>
-            <tag>console.command</tag>
-        </service>
-
-        <service id="pdg.command.index" class="PhpDocumentGenerator\Command\IndexCommand">
-            <argument type="service" id="pdg.configuration"/>
-            <argument type="service" id="pdg.twig"/>
-            <argument>%kernel.project_dir%/template/index.md.twig</argument>
             <tag>console.command</tag>
         </service>
 
         <service id="pdg.command.guide" class="PhpDocumentGenerator\Command\GuideCommand">
-            <argument type="service" id="pdg.twig"/>
-            <argument>%kernel.project_dir%/template/guides/guide.md.twig</argument>
             <tag>console.command</tag>
         </service>
 
         <service id="pdg.command.guides" class="PhpDocumentGenerator\Command\GuidesCommand">
             <argument type="service" id="pdg.configuration"/>
-            <argument>%kernel.project_dir%/template/guides/guide.md.twig</argument>
             <tag>console.command</tag>
         </service>
 

@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the API Platform project.
+ * This file is part of the PHP Documentation Generator project
  *
- * (c) Kévin Dunglas <dunglas@gmail.com>
+ * (c) Antoine Bluchet <soyuka@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,8 +25,7 @@ use Symfony\Component\Finder\SplFileInfo;
 final class ReferencesCommand extends AbstractReferencesCommand
 {
     public function __construct(
-        private readonly Configuration $configuration,
-        private readonly string $defaultTemplate
+        private readonly Configuration $configuration
     ) {
         parent::__construct(name: 'references');
     }
@@ -49,7 +48,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
                 name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
                 description: 'The path to the template file to use to generate each reference.',
-                default: $this->defaultTemplate
+                default: Path::normalize(__DIR__.'/../../template/references/reference.php')
             )
             ->addOption(
                 name: 'exclude',
@@ -74,6 +73,12 @@ final class ReferencesCommand extends AbstractReferencesCommand
                 mode: InputOption::VALUE_REQUIRED,
                 description: 'The PSR-4 prefix representing your source directory.',
                 default: $this->configuration->references->namespace
+            )
+            ->addOption(
+                name: 'base-url',
+                mode: InputOption::VALUE_REQUIRED,
+                description: 'The base URL for references.',
+                default: $this->configuration->references->baseUrl
             );
     }
 
@@ -82,6 +87,8 @@ final class ReferencesCommand extends AbstractReferencesCommand
         $style = new SymfonyStyle($input, $output);
         $stderr = $style->getErrorStyle();
         $template = $input->getOption('template');
+        $baseUrl = $input->getOption('base-url');
+        $namespace = $input->getOption('namespace');
 
         if (!$input->getArgument('src') || !$input->getArgument('output')) {
             $stderr->error('Specify "src" and "output" to create references.');
@@ -89,16 +96,24 @@ final class ReferencesCommand extends AbstractReferencesCommand
             return self::INVALID;
         }
 
-        $src = Path::canonicalize($input->getArgument('src'));
+        $root = Path::makeAbsolute($input->getArgument('src'), getcwd());
+        if ($excludePath = $input->getOption('exclude-path')) {
+            foreach ($excludePath as $key => $value) {
+                $excludePath[$key] = Path::makeAbsolute($value, $root);
+            }
+
+        }
+
         $out = Path::canonicalize($input->getArgument('output'));
 
         // get the output extension for a reference
-        $referenceExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
+        // TODO: add an option
+        // $referenceExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
         /** @var SplFileInfo[] */
-        $files = $this->getFiles($src, $input->getOption('namespace'), (array) $input->getOption('exclude'), (array) $input->getOption('tags-to-ignore'), (array) $input->getOption('exclude-path'));
+       $files = $this->getFiles($root, $namespace, (array) $input->getOption('exclude'), (array) $input->getOption('tags-to-ignore'), (array) $input->getOption('exclude-path'));
 
         if (!\count($files)) {
-            $stderr->warning(sprintf('No files were found in "%s".', $src));
+            $stderr->warning(sprintf('No files were found in "%s".', $root));
 
             return self::INVALID;
         }
@@ -107,8 +122,8 @@ final class ReferencesCommand extends AbstractReferencesCommand
         $progressBar?->start();
 
         foreach ($files as $file) {
-            $relativeToSrc = Path::makeRelative($file->getPath(), $this->configuration->references->src);
-            $target = Path::changeExtension(Path::join($out, $relativeToSrc, $file->getBaseName()), $referenceExtension);
+            $relativeToSrc = Path::makeRelative($file->getPath(), $root);
+            $target = Path::changeExtension(Path::join($out, $relativeToSrc, $file->getBaseName()), '.mdx');
 
             $stderr->writeln(sprintf('Processing %s => %s', $file, $target), OutputInterface::VERBOSITY_DEBUG);
 
@@ -122,8 +137,11 @@ final class ReferencesCommand extends AbstractReferencesCommand
             if (
                 self::FAILURE === $this->getApplication()?->find('reference')->run(new ArrayInput([
                     'filename' => $file->getPathName(),
+                    '--namespace' => $namespace,
                     '--template' => $template,
                     '--output' => $target,
+                    '--base-url' => $baseUrl,
+                    '--src' => $root,
                     '--quiet' => true,
                 ]), $output)
             ) {

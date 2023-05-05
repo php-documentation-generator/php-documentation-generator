@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the API Platform project.
+ * This file is part of the PHP Documentation Generator project
  *
- * (c) Kévin Dunglas <dunglas@gmail.com>
+ * (c) Antoine Bluchet <soyuka@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,6 +17,8 @@ use PhpDocumentGenerator\Kernel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 final class ReferencesIndexCommandTest extends KernelTestCase
 {
@@ -27,10 +29,14 @@ final class ReferencesIndexCommandTest extends KernelTestCase
         return Kernel::class;
     }
 
+    private function getOutputDirectory(): string
+    {
+        return Path::join(sys_get_temp_dir(), '/pdg');
+    }
+
     protected function setUp(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
-
+        @mkdir($this->getOutputDirectory(), 0755, true);
         $kernel = self::bootKernel();
         /** @var Application $application */
         $application = $kernel->getContainer()->get(Application::class);
@@ -38,30 +44,27 @@ final class ReferencesIndexCommandTest extends KernelTestCase
         $this->tester = new ApplicationTester($application);
     }
 
-    public function testItOutputsIndexInAFile(): void
+    protected function tearDown(): void
     {
-        $output = 'tests/Command/pages/references/index.md';
+        (new Filesystem())->remove($this->getOutputDirectory());
+    }
+
+    public function testItOutputsIndex(): void
+    {
+        $output = 'tests/Fixtures/output/references/index.md';
         $this->tester->run([
             'command' => 'references:index',
+            'src' => 'tests/Fixtures/src',
             '--output' => $output,
+            '--namespace' => 'PhpDocumentGenerator\Tests\Fixtures',
+            '--base-url' => '/reference',
         ]);
 
         $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
         $this->assertFileExists($output);
         $this->assertFileEquals(
-            'tests/Command/expected/references/index.md',
+            'tests/Fixtures/expected/references/index.md',
             $output
         );
-    }
-
-    public function testItOutputsIndexInCommandOutput(): void
-    {
-        $this->tester->run([
-            'command' => 'references:index',
-        ]);
-
-        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $display = preg_replace("/ {2,}\n/", "\n", preg_replace("/\n /", "\n", $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('## PhpDocumentGenerator\Tests\Command\App\Controller', $display);
     }
 }

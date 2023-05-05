@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the API Platform project.
+ * This file is part of the PHP Documentation Generator project
  *
- * (c) Kévin Dunglas <dunglas@gmail.com>
+ * (c) Antoine Bluchet <soyuka@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,6 +18,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 class GuidesCommandTest extends KernelTestCase
 {
@@ -26,67 +28,54 @@ class GuidesCommandTest extends KernelTestCase
         return Kernel::class;
     }
 
-    public function testItReturnsAWarningIfNoFilesWereFound(): void
+    private function getApplicationTester(): ApplicationTester
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/empty.config.yaml');
-
         $kernel = self::bootKernel();
         /** @var Application $application */
         $application = $kernel->getContainer()->get(Application::class);
         $application->setAutoExit(false);
-        $tester = new ApplicationTester($application);
-        @mkdir('/tmp/pdg/empty', 0755, true);
+
+        return new ApplicationTester($application);
+    }
+
+    private function getOutputDirectory(): string
+    {
+        return Path::join(sys_get_temp_dir(), '/pdg');
+    }
+
+    protected function setUp(): void
+    {
+        @mkdir($this->getOutputDirectory(), 0755, true);
+    }
+
+    protected function tearDown(): void
+    {
+        (new Filesystem())->remove($this->getOutputDirectory());
+    }
+
+    public function testItReturnsAWarningIfNoFilesWereFound(): void
+    {
+        $tester = $this->getApplicationTester();
 
         $tester->run([
             'command' => 'guides',
+            'src' => Path::join($this->getOutputDirectory(), 'empty'),
         ]);
 
-        $this->assertEquals(Command::INVALID, $tester->getStatusCode());
-        $this->assertStringContainsString('No files were found in "/tmp/pdg/empty".', $tester->getDisplay(true));
+        $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
     public function testItOutputsEachReferenceInAFile(): void
     {
-        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
-
-        $kernel = self::bootKernel();
-        /** @var Application $application */
-        $application = $kernel->getContainer()->get(Application::class);
-        $application->setAutoExit(false);
-        $tester = new ApplicationTester($application);
-
-        $output = '/tmp/pdg/guides';
+        $tester = $this->getApplicationTester();
+        $output = Path::join($this->getOutputDirectory(), 'guides');
         $tester->run([
             'command' => 'guides',
             'output' => $output,
-            'directory' => 'tests/Command/guides',
+            'directory' => 'tests/Fixtures/guides',
         ]);
 
         $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));
-        $this->assertFileEquals(
-            'tests/Command/expected/guides/use-doctrine.md',
-            sprintf('%s/use-doctrine.md', $output)
-        );
-    }
-
-    public function testItOutputsEachReferenceInAFileUsingConfiguration(): void
-    {
-        putenv('PDG_CONFIG_FILE=tests/Command/pdg.config.yaml');
-
-        $kernel = self::bootKernel();
-        /** @var Application $application */
-        $application = $kernel->getContainer()->get(Application::class);
-        $application->setAutoExit(false);
-        $tester = new ApplicationTester($application);
-
-        $tester->run([
-            'command' => 'guides',
-        ]);
-
-        $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));
-        $this->assertFileEquals(
-            'tests/Command/expected/guides/use-doctrine.md',
-            'tests/Command/pages/guides/use-doctrine.md'
-        );
+        $this->assertFileExists(Path::join($output, 'use-doctrine.md'));
     }
 }

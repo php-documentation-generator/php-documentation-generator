@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the API Platform project.
+ * This file is part of the PHP Documentation Generator project
  *
- * (c) Kévin Dunglas <dunglas@gmail.com>
+ * (c) Antoine Bluchet <soyuka@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,14 +13,13 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Twig\Environment;
+use Symfony\Component\Filesystem\Path;
 
 final class GuideCommand extends Command
 {
@@ -29,11 +28,8 @@ final class GuideCommand extends Command
     // Regular expression to match comment
     private const REGEX = '/^\s*\/\/\s/';
 
-    public function __construct(
-        Environment $environment,
-        private readonly string $defaultTemplate
-    ) {
-        $this->environment = $environment;
+    public function __construct()
+    {
         parent::__construct(name: 'guide');
     }
 
@@ -51,7 +47,7 @@ final class GuideCommand extends Command
                 name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
                 description: 'The path to the template files to use to generate the output file.',
-                default: $this->defaultTemplate
+                default: Path::normalize(__DIR__.'/../../template/guides/guide.php')
             );
     }
 
@@ -60,7 +56,7 @@ final class GuideCommand extends Command
         $style = new SymfonyStyle($input, $output);
         $stderr = $style->getErrorStyle();
 
-        $file = new SplFileInfo($input->getArgument('filename'));
+        $file = new \SplFileInfo($input->getArgument('filename'));
         if (!$file->isFile()) {
             $stderr->error(sprintf('File "%s" does not exist.', $file->getPathname()));
 
@@ -86,6 +82,7 @@ final class GuideCommand extends Command
         $headers = [];
 
         $previousLine = 'text';
+        $isPhp = false;
 
         while (($line = fgets($handle)) !== false) {
             if (!trim($line)) {
@@ -93,6 +90,7 @@ final class GuideCommand extends Command
             }
 
             if ('<?php' === trim($line)) {
+                $isPhp = true;
                 continue;
             }
 
@@ -163,10 +161,20 @@ final class GuideCommand extends Command
 
         fclose($handle);
 
-        $content = $this->environment->render(
-            $this->loadTemplate($input->getOption('template')),
-            ['headers' => $headers, 'sections' => $sections]
-        );
+        if (!$isPhp) {
+            $stderr->error(sprintf('Guide "%s" is not a PHP file.', $file->getPathname()));
+
+            return self::INVALID;
+        }
+
+        $template = include $input->getOption('template');
+        $content = $template($headers, $sections);
+
+        // Or with twig:
+        // $content = $this->environment->render(
+        //     $this->loadTemplate($input->getOption('template')),
+        //     ['headers' => $headers, 'sections' => $sections]
+        // );
 
         $out = $input->getOption('output');
         if (!$out) {

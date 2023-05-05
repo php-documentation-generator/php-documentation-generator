@@ -1,9 +1,0 @@
-{% block constant %}
-### <a href="#constant-{{ constant.name }}" id="constant-{{ constant.name }}">§</a> {{ constant.name|upper }} = `{{ constant.value|md_value }}`
-
-{% if constant.docComment|md_sanitize|raw|length > 0 %}
-
-{{ constant.docComment|md_sanitize|raw }}
-
-{% endif %}
-{% endblock %}

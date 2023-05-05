@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the API Platform project.
+ * This file is part of the PHP Documentation Generator project
  *
- * (c) Kévin Dunglas <dunglas@gmail.com>
+ * (c) Antoine Bluchet <soyuka@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Bridge\ApiPlatform\DependencyInjection\Compiler;
 
 use ApiPlatform\Util\AttributeFilterExtractorTrait;
-use ReflectionClass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -36,14 +35,14 @@ final class AttributeFilterPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         foreach (get_declared_classes() as $class) {
-            $this->createFilterDefinitions(new ReflectionClass($class), $container);
+            $this->createFilterDefinitions(new \ReflectionClass($class), $container);
         }
     }
 
     /**
      * @throws InvalidArgumentException
      */
-    private function createFilterDefinitions(ReflectionClass $resourceReflectionClass, ContainerBuilder $container): void
+    private function createFilterDefinitions(\ReflectionClass $resourceReflectionClass, ContainerBuilder $container): void
     {
         foreach ($this->readFilterAttributes($resourceReflectionClass) as $id => [$arguments, $filterClass]) {
             if ($container->has($id)) {
