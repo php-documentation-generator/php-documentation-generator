@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the API Platform project.
+ * This file is part of the PHP Documentation Generator project
  *
- * (c) Kévin Dunglas <dunglas@gmail.com>
+ * (c) Antoine Bluchet <soyuka@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -27,8 +27,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use PhpDocumentGenerator\Bridge\ApiPlatform\DependencyInjection\Compiler\AttributeFilterPass;
 use PhpDocumentGenerator\Bridge\ApiPlatform\DependencyInjection\Compiler\FilterPass;
 use PhpDocumentGenerator\Bridge\ApiPlatform\Metadata\Resource\Factory\StaticResourceNameCollectionFactory;
-use ReflectionAttribute;
-use ReflectionClass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -68,7 +66,7 @@ class Kernel extends BaseKernel
         $resources = [];
 
         foreach ($classes as $class) {
-            $refl = new ReflectionClass($class);
+            $refl = new \ReflectionClass($class);
             $ns = $refl->getNamespaceName();
             if (0 !== strpos($ns, 'App')) {
                 continue;
@@ -76,7 +74,7 @@ class Kernel extends BaseKernel
 
             $services->set($class);
 
-            if ($refl->getAttributes(ApiResource::class, ReflectionAttribute::IS_INSTANCEOF)) {
+            if ($refl->getAttributes(ApiResource::class, \ReflectionAttribute::IS_INSTANCEOF)) {
                 $resources[] = $class;
             }
         }
@@ -125,7 +123,7 @@ class Kernel extends BaseKernel
         $this->boot();
 
         foreach ($migrationClasses as $migrationClass) {
-            if ("Doctrine\Migrations\AbstractMigration" !== (new ReflectionClass($migrationClass))->getParentClass()->getName()) {
+            if ("Doctrine\Migrations\AbstractMigration" !== (new \ReflectionClass($migrationClass))->getParentClass()->getName()) {
                 continue;
             }
             $conf = new Configuration();
@@ -168,7 +166,7 @@ class Kernel extends BaseKernel
         $this->boot();
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         foreach ($fixtureClasses as $class) {
-            if ("Doctrine\Bundle\FixturesBundle\Fixture" !== (new ReflectionClass($class))->getParentClass()->getName()) {
+            if ("Doctrine\Bundle\FixturesBundle\Fixture" !== (new \ReflectionClass($class))->getParentClass()->getName()) {
                 continue;
             }
             (new $class())->load($em);

@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the API Platform project.
+ * This file is part of the PHP Documentation Generator project
  *
- * (c) Kévin Dunglas <dunglas@gmail.com>
+ * (c) Antoine Bluchet <soyuka@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Command;
 
 use PhpDocumentGenerator\Configuration;
-use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,8 +27,7 @@ use Symfony\Component\Finder\Finder;
 final class GuidesCommand extends Command
 {
     public function __construct(
-        private readonly Configuration $configuration,
-        private readonly string $defaultTemplate
+        private readonly Configuration $configuration
     ) {
         parent::__construct(name: 'guides');
     }
@@ -54,7 +52,7 @@ final class GuidesCommand extends Command
                 name: 'template',
                 mode: InputOption::VALUE_REQUIRED,
                 description: 'The path to the template file to use to generate each guide.',
-                default: $this->defaultTemplate
+                default: Path::normalize(__DIR__.'/../../template/guides/guide.php')
             );
     }
 
@@ -85,14 +83,15 @@ final class GuidesCommand extends Command
         $out = $input->getArgument('output');
 
         if (!($application = $this->getApplication())) {
-            throw new RuntimeException('No Application.');
+            throw new \RuntimeException('No Application.');
         }
 
         $guideCommand = $application->find('guide');
-        $guideExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
+        // TODO: add an option
+        // $guideExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
 
         foreach ($files as $file) {
-            $target = Path::changeExtension(Path::join($out, $file->getBaseName()), $guideExtension);
+            $target = Path::changeExtension(Path::join($out, $file->getBaseName()), '.mdx');
             $input = new ArrayInput([
                 'filename' => $file->getPathName(),
                 '--output' => $target,

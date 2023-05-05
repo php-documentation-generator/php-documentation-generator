@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the API Platform project.
+ * This file is part of the PHP Documentation Generator project
  *
- * (c) Kévin Dunglas <dunglas@gmail.com>
+ * (c) Antoine Bluchet <soyuka@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,7 +15,6 @@ namespace PhpDocumentGenerator;
 
 use PhpDocumentGenerator\Configuration\Guides;
 use PhpDocumentGenerator\Configuration\References;
-use RuntimeException;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -83,7 +82,7 @@ final class Kernel extends BaseKernel
         // First, load config file from PDG_CONFIG_FILE environment variable
         $configFile = getenv('PDG_CONFIG_FILE');
         if ($configFile && !is_file($configFile)) {
-            throw new RuntimeException(sprintf('Configuration file "%s" does not exist.', $configFile));
+            throw new \RuntimeException(sprintf('Configuration file "%s" does not exist.', $configFile));
         }
 
         // If PDG_CONFIG_FILE environment variable is not set, try to load config file from default ordered ones
@@ -127,7 +126,7 @@ final class Kernel extends BaseKernel
             // Autoload project autoloader
             $autoload = Path::join($root, $config['autoload']);
             if (!file_exists($autoload)) {
-                throw new RuntimeException(sprintf('Autoload file "%s" does not exist.', $autoload));
+                throw new \RuntimeException(sprintf('Autoload file "%s" does not exist.', $autoload));
             }
             require_once $autoload;
         }

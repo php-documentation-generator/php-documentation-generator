@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the API Platform project.
+ * This file is part of the PHP Documentation Generator project
  *
- * (c) Kévin Dunglas <dunglas@gmail.com>
+ * (c) Antoine Bluchet <soyuka@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,11 +13,7 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Tests\Fixtures\Serializer;
 
-use DateTimeInterface;
-use LogicException;
 use PhpDocumentGenerator\Tests\Fixtures\Services\IgnoredInterface;
-use RuntimeException;
-use stdClass;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException as FooBarException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
@@ -34,14 +30,14 @@ final class DateTimeDenormalizer implements DenormalizerInterface, DenormalizerA
      *
      * Also, the parent documentation should be placed in the middle of this method documentation.
      *
-     * @throws FooBarException|RuntimeException
-     * @throws LogicException
+     * @throws FooBarException|\RuntimeException
+     * @throws \LogicException
      *
-     * @return mixed                             the data
-     * @return string|stdClass|DateTimeInterface
-     * @return array<int, DateTimeInterface>
+     * @return mixed                               the data
+     * @return string|\stdClass|\DateTimeInterface
+     * @return array<int, \DateTimeInterface>
      */
-    public function denormalize($data, string $type, string $format = null, array $context = []): DateTimeInterface
+    public function denormalize($data, string $type, string $format = null, array $context = []): \DateTimeInterface
     {
         return $data;
     }

@@ -1,9 +1,9 @@
 <?php
 
 /*
- * This file is part of the API Platform project.
+ * This file is part of the PHP Documentation Generator project
  *
- * (c) Kévin Dunglas <dunglas@gmail.com>
+ * (c) Antoine Bluchet <soyuka@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use RuntimeException;
-use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
 use Twig\Environment;
 
@@ -26,7 +24,7 @@ trait CommandTrait
     {
         // check template
         if (!is_file($template)) {
-            throw new RuntimeException(sprintf('Template file "%s" does not exist.', $template));
+            throw new \RuntimeException(sprintf('Template file "%s" does not exist.', $template));
         }
 
         // load template dir in Twig
@@ -39,7 +37,7 @@ trait CommandTrait
         return pathinfo($template, \PATHINFO_BASENAME);
     }
 
-    private function getFQDNFromFile(SplFileInfo $file, string $src, string $namespace): string
+    private function getFQDNFromFile(\SplFileInfo $file, string $src, string $namespace): string
     {
         $relativeToSrc = Path::makeRelative($file->getPath(), $src);
         // Remove root path from file path
