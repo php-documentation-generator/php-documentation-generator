@@ -26,7 +26,7 @@
             <tag>console.command</tag>
         </service>
 
-        <service id="pdg.command.guide_test" class="PhpDocumentGenerator\Command\GuideTestCommand">
+        <service id="pdg.command.guide_test" class="PhpDocumentGenerator\Command\TestGuideCommand">
             <argument type="service" id="pdg.configuration"/>
             <tag>console.command</tag>
         </service>

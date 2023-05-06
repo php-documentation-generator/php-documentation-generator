@@ -1,5 +1,0 @@
-{
-  "name": "php-documentation-generator/app",
-  "description": "Application for testing purposes (composer.json needed for project dir resolving)",
-  "license": "MIT"
-}

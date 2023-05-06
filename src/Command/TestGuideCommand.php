@@ -13,20 +13,28 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use App\Kernel;
-use PhpDocumentGenerator\Playground\Command\PhpUnitCommand;
-use PhpDocumentGenerator\Playground\PlaygroundTestCase;
+use PHPUnit\Event\Facade as EventFacade;
+use PHPUnit\Framework\TestCase;
+use SebastianBergmann\Timer\Timer;
+use PHPUnit\TestRunner\TestResult\Facade as TestResultFacade;
+use PHPUnit\TextUI\Output\Facade as OutputFacade;
+use PHPUnit\Runner\ResultCache\NullResultCache;
 use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\Configuration\Builder as ConfigurationBuilder;
+use PHPUnit\TextUI\TestRunner;
+use PhpDocumentGenerator\Configuration;
+use PhpDocumentGenerator\Playground\PlaygroundTestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-final class GuideTestCommand extends Command
+final class TestGuideCommand extends Command
 {
-    public function __construct()
-    {
+    public function __construct(
+        private readonly Configuration $configuration,
+    ) {
         parent::__construct(name: 'guide:test');
     }
 
@@ -44,24 +52,37 @@ final class GuideTestCommand extends Command
         // This requires the configured autoloader
         $style = new SymfonyStyle($input, $output);
         $guide = $input->getArgument('guide');
-        $style->info('Testing guide: '.$guide);
+        $style->info('Testing guide: ' . $guide);
 
-        $suite = new TestSuite();
-
-        require $guide;
-
-        $testClasses = $this->getDeclaredClassesForNamespace('App\Tests');
-
-        foreach ($testClasses as $testClass) {
-            $suite->addTestSuite($testClass);
-        }
-        $suite->addTestSuite(PlaygroundTestCase::class);
-
-        PhpUnitCommand::setSuite($suite);
-        $_ENV['KERNEL_CLASS'] = Kernel::class;
         $_ENV['GUIDE_NAME'] = $this->getGuideName($guide);
+        $configuration = (new ConfigurationBuilder)->build([]);
+        $suite = TestSuite::fromClassReflector(new \ReflectionClass(PlaygroundTestCase::class));
+        $testClasses = $this->getDeclaredClassesForNamespace('App\Tests');
+        foreach ($testClasses as $testClass) {
+            if (is_a($testClass, TestCase::class, true)) {
+                $suite->addTestSuite(new \ReflectionClass($testClass));
+            }
+        }
 
-        return PhpUnitCommand::main(false);
+        $printer = OutputFacade::init(
+            $configuration,
+            false,
+            false
+        );
+
+        TestResultFacade::init();
+        EventFacade::instance()->seal();
+
+        $timer = new Timer;
+        $timer->start();
+        $testRunner = new TestRunner();
+        $testRunner->run($configuration, new NullResultCache(), $suite);
+        $duration = $timer->stop();
+
+        $result = TestResultFacade::result();
+        OutputFacade::printResult($result, null, $duration);
+
+        return 0;
     }
 
     /**
