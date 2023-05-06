@@ -1,0 +1,77 @@
+#!/usr/bin/env php
+<?php
+
+require_once $_SERVER['PDG_AUTOLOAD'] ?? __DIR__.'/../vendor/autoload.php';
+
+use PHPUnit\Event\Facade as EventFacade;
+use PHPUnit\Framework\TestCase;
+use SebastianBergmann\Timer\Timer;
+use PHPUnit\TestRunner\TestResult\Facade as TestResultFacade;
+use PHPUnit\TextUI\Output\Facade as OutputFacade;
+use PHPUnit\Runner\ResultCache\NullResultCache;
+use PHPUnit\Framework\TestSuite;
+use PHPUnit\TextUI\Configuration\Builder as ConfigurationBuilder;
+use PHPUnit\TextUI\TestRunner;
+use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
+use function App\Playground\request;
+
+final class PlaygroundTestCase extends ApiTestCase
+{
+    public function testGuideRequest(): void
+    {
+        if (!\function_exists('App\Playground\request')) {
+            $this->markTestSkipped('No function request defined');
+        }
+
+        $kernel = static::createKernel();
+
+        $request = request();
+        $response = $kernel->handle($request);
+        $kernel->terminate($request, $response);
+        $this->assertLessThan(500, $response->getStatusCode());
+    }
+}
+
+function getGuideName(string $guide): string
+{
+    $expl = explode('/', $guide);
+
+    return str_replace('.php', '', end($expl));
+}
+
+function getDeclaredClassesForNamespace(string $namespace): array
+{
+    return array_filter(get_declared_classes(), static function (string $class) use ($namespace): bool {
+        return str_starts_with($class, $namespace);
+    });
+}
+
+$guide = $argv[1];
+require_once $guide;
+$_ENV['GUIDE_NAME'] = getGuideName($guide);
+$configuration = (new ConfigurationBuilder)->build([]);
+$suite = TestSuite::fromClassReflector(new \ReflectionClass(PlaygroundTestCase::class));
+$testClasses = getDeclaredClassesForNamespace('App\Tests');
+foreach ($testClasses as $testClass) {
+    if (is_a($testClass, TestCase::class, true)) {
+        $suite->addTestSuite(new \ReflectionClass($testClass));
+    }
+}
+
+$printer = OutputFacade::init(
+    $configuration,
+    false,
+    false
+);
+
+TestResultFacade::init();
+EventFacade::instance()->seal();
+
+$timer = new Timer;
+$timer->start();
+$testRunner = new TestRunner();
+$testRunner->run($configuration, new NullResultCache(), $suite);
+$duration = $timer->stop();
+
+$result = TestResultFacade::result();
+OutputFacade::printResult($result, null, $duration);
