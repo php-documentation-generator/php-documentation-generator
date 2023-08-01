@@ -39,7 +39,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: composer:v2, php-cs-fixer, phpstan, phpdoc
+          tools: composer, php-cs-fixer, phpstan
           coverage: none
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -67,10 +67,10 @@ jobs:
           restore-keys: phpstan-
       - name: Run PHPStan tests
         if: ${{ !cancelled() }}
-        run: phpstan analyze src tests
+        run: phpstan analyze
       - name: Run PHPUnit tests
         if: ${{ !cancelled() }}
-        run: vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml
+        run: vendor/bin/phpunit
       - name: Upload test artifacts
         uses: actions/upload-artifact@v3
         with:
