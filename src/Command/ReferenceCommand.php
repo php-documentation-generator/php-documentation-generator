@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace PhpDocumentGenerator\Command;
 
 use PhpDocumentGenerator\Configuration;
-use PhpDocumentGenerator\Reflection\ReflectionClass;
 use PhpDocumentGenerator\Link\LinkContext;
+use PhpDocumentGenerator\Reflection\ReflectionClass;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\YamlReferenceDumper;
 use Symfony\Component\Console\Command\Command;
@@ -96,7 +96,7 @@ final class ReferenceCommand extends Command
             }
 
             $out = $input->getOption('output');
-$mdx = <<<MDX
+            $mdx = <<<MDX
 ---
 type: Class
 ---
@@ -114,11 +114,12 @@ MDX;
 
         $template = include $input->getOption('template');
         $content = $template($reflectionClass);
-        return $this->output($content, $style, $input);
 
+        return $this->output($content, $style, $input);
     }
 
-    private function output(string $content, SymfonyStyle $style, InputInterface $input): int {
+    private function output(string $content, SymfonyStyle $style, InputInterface $input): int
+    {
         $out = $input->getOption('output');
         if (!$out) {
             $style->write($content);

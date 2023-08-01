@@ -11,19 +11,18 @@
 
 namespace PhpDocumentGenerator\Reflection;
 
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PhpDocumentGenerator\Link\LinkContext;
 use PhpDocumentGenerator\Link\LinkInterface;
 use PhpDocumentGenerator\Link\LinkTrait;
 use PhpDocumentGenerator\Link\PhpStanLinkTypeHelper;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use Symfony\Component\PropertyInfo\PhpStan\NameScopeFactory;
 
 class ReflectionMethod extends \ReflectionMethod implements LinkInterface
 {
-    use ReflectionTypeSeparatorTrait;
-    use PhpDocTrait;
     use LinkTrait;
+    use PhpDocTrait;
+    use ReflectionTypeSeparatorTrait;
     public readonly string $visibility;
     private $phpStanLinkTypeHelper;
 
@@ -61,11 +60,11 @@ class ReflectionMethod extends \ReflectionMethod implements LinkInterface
         if (!$this->getDocComment()) {
             return null;
         }
-        
+
         $declaringClass = $this->getDeclaringClass();
-        foreach($this->getPhpDoc($this->getDocComment()) as $node) {
+        foreach ($this->getPhpDoc($this->getDocComment()) as $node) {
             foreach ($node as $t) {
-                if(!$t instanceof PhpDocTextNode) {
+                if (!$t instanceof PhpDocTextNode) {
                     continue;
                 }
 
@@ -74,7 +73,7 @@ class ReflectionMethod extends \ReflectionMethod implements LinkInterface
                     continue;
                 }
 
-                foreach($declaringClass->getInterfaces() as $i) {
+                foreach ($declaringClass->getInterfaces() as $i) {
                     if ($i->hasMethod($this->getName()) && $m = $i->getMethod($this->getName())) {
                         $text .= $m->getDescription();
                     }
@@ -113,7 +112,8 @@ class ReflectionMethod extends \ReflectionMethod implements LinkInterface
         return [];
     }
 
-    public function getReturnTypeSeparator(): string {
+    public function getReturnTypeSeparator(): string
+    {
         return $this->getReflectionTypeSeparator($this->getReturnType());
     }
 

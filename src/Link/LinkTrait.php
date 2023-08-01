@@ -11,17 +11,16 @@
 
 namespace PhpDocumentGenerator\Link;
 
-use PhpDocumentGenerator\Link\LinkContext;
-
 /**
  * Code adapted from https://github.com/symfony/property-info/blob/6.2/Extractor/ReflectionExtractor.php
- * (c) Fabien Potencier <fabien@symfony.com>
+ * (c) Fabien Potencier <fabien@symfony.com>.
  */
 trait LinkTrait
 {
     private LinkContext $linkContext;
 
-    public function getLinkContext(): LinkContext {
+    public function getLinkContext(): LinkContext
+    {
         return $this->linkContext;
     }
 

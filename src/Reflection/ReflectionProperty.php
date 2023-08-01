@@ -1,21 +1,31 @@
 <?php
 
+/*
+ * This file is part of the PHP Documentation Generator project
+ *
+ * (c) Antoine Bluchet <soyuka@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace PhpDocumentGenerator\Reflection;
 
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PhpDocumentGenerator\Link\LinkContext;
 use PhpDocumentGenerator\Link\LinkTrait;
 use PhpDocumentGenerator\Link\PhpStanLinkTypeHelper;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use Symfony\Component\PropertyInfo\PhpStan\NameScopeFactory;
 
 class ReflectionProperty extends \ReflectionProperty
 {
-    use ReflectionTypeSeparatorTrait;
     use LinkTrait;
     use PhpDocTrait;
+    use ReflectionTypeSeparatorTrait;
     private $phpStanLinkTypeHelper;
 
-    public function __construct(object|string $class, string $property, LinkContext $linkContext) {
+    public function __construct(object|string $class, string $property, LinkContext $linkContext)
+    {
         parent::__construct($class, $property);
         $this->linkContext = $linkContext;
         $this->phpStanLinkTypeHelper = new PhpStanLinkTypeHelper($linkContext);
@@ -28,10 +38,10 @@ class ReflectionProperty extends \ReflectionProperty
         }
 
         $text = '';
-        foreach($this->getPhpDoc($this->getDocComment()) as $node) {
+        foreach ($this->getPhpDoc($this->getDocComment()) as $node) {
             foreach ($node as $t) {
-                if($t instanceof PhpDocTextNode) {
-                    $text .= $t->text . PHP_EOL;
+                if ($t instanceof PhpDocTextNode) {
+                    $text .= $t->text.\PHP_EOL;
                 }
             }
         }
@@ -72,12 +82,14 @@ class ReflectionProperty extends \ReflectionProperty
     }
 
     // TODO: fix link for methods
-    public function getLink(): ?string {
+    public function getLink(): ?string
+    {
         return 'link prop';
         // return $this->getDeclaringClass()->getLink() . '#' . $this->name;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->getName();
     }
 }

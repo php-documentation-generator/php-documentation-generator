@@ -11,18 +11,18 @@
 
 namespace PhpDocumentGenerator\Reflection;
 
+use PhpDocumentGenerator\Link\LinkContext;
 use PhpDocumentGenerator\Link\LinkInterface;
 use PhpDocumentGenerator\Link\LinkTrait;
 use PhpDocumentGenerator\Link\LinkType;
 use PhpDocumentGenerator\Link\PhpStanLinkTypeHelper;
-use PhpDocumentGenerator\Link\LinkContext;
 use Symfony\Component\PropertyInfo\PhpStan\NameScopeFactory;
 
 class ReflectionParameter extends \ReflectionParameter implements LinkInterface
 {
-    use ReflectionTypeSeparatorTrait;
     use LinkTrait;
     use PhpDocTrait;
+    use ReflectionTypeSeparatorTrait;
     private $phpStanLinkTypeHelper;
 
     public function __construct(string|array|object $function, int|string $param, LinkContext $linkContext)
@@ -37,11 +37,13 @@ class ReflectionParameter extends \ReflectionParameter implements LinkInterface
         return parent::getType();
     }
 
-    public function getTypeSeparator(): string {
+    public function getTypeSeparator(): string
+    {
         return $this->getReflectionTypeSeparator($this->getType());
     }
 
-    public function getDescription(): string {
+    public function getDescription(): string
+    {
         $docComment = $this->getDeclaringFunction()->getDocComment();
 
         if (!$docComment) {
@@ -98,11 +100,18 @@ class ReflectionParameter extends \ReflectionParameter implements LinkInterface
     }
 
     // TODO: fix link for methods
-    public function getLink(): ?string {
-        return $this->getDeclaringClass()->getLink() . '#' . $this->name;
+    public function getLink(): ?string
+    {
+        return $this->getDeclaringClass()->getLink().'#'.$this->name;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->getName();
+    }
+
+    public function getDocComment()
+    {
+        return $this->getDeclaringFunction()->getDocComment();
     }
 }

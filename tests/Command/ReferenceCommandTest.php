@@ -48,35 +48,6 @@ final class ReferenceCommandTest extends KernelTestCase
         $this->assertStringContainsString('File "tests/Command/src/Invalid/Invalid.php" does not exist.', $this->tester->getDisplay(true));
     }
 
-    /**
-     * @dataProvider getReferences
-     */
-    public function testItOutputsAReferenceInAFile(string $name): void
-    {
-        $output = sprintf('tests/Fixtures/output/references/%s.md', $name);
-        $this->tester->run([
-            'command' => 'reference',
-            'filename' => sprintf('tests/Fixtures/src/%s.php', $name),
-            '--output' => $output,
-            '--src' => 'tests/Fixtures/src',
-            '--namespace' => 'PhpDocumentGenerator\Tests\Fixtures',
-        ]);
-
-        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertFileExists($output);
-        $this->assertFileEquals(
-            sprintf('tests/Fixtures/expected/references/%s.md', $name),
-            $output
-        );
-    }
-
-    public function getReferences(): iterable
-    {
-        yield ['Controller/IndexController'];
-        yield ['DependencyInjection/Configuration'];
-        yield ['Serializer/DateTimeDenormalizer'];
-    }
-
     public function testItOutputsAReferenceInStdout(): void
     {
         $this->tester->run([

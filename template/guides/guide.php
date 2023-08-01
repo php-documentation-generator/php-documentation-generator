@@ -13,14 +13,14 @@ return static function (array $headers, array $sections): string {
     $t = '';
     $t .= implode('', $headers);
     foreach ($sections as $i => $section) {
-        $t .= '<SectionGuide id="section-'.$i.'">' . \PHP_EOL;
+        $t .= '<SectionGuide id="section-'.$i.'">'.\PHP_EOL;
         $t .= implode('', $section['text']).\PHP_EOL;
         if ($section['code'] ?? null) {
             $t .= '```php'.\PHP_EOL;
             $t .= implode('', $section['code']).\PHP_EOL;
             $t .= '```'.\PHP_EOL;
         }
-        $t .= '</SectionGuide>'.PHP_EOL;
+        $t .= '</SectionGuide>'.\PHP_EOL;
     }
 
     return $t;

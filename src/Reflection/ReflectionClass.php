@@ -13,18 +13,17 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Reflection;
 
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
-use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use PhpDocumentGenerator\Link\LinkContext;
 use PhpDocumentGenerator\Link\LinkInterface;
 use PhpDocumentGenerator\Link\LinkTrait;
+use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTextNode;
 use ReflectionClass as GlobalReflectionClass;
 use Symfony\Component\Filesystem\Path;
 
 final class ReflectionClass extends \ReflectionClass implements LinkInterface
 {
-    use PhpDocTrait;
     use LinkTrait;
+    use PhpDocTrait;
     public readonly string $type;
     public readonly string $builtinType;
 
@@ -40,7 +39,7 @@ final class ReflectionClass extends \ReflectionClass implements LinkInterface
     {
         $interfaces = [];
         foreach (parent::getInterfaces() as $i) {
-            $interfaces[] = new ReflectionClass($i->getName(), $this->linkContext);
+            $interfaces[] = new self($i->getName(), $this->linkContext);
         }
 
         return $interfaces;
@@ -55,7 +54,7 @@ final class ReflectionClass extends \ReflectionClass implements LinkInterface
         return null;
     }
 
-    public function getMethods(?int $filter = null): array
+    public function getMethods(int $filter = null): array
     {
         $methods = [];
         foreach (parent::getMethods($filter) as $method) {
@@ -65,11 +64,11 @@ final class ReflectionClass extends \ReflectionClass implements LinkInterface
         return $methods;
     }
 
-    public function getProperties(?int $filter = null): array
+    public function getProperties(int $filter = null): array
     {
         $properties = [];
         $class = $this->getName();
-        foreach(parent::getProperties($filter) as $property) {
+        foreach (parent::getProperties($filter) as $property) {
             $properties[] = new ReflectionProperty($class, $property->name, $this->linkContext);
         }
 
@@ -105,9 +104,9 @@ final class ReflectionClass extends \ReflectionClass implements LinkInterface
         }
 
         $text = [];
-        foreach($this->getPhpDoc($this->getDocComment()) as $node) {
+        foreach ($this->getPhpDoc($this->getDocComment()) as $node) {
             foreach ($node as $t) {
-                if(!$t instanceof PhpDocTextNode) {
+                if (!$t instanceof PhpDocTextNode) {
                     continue;
                 }
 
@@ -120,10 +119,11 @@ final class ReflectionClass extends \ReflectionClass implements LinkInterface
             }
         }
 
-        return implode(PHP_EOL, $text);
+        return implode(\PHP_EOL, $text);
     }
 
-    public function getDeclaringClass(): \ReflectionClass {
+    public function getDeclaringClass(): GlobalReflectionClass
+    {
         return $this;
     }
 
@@ -134,8 +134,7 @@ final class ReflectionClass extends \ReflectionClass implements LinkInterface
             return false;
         }
 
-        return new ReflectionClass($t->getName(), $this->linkContext);
-        
+        return new self($t->getName(), $this->linkContext);
     }
 
     public function getClassType(): ReflectionClassType
@@ -159,7 +158,8 @@ final class ReflectionClass extends \ReflectionClass implements LinkInterface
         return ReflectionClassType::ClassType;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return $this->getName();
     }
 }

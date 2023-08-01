@@ -11,11 +11,11 @@
 
 namespace PhpDocumentGenerator\Reflection;
 
+use PhpDocumentGenerator\Link\LinkInterface;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Lexer\Lexer;
 use PHPStan\PhpDocParser\Parser;
-use PhpDocumentGenerator\Link\LinkInterface;
 
 trait PhpDocTrait
 {
@@ -42,15 +42,16 @@ trait PhpDocTrait
 
         preg_match_all('|{@see ([^}]+)}|', $text, $matches);
 
-        foreach($matches[0] ?? [] as $key => $match) {
+        foreach ($matches[0] ?? [] as $key => $match) {
             $text = str_replace($match, $this->transformToLink($matches[1][$key]), $text);
         }
 
         return $text;
     }
 
-    private function transformToLink(string $v, bool $linkInterface = false): string|LinkInterface {
-        if (class_exists($cl = $this->getDeclaringClass()->getNamespaceName() . '\\' . $v)) {
+    private function transformToLink(string $v, bool $linkInterface = false): string|LinkInterface
+    {
+        if (class_exists($cl = $this->getDeclaringClass()->getNamespaceName().'\\'.$v)) {
             $v = $cl;
         }
 
@@ -60,7 +61,7 @@ trait PhpDocTrait
                 return $c;
             }
 
-            if(!$c->getLink()) {
+            if (!$c->getLink()) {
                 return (string) $c;
             }
 
@@ -70,17 +71,17 @@ trait PhpDocTrait
         if (strpos($v, '::')) {
             [$class, $method] = explode('::', $v);
 
-            if (class_exists($cl = $this->getDeclaringClass()->getNamespaceName() . '\\' . $class)) {
+            if (class_exists($cl = $this->getDeclaringClass()->getNamespaceName().'\\'.$class)) {
                 $class = $cl;
             }
 
             if (class_exists($class)) {
-                $c =  new ReflectionMethod($class, $method, $this->linkContext);
+                $c = new ReflectionMethod($class, $method, $this->linkContext);
                 if ($linkInterface) {
                     return $c;
                 }
 
-                if(!$c->getLink()) {
+                if (!$c->getLink()) {
                     return (string) $c;
                 }
 
@@ -90,12 +91,17 @@ trait PhpDocTrait
 
         if ($linkInterface) {
             return new class($v) implements LinkInterface {
-                public function __construct(private string $v) {}
-                public function getLink(): ?string {
+                public function __construct(private string $v)
+                {
+                }
+
+                public function getLink(): ?string
+                {
                     return $this->v;
                 }
 
-                public function __toString() {
+                public function __toString()
+                {
                     return $this->v;
                 }
             };
@@ -104,6 +110,9 @@ trait PhpDocTrait
         return (string) $v;
     }
 
+    /**
+     * @return string[]
+     */
     public function getSeeAlso(): array
     {
         if (!$this->getDocComment()) {
@@ -111,9 +120,9 @@ trait PhpDocTrait
         }
 
         $seeAlso = [];
-        foreach($this->getPhpDoc($this->getDocComment()) as $node) {
+        foreach ($this->getPhpDoc($this->getDocComment()) as $node) {
             foreach ($node as $t) {
-                if(!$t instanceof PhpDocTagNode || $t->name !== '@see') {
+                if (!$t instanceof PhpDocTagNode || '@see' !== $t->name) {
                     continue;
                 }
 

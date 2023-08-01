@@ -101,7 +101,6 @@ final class ReferencesCommand extends AbstractReferencesCommand
             foreach ($excludePath as $key => $value) {
                 $excludePath[$key] = Path::makeAbsolute($value, $root);
             }
-
         }
 
         $out = Path::canonicalize($input->getArgument('output'));
@@ -110,7 +109,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
         // TODO: add an option
         // $referenceExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
         /** @var SplFileInfo[] */
-       $files = $this->getFiles($root, $namespace, (array) $input->getOption('exclude'), (array) $input->getOption('tags-to-ignore'), (array) $input->getOption('exclude-path'));
+        $files = $this->getFiles($root, $namespace, (array) $input->getOption('exclude'), (array) $input->getOption('tags-to-ignore'), (array) $input->getOption('exclude-path'));
 
         if (!\count($files)) {
             $stderr->warning(sprintf('No files were found in "%s".', $root));
