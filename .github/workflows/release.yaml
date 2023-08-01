@@ -17,7 +17,7 @@ jobs:
           git config --global user.name github-actions
       - name: Cocogitto release
         id: release
-        uses: oknozor/cocogitto-action@v3.4
+        uses: oknozor/cocogitto-action@v3.5
         with:
           release: true
           git-user: 'github-actions'
