@@ -46,8 +46,7 @@
     },
     "autoload": {
         "psr-4": {
-            "PhpDocumentGenerator\\": "src/",
-            "App\\": "tests/Fixtures/app/src/"
+            "PhpDocumentGenerator\\": "src/"
         }
     },
     "autoload-dev": {
@@ -56,7 +55,7 @@
             "PhpDocumentGenerator\\Tests\\Fixtures\\": "tests/Fixtures/src/"
         }
     },
-    "bin": ["bin/pdg"],
+    "bin": ["bin/pdg", "bin/pdg-phpunit"],
     "config": {
         "allow-plugins": {
             "symfony/runtime": true

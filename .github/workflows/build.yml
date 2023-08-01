@@ -35,17 +35,24 @@ jobs:
         run: composer global require humbug/box
       - name: Run Box Project
         run: box compile
+      - name: Run Box Phpunit Project
+        run: box compile -c box-phpunit.json.dist
       - name: Upload phar artifact
         uses: actions/upload-artifact@v3
         with:
           name: pdg.phar
           path: bin/pdg.phar
+      - name: Upload phar artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: pdg-phpunit.phar
+          path: bin/pdg-phpunit.phar
       - name: Create release if necessary, and upload phar to it
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ github.token }}
-          file: bin/pdg.phar
-          asset_name: pdg.phar
+          file: bin/*.phar
+          file_glob: true
           tag: ${{ github.ref_name }}
           release_name: ${{ github.ref_name }}
           overwrite: false
