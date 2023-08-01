@@ -5,6 +5,7 @@ var
 .phpunit.result.cache
 bin/.phpunit.result.cache
 bin/pdg.phar
+bin/pdg-phpunit.phar
 
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
@@ -12,3 +13,6 @@ bin/pdg.phar
 .phpstan
 
 tests/Fixtures/output/
+
+.phive
+tools/

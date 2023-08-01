@@ -46,7 +46,12 @@ function getDeclaredClassesForNamespace(string $namespace): array
     });
 }
 
-$guide = $argv[1];
+$guide = $argv[1] ?? null;
+
+if (!$guide) {
+    throw new \RuntimeException('No guide to test. Usage: "pdg-phpunit guide.php"');
+}
+
 require_once $guide;
 $_ENV['GUIDE_NAME'] = getGuideName($guide);
 $configuration = (new ConfigurationBuilder)->build([]);
