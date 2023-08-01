@@ -52,8 +52,6 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
       - name: Update project dependencies
         run: composer update --no-progress --ansi --prefer-stable
-      - name: Install PHPUnit
-        run: vendor/bin/simple-phpunit --version
       - name: Run php-cs-fixer tests
         if: ${{ !cancelled() }}
         env:
@@ -72,7 +70,7 @@ jobs:
         run: phpstan analyze src tests
       - name: Run PHPUnit tests
         if: ${{ !cancelled() }}
-        run: vendor/bin/simple-phpunit --coverage-clover build/logs/phpunit/clover.xml
+        run: vendor/bin/phpunit --coverage-clover build/logs/phpunit/clover.xml
       - name: Upload test artifacts
         uses: actions/upload-artifact@v3
         with:
