@@ -29,7 +29,8 @@
         "dama/doctrine-test-bundle": "^7.1",
         "justinrainbow/json-schema": "^5.2",
         "zenstruck/foundry": "^1.27",
-        "twig/twig": "^3.5"
+        "twig/twig": "^3.5",
+        "phpstan/phpstan": "^1.10"
     },
     "require-dev": {
         "symfony/dom-crawler": "^6.2",

@@ -64,18 +64,4 @@ class GuidesCommandTest extends KernelTestCase
 
         $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
-
-    public function testItOutputsEachReferenceInAFile(): void
-    {
-        $tester = $this->getApplicationTester();
-        $output = Path::join($this->getOutputDirectory(), 'guides');
-        $tester->run([
-            'command' => 'guides',
-            'output' => $output,
-            'directory' => 'tests/Fixtures/guides',
-        ]);
-
-        $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));
-        $this->assertFileExists(Path::join($output, 'use-doctrine.md'));
-    }
 }

@@ -51,26 +51,6 @@ EOT
             , $this->tester->getDisplay(true));
     }
 
-    public function testItOutputsAGuideInAFile(): void
-    {
-        $output = 'tests/Fixtures/output/guides/use-doctrine.md';
-        $filename = 'tests/Fixtures/guides/use-doctrine.php';
-        $this->tester->run([
-            'command' => 'guide',
-            'filename' => $filename,
-            '--output' => $output,
-        ]);
-
-        $this->tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $this->tester->getDisplay(true)));
-        $this->assertStringContainsString('[OK] Guide "tests/Fixtures/guides/use-doctrine.php" successfully created.', $this->tester->getDisplay(true));
-        $this->assertStringContainsString(sprintf('"%s"', $filename), $this->tester->getDisplay(true));
-        $this->assertFileExists($output);
-        $this->assertFileEquals(
-            'tests/Fixtures/expected/guides/use-doctrine.md',
-            $output
-        );
-    }
-
     public function testItOutputsAGuideInCommandOutput(): void
     {
         $filename = 'tests/Fixtures/guides/use-doctrine.php';

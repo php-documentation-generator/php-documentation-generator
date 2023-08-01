@@ -37,7 +37,9 @@ use Symfony\Component\PropertyInfo\PhpStan\NameScope;
  */
 final class PhpStanLinkTypeHelper
 {
-    public function __construct(private readonly LinkContext $linkContext) {}
+    public function __construct(private readonly LinkContext $linkContext)
+    {
+    }
 
     /**
      * Creates a {@see LinkType} from a PhpDocTagValueNode type.

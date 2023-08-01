@@ -297,7 +297,7 @@ MDX;
         'Class' => $classTemplate($c),
         'Trait' => $classTemplate($c),
         'Interface' => $classTemplate($c),
-        default => throw new RuntimeException('Unsupported ' . $c->type)
+        default => throw new RuntimeException('Unsupported '.$c->type)
     };
 
     return $mdx;

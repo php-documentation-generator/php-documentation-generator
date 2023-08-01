@@ -13,7 +13,6 @@ namespace PhpDocumentGenerator\Link;
 
 use PhpDocumentGenerator\Reflection\ReflectionClass;
 
-
 /**
  * Type value object (immutable).
  *
@@ -79,9 +78,9 @@ final class LinkType implements LinkInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(string $builtinType, bool $nullable = false, string $class = null, bool $collection = false, array|LinkType $collectionKeyType = null, array|LinkType $collectionValueType = null, ?LinkContext $linkContext = null)
+    public function __construct(string $builtinType, bool $nullable = false, string $class = null, bool $collection = false, array|self $collectionKeyType = null, array|self $collectionValueType = null, LinkContext $linkContext = null)
     {
-        if (!\in_array($builtinType, self::$builtinTypes)) {
+        if (!\in_array($builtinType, self::$builtinTypes, true)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not a valid PHP type.', $builtinType));
         }
 
@@ -94,7 +93,7 @@ final class LinkType implements LinkInterface
         $this->linkContext = $linkContext;
     }
 
-    private function validateCollectionArgument(array|LinkType|null $collectionArgument, int $argumentIndex, string $argumentName): ?array
+    private function validateCollectionArgument(array|self|null $collectionArgument, int $argumentIndex, string $argumentName): ?array
     {
         if (null === $collectionArgument) {
             return null;
@@ -184,7 +183,8 @@ final class LinkType implements LinkInterface
         return null;
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         if ($this->class) {
             $str = $this->class;
             if ($this->collection) {

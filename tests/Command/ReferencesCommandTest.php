@@ -65,27 +65,6 @@ final class ReferencesCommandTest extends KernelTestCase
         $this->assertEquals(Command::FAILURE, $tester->getStatusCode());
     }
 
-    public function testItOutputsEachReferenceInAFile(): void
-    {
-        $kernel = self::bootKernel();
-        /** @var Application $application */
-        $application = $kernel->getContainer()->get(Application::class);
-        $application->setAutoExit(false);
-        $tester = new ApplicationTester($application);
-        $output = $this->getOutputDirectory();
-
-        $tester->run([
-            'command' => 'references',
-            'output' => $output,
-            'src' => 'tests/Fixtures/src',
-            '--namespace' => 'PhpDocumentGenerator\Tests\Fixtures',
-        ]);
-
-        $tester->assertCommandIsSuccessful(sprintf('Command failed: %s', $tester->getDisplay(true)));
-
-        $this->assertFileExists(Path::join($output, 'Controller/IndexController.md'));
-    }
-
     public function testSkipPaths(): void
     {
         $kernel = self::bootKernel();

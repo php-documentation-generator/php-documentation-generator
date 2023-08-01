@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace PhpDocumentGenerator\Command;
 
-use PhpDocumentGenerator\Reflection\ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -22,7 +21,7 @@ abstract class AbstractReferencesCommand extends Command
 {
     use CommandTrait;
 
-    public function __construct(?string $name = null)
+    public function __construct(string $name = null)
     {
         parent::__construct($name);
     }
