@@ -55,13 +55,15 @@ if (!$guide) {
 require_once $guide;
 $_ENV['GUIDE_NAME'] = getGuideName($guide);
 $configuration = (new ConfigurationBuilder)->build([]);
-$suite = TestSuite::fromClassReflector(new \ReflectionClass(PlaygroundTestCase::class));
+$suite = TestSuite::empty($guide);
 $testClasses = getDeclaredClassesForNamespace('App\Tests');
 foreach ($testClasses as $testClass) {
     if (is_a($testClass, TestCase::class, true)) {
         $suite->addTestSuite(new \ReflectionClass($testClass));
     }
 }
+
+$suite->addTestSuite(new \ReflectionClass(PlaygroundTestCase::class));
 
 $printer = OutputFacade::init(
     $configuration,
@@ -80,3 +82,6 @@ $duration = $timer->stop();
 
 $result = TestResultFacade::result();
 OutputFacade::printResult($result, null, $duration);
+if ($result->hasTestFailedEvents()) {
+    exit(1);
+}
