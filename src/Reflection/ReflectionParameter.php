@@ -102,7 +102,7 @@ class ReflectionParameter extends \ReflectionParameter implements LinkInterface
     // TODO: fix link for methods
     public function getLink(): ?string
     {
-        return $this->getDeclaringClass()->getLink().'#'.$this->name;
+        return $this->getDeclaringClass()->getLink().'#'.strtolower($this->name);
     }
 
     public function __toString()

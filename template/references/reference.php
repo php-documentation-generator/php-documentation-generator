@@ -37,14 +37,14 @@ if (!function_exists('mdLink')) {
 }
 
 if (!function_exists('typesToString')) {
-    function typesToString(array $types, string $separator = '|'): array
+    function typesToString(array $types, string $separator = '|', bool $inCode = false): array
     {
         $strTypes = [];
 
         foreach ($types as $type) {
             if ($type->isCollection() && $type->getCollectionKeyTypes()) {
-                $values = $type->getCollectionValueTypes() ? ', '.implode(\PHP_EOL, typesToString($type->getCollectionValueTypes(), $separator)) : '';
-                $strTypes[] = sprintf('array&lt;%s%s&gt;', implode(\PHP_EOL, typesToString($type->getCollectionKeyTypes(), $separator)), $values);
+                $values = $type->getCollectionValueTypes() ? ', '.implode(\PHP_EOL, typesToString($type->getCollectionValueTypes(), $separator)) : ', mixed';
+                $strTypes[] = sprintf('array%s%s%s%s', $inCode ? '<' : '&lt;', implode(\PHP_EOL, typesToString($type->getCollectionKeyTypes(), $separator)), $values, $inCode ? '>' : '&gt;');
                 continue;
             }
 
@@ -61,7 +61,7 @@ if (!function_exists('getMethodParameters')) {
         $parameters = [];
         foreach ($method->getParameters() as $parameter) {
             $separator = $parameter->getTypeSeparator();
-            $types = typesToString($parameter->getTypes(), $separator);
+            $types = typesToString($parameter->getTypes(), $separator, inCode: true);
             $prefix = $parameter->getType()?->allowsNull() ? 'null'.$separator : '';
             $parameters[] = sprintf('%s$%s', $types ? $prefix.implode($separator, $types).' ' : '', $parameter->name);
         }

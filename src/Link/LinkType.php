@@ -173,7 +173,7 @@ final class LinkType implements LinkInterface
         }
 
         if ($this->class) {
-            if ($this->isLocal($this->class) && class_exists($this->class)) {
+            if ($this->isLocal($this->class) && (class_exists($this->class) || interface_exists($this->class))) {
                 return (new ReflectionClass($this->class, $this->linkContext))->getLink();
             }
 

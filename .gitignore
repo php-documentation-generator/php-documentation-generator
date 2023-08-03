@@ -3,7 +3,7 @@ vendor
 var
 
 .phpunit.result.cache
-bin/.phpunit.result.cache
+.phpunit.cache
 bin/pdg.phar
 bin/pdg-phpunit.phar
 

@@ -4,11 +4,11 @@
 use PhpDocumentGenerator\Kernel;
 use Symfony\Component\Console\Application;
 
+require_once __DIR__.'/../vendor/autoload.php';
+
 if (isset($_SERVER['PDG_AUTOLOAD'])) {
     require_once $_SERVER['PDG_AUTOLOAD'];
 }
-
-require_once __DIR__.'/../vendor/autoload.php';
 
 $app = function (array $context) {
     $kernel = new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);

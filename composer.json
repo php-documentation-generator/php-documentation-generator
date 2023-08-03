@@ -10,7 +10,6 @@
     "require": {
         "php": ">=8.1",
         "phpunit/phpunit": "^10",
-        "api-platform/core": "^3.1",
         "nelmio/cors-bundle": "^2.2",
         "doctrine/doctrine-bundle": "^2.8",
         "doctrine/orm": "^2.14",

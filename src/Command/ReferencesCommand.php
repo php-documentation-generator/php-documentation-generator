@@ -35,14 +35,14 @@ final class ReferencesCommand extends AbstractReferencesCommand
         $this
             ->setDescription('Creates references documentation for PHP classes')
             ->addArgument(
-                name: 'output',
-                description: 'The path where the references will be printed.',
-                default: $this->configuration->references->output
-            )
-            ->addArgument(
                 name: 'src',
                 description: 'The source directory',
                 default: $this->configuration->references->src
+            )
+            ->addArgument(
+                name: 'output',
+                description: 'The path where the references will be printed.',
+                default: $this->configuration->references->output
             )
             ->addOption(
                 name: 'template',

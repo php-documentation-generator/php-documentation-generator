@@ -2,7 +2,10 @@
   "chmod": "0700",
   "force-autodiscovery": true,
   "files": [
-    "config/services.xml"
+    "config/services.xml",
+    "template/guides/guide.php",
+    "template/references/interface.php",
+    "template/references/reference.php"
   ],
   "compactors": [
     "KevinGH\\Box\\Compactor\\Php"
