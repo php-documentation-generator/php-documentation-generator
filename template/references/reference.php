@@ -43,8 +43,8 @@ if (!function_exists('typesToString')) {
 
         foreach ($types as $type) {
             if ($type->isCollection() && $type->getCollectionKeyTypes()) {
-                $values = $type->getCollectionValueTypes() ? ', '.implode(\PHP_EOL, typesToString($type->getCollectionValueTypes(), $separator)) : ', mixed';
-                $strTypes[] = sprintf('array%s%s%s%s', $inCode ? '<' : '&lt;', implode(\PHP_EOL, typesToString($type->getCollectionKeyTypes(), $separator)), $values, $inCode ? '>' : '&gt;');
+                $values = $type->getCollectionValueTypes() ? ', '.implode($inCode ? $separator : \PHP_EOL, typesToString($type->getCollectionValueTypes(), $separator, $inCode)) : ', mixed';
+                $strTypes[] = sprintf('array%s%s%s%s', $inCode ? '<' : '&lt;', implode($inCode ? $separator : \PHP_EOL, typesToString($type->getCollectionKeyTypes(), $separator, $inCode)), $values, $inCode ? '>' : '&gt;');
                 continue;
             }
 
@@ -211,7 +211,7 @@ $classTemplate = static function (ReflectionClass $c) {
     $s = $c->builtinType.' '.$c->name;
 
     if ($c->getParentClass()) {
-        $s .= ' extends '.$c->getParentClass()->name;
+        $s .= ' extends '.href($c->getParentClass());
     }
 
     if ($c->getInterfaces()) {
