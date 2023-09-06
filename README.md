@@ -68,3 +68,16 @@ Find also a programmatic usage on [API Platform's website](https://github.com/ap
 ## Notes
 
 This tool is not ready to be customized or used as-is and you'll need to code to adapt to your needs. The code architecture is based on extending Reflection with advanced types (read from php documentation) and Linking support. Feel free to reuse this nice basis to help with your documentation. Templates are written in old-school, hard to read PHP and only output MDX as needed for API Platform. We don't guarantee any backward compatibility release yet.
+
+## Compile phar
+
+There are 2 binaries, pdg and pdg-phpunit:
+
+```
+./tools/box compile
+gpg -u soyuka@pm.me --detach-sign --output bin/pdg.phar.asc bin/pdg.phar
+./tools/box compile -c box-phpunit.json.dist
+gpg -u soyuka@pm.me --detach-sign --output bin/pdg-phpunit.phar.asc bin/pdg-phpunit.phar
+```
+
+These need optimization imo.
