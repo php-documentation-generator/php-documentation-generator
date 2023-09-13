@@ -82,6 +82,6 @@ $duration = $timer->stop();
 
 $result = TestResultFacade::result();
 OutputFacade::printResult($result, null, $duration);
-if ($result->hasTestFailedEvents()) {
+if ($result->hasTestFailedEvents() || $result->hasTestErroredEvents()) {
     exit(1);
 }
