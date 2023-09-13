@@ -23,7 +23,11 @@ final class PlaygroundTestCase extends ApiTestCase
             $this->markTestSkipped('No function request defined');
         }
 
-        $kernel = static::createKernel();
+        $guide = basename($_SERVER['argv'][1], '.php');
+
+        static::$class ??= static::getKernelClass();
+        $guide = basename($_SERVER['argv'][1], '.php');
+        $kernel = new static::$class('test', true, $guide);
 
         $request = request();
         $response = $kernel->handle($request);
