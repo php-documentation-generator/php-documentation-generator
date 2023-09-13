@@ -23,24 +23,12 @@ final class PlaygroundTestCase extends ApiTestCase
             $this->markTestSkipped('No function request defined');
         }
 
-        $guide = basename($_SERVER['argv'][1], '.php');
-
-        static::$class ??= static::getKernelClass();
-        $guide = basename($_SERVER['argv'][1], '.php');
-        $kernel = new static::$class('test', true, $guide);
-
+        $kernel = static::createKernel();
         $request = request();
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
         $this->assertLessThan(500, $response->getStatusCode());
     }
-}
-
-function getGuideName(string $guide): string
-{
-    $expl = explode('/', $guide);
-
-    return str_replace('.php', '', end($expl));
 }
 
 function getDeclaredClassesForNamespace(string $namespace): array
@@ -57,7 +45,7 @@ if (!$guide) {
 }
 
 require_once $guide;
-$_ENV['GUIDE_NAME'] = getGuideName($guide);
+$_ENV['APP_GUIDE'] = basename($guide, '.php');
 $configuration = (new ConfigurationBuilder)->build([]);
 $suite = TestSuite::empty($guide);
 $testClasses = getDeclaredClassesForNamespace('App\Tests');
