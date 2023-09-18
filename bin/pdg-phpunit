@@ -24,6 +24,8 @@ final class PlaygroundTestCase extends ApiTestCase
         }
 
         $kernel = static::createKernel();
+        $kernel->executeMigrations();
+        $kernel->loadFixtures();
         $request = request();
         $response = $kernel->handle($request);
         $kernel->terminate($request, $response);
