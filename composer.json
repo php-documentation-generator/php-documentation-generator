@@ -25,7 +25,7 @@
         "symfony/css-selector": "^6.2",
         "symfony/property-info": "^6.2",
         "symfony/http-client": "^6.2",
-        "symfony/yaml": "^6.2",
+        "symfony/yaml": "^6.3",
         "dama/doctrine-test-bundle": "^7.1",
         "justinrainbow/json-schema": "^5.2",
         "zenstruck/foundry": "^1.27",
