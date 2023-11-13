@@ -97,9 +97,10 @@ final class ReferenceCommand extends Command
 
             $out = $input->getOption('output');
             $mdx = <<<MDX
----
-type: Class
----
+===
+type: reference
+php-type: Class
+===
 
 # Configuration
 

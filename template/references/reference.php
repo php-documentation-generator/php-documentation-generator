@@ -284,7 +284,8 @@ MDX;
 return static function (ReflectionClass $c) use ($attributeTemplate, $classTemplate): string {
     $mdx = <<<MDX
 ---
-type: {$c->type}
+type: reference
+php-type: {$c->type}
 ---
 
 # [{$c->name}]({$c->getLink()})

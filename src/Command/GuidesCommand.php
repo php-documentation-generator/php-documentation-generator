@@ -91,7 +91,7 @@ final class GuidesCommand extends Command
         // $guideExtension = Path::getExtension(preg_replace('/\.twig$/i', '', $template));
 
         foreach ($files as $file) {
-            $target = Path::changeExtension(Path::join($out, $file->getBaseName()), '.mdx');
+            $target = Path::changeExtension(Path::join($out, $file->getBaseName()), '.md');
             $input = new ArrayInput([
                 'filename' => $file->getPathName(),
                 '--output' => $target,

@@ -122,7 +122,7 @@ final class ReferencesCommand extends AbstractReferencesCommand
 
         foreach ($files as $file) {
             $relativeToSrc = Path::makeRelative($file->getPath(), $root);
-            $target = Path::changeExtension(Path::join($out, $relativeToSrc, $file->getBaseName()), '.mdx');
+            $target = Path::changeExtension(Path::join($out, $relativeToSrc, $file->getBaseName()), '.md');
 
             $stderr->writeln(sprintf('Processing %s => %s', $file, $target), OutputInterface::VERBOSITY_DEBUG);
 
