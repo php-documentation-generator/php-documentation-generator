@@ -26,6 +26,8 @@ return static function (array $headers, array $sections): string {
         $t .= $header;
     }
 
+    $t .= 'type: guides' . PHP_EOL;
+
     $s = [];
     foreach ($sections as $i => $section) {
         $temp = [];
