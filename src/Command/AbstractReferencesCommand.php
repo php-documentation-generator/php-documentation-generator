@@ -35,6 +35,10 @@ abstract class AbstractReferencesCommand extends Command
         foreach ($this->findFiles($src, $exclude, $excludePath) as $file) {
             $className = $this->getFQDNFromFile($file, $src, $namespace);
 
+            if (!class_exists($className)) {
+                continue;
+            }
+
             if ($doc = (new \ReflectionClass($className))->getDocComment()) {
                 // Class has tags to ignore or should be excluded
                 foreach ($tagsToIgnore as $tagToIgnore) {
